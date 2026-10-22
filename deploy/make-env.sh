@@ -1,15 +1,15 @@
 #!/bin/sh
-# สร้างไฟล์ .env สำหรับ production บน VPS
-# วิธีใช้: sh make-env.sh ghcr.io/<username>/<repo>
+# à¸ªà¸£à¹‰à¸²à¸‡à¹„à¸Ÿà¸¥à¹Œ .env à¸ªà¸³à¸«à¸£à¸±à¸š production à¸šà¸™ VPS
+# à¸§à¸´à¸˜à¸µà¹ƒà¸Šà¹‰: sh make-env.sh ghcr.io/<username>/<repo>
 set -e
 
 if [ -z "$1" ]; then
-  echo "วิธีใช้: sh make-env.sh ghcr.io/<username>/<repo>"
+  echo "à¸§à¸´à¸˜à¸µà¹ƒà¸Šà¹‰: sh make-env.sh ghcr.io/<username>/<repo>"
   exit 1
 fi
 
 if [ -f .env ]; then
-  echo "มีไฟล์ .env อยู่แล้ว — ไม่เขียนทับ (ถ้าต้องการสร้างใหม่ ให้ลบ .env ก่อน)"
+  echo "à¸¡à¸µà¹„à¸Ÿà¸¥à¹Œ .env à¸­à¸¢à¸¹à¹ˆà¹à¸¥à¹‰à¸§ â€” à¹„à¸¡à¹ˆà¹€à¸‚à¸µà¸¢à¸™à¸—à¸±à¸š (à¸–à¹‰à¸²à¸•à¹‰à¸­à¸‡à¸à¸²à¸£à¸ªà¸£à¹‰à¸²à¸‡à¹ƒà¸«à¸¡à¹ˆ à¹ƒà¸«à¹‰à¸¥à¸š .env à¸à¹ˆà¸­à¸™)"
   exit 1
 fi
 
@@ -23,4 +23,4 @@ SLIPOK_BRANCH_ID=77947
 EOF
 
 chmod 600 .env
-echo "สร้าง .env แล้ว (image: $IMAGE)"
+echo "à¸ªà¸£à¹‰à¸²à¸‡ .env à¹à¸¥à¹‰à¸§ (image: $IMAGE)"
