@@ -484,9 +484,9 @@ export default function AdminPaymentsPage() {
 
       {/* Printable Receipt Modal for Admin */}
       {selectedBillForReceipt && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-slate-900 rounded-3xl max-w-xl w-full p-8 space-y-6 shadow-2xl border border-slate-800 my-8 text-white">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto print:bg-white print:p-0">
+          <div className="bg-slate-900 rounded-3xl max-w-xl w-full p-8 space-y-6 shadow-2xl border border-slate-800 my-8 text-white print:bg-white print:border-none print:shadow-none print:p-0 print:my-0 print:text-black">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4 print:hidden">
               <div className="flex items-center gap-2 text-sky-400 font-black text-lg">
                 <ShieldCheck className="w-6 h-6" />
                 ใบเสร็จรับเงินคลินิก (Official Receipt)
@@ -496,45 +496,45 @@ export default function AdminPaymentsPage() {
               </button>
             </div>
 
-            <div className="space-y-5 text-xs text-slate-300 border border-slate-800 p-6 rounded-2xl bg-slate-950 shadow-inner">
-              <div className="flex justify-between items-start border-b border-slate-800 pb-4">
+            <div className="receipt-print-area space-y-5 text-xs text-black border border-black p-6 rounded-2xl bg-white shadow-inner">
+              <div className="flex justify-between items-start border-b border-black pb-4 text-black">
                 <div>
-                  <h3 className="font-extrabold text-white text-base">VetCare Animal Clinic</h3>
-                  <p className="text-slate-400">123 ถนนสุขุมวิท 71 แขวงพระโขนงเหนือ เขตวัฒนา กทม. 10110</p>
-                  <p className="text-slate-400">เลขประจำตัวผู้เสียภาษี: 0105565012345 &bull; โทร 02-999-8888</p>
+                  <h3 className="font-extrabold text-black text-base">VetCare Animal Clinic</h3>
+                  <p className="text-black">123 ถนนสุขุมวิท 71 แขวงพระโขนงเหนือ เขตวัฒนา กทม. 10110</p>
+                  <p className="text-black">เลขประจำตัวผู้เสียภาษี: 0105565012345 &bull; โทร 02-999-8888</p>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-sky-400 text-sm font-mono">{selectedBillForReceipt.receiptNumber}</div>
-                  <div className="text-[11px] text-slate-500">วันที่: {selectedBillForReceipt.paidAt || '2026-08-24'}</div>
+                <div className="text-right text-black">
+                  <div className="font-bold text-black text-sm font-mono">{selectedBillForReceipt.receiptNumber}</div>
+                  <div className="text-[11px] text-black">วันที่: {selectedBillForReceipt.paidAt || '2026-08-24'}</div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-900 p-3.5 rounded-xl border border-slate-800">
-                <div>ลูกค้า: <strong className="text-white">{users.find((u) => u.id === selectedBillForReceipt.ownerId)?.name}</strong></div>
-                <div>สัตว์เลี้ยง: <strong className="text-white">{pets.find((p) => p.id === selectedBillForReceipt.petId)?.name}</strong></div>
-                <div>สถานะ: <strong className="text-emerald-400 font-bold">ชำระเงินเรียบร้อยแล้ว</strong></div>
-                <div>เจ้าหน้าที่ผู้อนุมัติ: <strong className="text-white">Admin Officer</strong></div>
+              <div className="grid grid-cols-2 gap-2 text-[11px] bg-white p-3.5 rounded-xl border border-black text-black">
+                <div className="text-black">ลูกค้า: <strong className="text-black">{users.find((u) => u.id === selectedBillForReceipt.ownerId)?.name}</strong></div>
+                <div className="text-black">สัตว์เลี้ยง: <strong className="text-black">{pets.find((p) => p.id === selectedBillForReceipt.petId)?.name}</strong></div>
+                <div className="text-black">สถานะ: <strong className="text-black font-bold">ชำระเงินเรียบร้อยแล้ว</strong></div>
+                <div className="text-black">เจ้าหน้าที่ผู้อนุมัติ: <strong className="text-black">Admin Officer</strong></div>
               </div>
 
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-xs text-black">
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-400">
-                    <th className="pb-2">รายการ</th>
-                    <th className="pb-2 text-right">จำนวนเงิน</th>
+                  <tr className="border-b border-black text-black">
+                    <th className="pb-2 text-black font-bold">รายการ</th>
+                    <th className="pb-2 text-right text-black font-bold">จำนวนเงิน</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-black/30 text-black">
                   {treatments
                     .find((t) => t.id === selectedBillForReceipt.treatmentRecordId)
                     ?.prescriptions.map((rx, i) => (
-                      <tr key={i} className="py-2">
-                        <td className="py-2 text-slate-300">{rx.name} ({rx.quantity} {rx.unit})</td>
-                        <td className="py-2 text-right font-mono text-white">{formatCurrency(rx.totalPrice)}</td>
+                      <tr key={i} className="py-2 text-black">
+                        <td className="py-2 text-black">{rx.name} ({rx.quantity} {rx.unit})</td>
+                        <td className="py-2 text-right font-mono text-black">{formatCurrency(rx.totalPrice)}</td>
                       </tr>
                     ))}
-                  <tr>
-                    <td className="py-2 text-slate-300">ค่าบริการตรวจรักษาทางการแพทย์</td>
-                    <td className="py-2 text-right font-mono text-white">
+                  <tr className="text-black">
+                    <td className="py-2 text-black">ค่าบริการตรวจรักษาทางการแพทย์</td>
+                    <td className="py-2 text-right font-mono text-black">
                       {formatCurrency(
                         treatments.find((t) => t.id === selectedBillForReceipt.treatmentRecordId)?.serviceFee || 0
                       )}
@@ -542,9 +542,9 @@ export default function AdminPaymentsPage() {
                   </tr>
                 </tbody>
                 <tfoot>
-                  <tr className="border-t-2 border-slate-700 font-bold text-sm">
-                    <td className="pt-3 text-white">ยอดรวมทั้งสิ้น (Net Total):</td>
-                    <td className="pt-3 text-right font-mono text-sky-400 font-black">
+                  <tr className="border-t-2 border-black font-bold text-sm text-black">
+                    <td className="pt-3 text-black">ยอดรวมทั้งสิ้น (Net Total):</td>
+                    <td className="pt-3 text-right font-mono text-black font-black">
                       {formatCurrency(selectedBillForReceipt.totalAmount)}
                     </td>
                   </tr>
@@ -552,7 +552,7 @@ export default function AdminPaymentsPage() {
               </table>
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex justify-end gap-3 pt-2 print:hidden">
               <button
                 onClick={() => window.print()}
                 className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-sky-500/20 transition cursor-pointer"

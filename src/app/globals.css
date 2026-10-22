@@ -56,3 +56,17 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   background: #38bdf8;
 }
 
+/* Print Styles for Receipts / Slips */
+@media print {
+  body,
+  .receipt-print-area,
+  .receipt-print-area * {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+
