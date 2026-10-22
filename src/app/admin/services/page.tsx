@@ -25,8 +25,8 @@ export default function AdminServicesAndMedsPage() {
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
   const [srvName, setSrvName] = useState('');
   const [srvCategory, setSrvCategory] = useState<ServiceItem['category']>('checkup');
-  const [srvPrice, setSrvPrice] = useState<number>(300);
-  const [srvTime, setSrvTime] = useState<number>(20);
+  const [srvPrice, setSrvPrice] = useState<string | number>(300);
+  const [srvTime, setSrvTime] = useState<string | number>(20);
   const [srvDesc, setSrvDesc] = useState('');
   const [srvPopular, setSrvPopular] = useState(false);
 
@@ -37,8 +37,8 @@ export default function AdminServicesAndMedsPage() {
   const [medName, setMedName] = useState('');
   const [medCategory, setMedCategory] = useState<MedicineItem['category']>('antibiotic');
   const [medUnit, setMedUnit] = useState('เม็ด');
-  const [medUnitPrice, setMedUnitPrice] = useState<number>(25);
-  const [medStock, setMedStock] = useState<number>(100);
+  const [medUnitPrice, setMedUnitPrice] = useState<string | number>(25);
+  const [medStock, setMedStock] = useState<string | number>(100);
   const [medInstructions, setMedInstructions] = useState('');
 
   // Service Handlers
@@ -371,8 +371,10 @@ export default function AdminServicesAndMedsPage() {
                   <input
                     type="number"
                     required
+                    min="0"
+                    placeholder="0"
                     value={srvPrice}
-                    onChange={(e) => setSrvPrice(Number(e.target.value))}
+                    onChange={(e) => setSrvPrice(e.target.value.replace(/^0+(?=\d)/, ''))}
                     className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white font-mono focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                   />
                 </div>
@@ -382,8 +384,10 @@ export default function AdminServicesAndMedsPage() {
                 <label className="block font-bold text-slate-300 mb-1">เวลาตรวจโดยประมาณ (นาที)</label>
                 <input
                   type="number"
+                  min="1"
+                  placeholder="20"
                   value={srvTime}
-                  onChange={(e) => setSrvTime(Number(e.target.value))}
+                  onChange={(e) => setSrvTime(e.target.value.replace(/^0+(?=\d)/, ''))}
                   className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                 />
               </div>
@@ -480,8 +484,10 @@ export default function AdminServicesAndMedsPage() {
                   <input
                     type="number"
                     required
+                    min="0"
+                    placeholder="0"
                     value={medUnitPrice}
-                    onChange={(e) => setMedUnitPrice(Number(e.target.value))}
+                    onChange={(e) => setMedUnitPrice(e.target.value.replace(/^0+(?=\d)/, ''))}
                     className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white font-mono focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
@@ -490,8 +496,10 @@ export default function AdminServicesAndMedsPage() {
                   <input
                     type="number"
                     required
+                    min="0"
+                    placeholder="0"
                     value={medStock}
-                    onChange={(e) => setMedStock(Number(e.target.value))}
+                    onChange={(e) => setMedStock(e.target.value.replace(/^0+(?=\d)/, ''))}
                     className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-sky-500"
                   />
                 </div>

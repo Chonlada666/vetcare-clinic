@@ -35,14 +35,14 @@ export default function ClinicalEMRPage() {
   // Past medical records for this pet
   const pastTreatments = treatments.filter((t) => t.petId === pet?.id);
 
-  // Form State - default serviceFee set to 200
+  // Form State
   const [symptoms, setSymptoms] = useState(appointment?.initialSymptoms || '');
-  const [serviceFee, setServiceFee] = useState<number>(200);
+  const [serviceFee, setServiceFee] = useState<string>('200');
   const [prescriptions, setPrescriptions] = useState<PrescribedMedicine[]>([]);
 
   // Medicine adder state
   const [selectedMedId, setSelectedMedId] = useState<string>(medicines[0]?.id || '');
-  const [medQuantity, setMedQuantity] = useState<number>(1);
+  const [medQuantity, setMedQuantity] = useState<string>('1');
   const [medInstruction, setMedInstruction] = useState<string>(medicines[0]?.instructions || '');
 
   // Follow-up state
@@ -133,7 +133,7 @@ export default function ClinicalEMRPage() {
       return [...prev, newItem];
     });
 
-    setMedQuantity(1);
+    setMedQuantity('1');
   };
 
   const handleRemoveMedicine = (index: number) => {
@@ -455,8 +455,15 @@ export default function ClinicalEMRPage() {
                       type="number"
                       min="1"
                       max={selectedBaseAvailable || 999}
+                      placeholder="1"
                       value={medQuantity}
-                      onChange={(e) => setMedQuantity(Math.max(1, Number(e.target.value)))}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/^0+/, '');
+                        setMedQuantity(raw);
+                      }}
+                      onBlur={() => {
+                        if (!medQuantity || Number(medQuantity) < 1) setMedQuantity('1');
+                      }}
                       className="w-full px-3 py-2 rounded-xl border border-slate-700 text-xs font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                     />
                   </div>
@@ -583,8 +590,12 @@ export default function ClinicalEMRPage() {
                     <input
                       type="number"
                       min="0"
+                      placeholder="0"
                       value={serviceFee}
-                      onChange={(e) => setServiceFee(Number(e.target.value))}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/^0+(?=\d)/, '');
+                        setServiceFee(raw);
+                      }}
                       className="w-32 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-mono font-bold text-sm focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                     />
                   </div>
