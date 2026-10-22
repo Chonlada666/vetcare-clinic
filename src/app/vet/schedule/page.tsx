@@ -167,6 +167,11 @@ export default function VetSchedulePage() {
             <input
               type="date"
               value={selectedDate}
+              onClick={(e) => {
+                try {
+                  e.currentTarget.showPicker();
+                } catch {}
+              }}
               onChange={(e) => setSelectedDate(e.target.value)}
               className="w-full px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 [color-scheme:dark] cursor-pointer"
             />

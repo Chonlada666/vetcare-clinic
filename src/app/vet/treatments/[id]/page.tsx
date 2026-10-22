@@ -562,6 +562,11 @@ export default function ClinicalEMRPage() {
                       value={followUpDate}
                       min={new Date().toISOString().split('T')[0]}
                       onKeyDown={(e) => e.preventDefault()}
+                      onClick={(e) => {
+                        try {
+                          e.currentTarget.showPicker();
+                        } catch {}
+                      }}
                       onChange={(e) => setFollowUpDate(e.target.value)}
                       className="w-full px-3 py-2 rounded-xl border border-slate-700 text-xs font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 [color-scheme:dark] cursor-pointer"
                     />

@@ -35,10 +35,10 @@ input[type="time"] {
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
   opacity: 0 !important;
-  width: 24px;
-  height: 24px;
+  pointer-events: none !important;
+  width: 20px;
+  height: 20px;
 }
 
 /* Custom Sleek Dark Scrollbar */
