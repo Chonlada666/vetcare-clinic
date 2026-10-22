@@ -306,91 +306,50 @@ export default function OwnerDashboardPage() {
                   : 'opacity-0 translate-x-full z-0 pointer-events-none'
               }`}
             >
-              {/* Slide Background Image */}
+              {/* Full-Width Wide Background Image */}
               <div className="absolute inset-0 z-0">
                 <img
                   src={slideItem.bgImage}
                   alt={slideItem.leftLogo.title}
-                  className="w-full h-full object-cover object-center opacity-30"
+                  className="w-full h-full object-cover object-center"
                 />
-                {/* Edge-to-edge dark fades */}
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-slate-950/90" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40" />
+                {/* Subtle right-side gradient so wide image is clear and right-side text is legible */}
+                <div className="absolute inset-0 bg-gradient-to-l from-slate-950/85 via-slate-950/35 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
               </div>
 
-              {/* Slide 3-Column Content Layout (Left Logo / Center Artwork / Right Offer) */}
-              <div className="relative z-10 w-full px-8 sm:px-16 lg:px-24 py-8 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
-                {/* Left Column: Stylized Title Graphic */}
-                <div className="w-full lg:w-4/12 text-left space-y-2 z-10">
-                  <span className="text-[10px] sm:text-xs font-black tracking-widest text-sky-400 uppercase block">
+              {/* Right-Only Content Layout */}
+              <div className="relative z-10 w-full max-w-7xl mx-auto px-12 sm:px-20 lg:px-24 py-8 flex items-center justify-end">
+                <div className="w-full max-w-lg text-right space-y-3 z-10">
+                  <span className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-sky-300 uppercase block drop-shadow">
                     {slideItem.leftLogo.sub}
                   </span>
-                  <div className="space-y-0">
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-lg">
-                      {slideItem.leftLogo.title}
-                    </h2>
-                    <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-sky-400 tracking-tight leading-tight drop-shadow-md">
-                      {slideItem.leftLogo.titleHighlight}
-                    </div>
-                  </div>
-                  <div className="pt-2 text-[10px] text-slate-400 font-medium">
-                    *เงื่อนไขเป็นไปตามที่คลินิกฯ กำหนด
-                  </div>
-                </div>
 
-                {/* Center Column: Dramatic Focus Visual */}
-                <div className="hidden md:flex lg:w-4/12 justify-center items-center">
-                  <div className="relative w-48 sm:w-64 h-64 sm:h-80 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/20 transform hover:scale-105 transition duration-500">
-                    <img
-                      src={slideItem.centerPetImage}
-                      alt="Clinic Focus"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-3 left-0 right-0 text-center">
-                      <span className="px-3 py-1 bg-sky-600/90 text-white rounded-full text-[10px] font-bold backdrop-blur-xs">
-                        VETCARE EXCELLENCE
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight drop-shadow-lg">
+                    {slideItem.leftLogo.title}{' '}
+                    <span className="text-sky-300">{slideItem.leftLogo.titleHighlight}</span>
+                  </h2>
 
-                {/* Right Column: Promotional Highlight (Clean Text Without White Background) */}
-                <div className="w-full lg:w-4/12 text-center lg:text-right space-y-2.5 z-10">
-                  {/* Big Headline in Sky Blue */}
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-sky-400 tracking-tight leading-none drop-shadow-md">
-                    {slideItem.highlightPrice}
+                  <div className="text-lg sm:text-2xl font-semibold text-white drop-shadow">
+                    {slideItem.highlightPrice}{' '}
+                    <span className="text-sm sm:text-base font-normal text-slate-200">
+                      ({slideItem.priceSub})
+                    </span>
                   </div>
 
-                  {/* Subhead line */}
-                  <div className="text-base sm:text-xl font-black text-white tracking-tight leading-tight">
-                    {slideItem.priceSub}
-                  </div>
+                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed drop-shadow">
+                    {slideItem.systemText} {slideItem.systemBadge} &bull; {slideItem.ribbonText}
+                  </p>
 
-                  {/* System line with colored Badge */}
-                  <div className="text-lg sm:text-2xl font-black text-white tracking-tight flex items-center justify-center lg:justify-end gap-2 flex-wrap">
-                    <span>{slideItem.systemText}</span>
-                    <span className="text-sky-400 font-black tracking-widest">{slideItem.systemBadge}</span>
-                  </div>
+                  <p className="text-[11px] text-slate-300/90 font-light">
+                    {slideItem.disclaimer1}
+                  </p>
 
-                  {/* Clean Transparent Text (No White Box Background) */}
-                  <div className="text-xs sm:text-sm text-sky-200 font-bold my-1 flex items-center justify-center lg:justify-end gap-1.5 leading-relaxed">
-                    <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                    <span>{slideItem.ribbonText}</span>
-                  </div>
-
-                  {/* Small Disclaimer */}
-                  <div className="space-y-0.5 text-[10px] text-slate-300 font-light">
-                    <p>{slideItem.disclaimer1}</p>
-                    <p className="text-slate-400">{slideItem.disclaimer2}</p>
-                  </div>
-
-                  {/* Direct Action Button in Sky Blue */}
-                  <div className="pt-2 flex justify-center lg:justify-end">
+                  <div className="pt-2 flex justify-end">
                     <button
                       type="button"
                       onClick={() => router.push(`/owner/booking?serviceId=${slideItem.serviceId}`)}
-                      className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-lg shadow-sky-500/25 transition transform hover:-translate-y-0.5 cursor-pointer"
+                      className="inline-flex items-center gap-2 bg-white/95 hover:bg-white text-slate-950 font-bold text-xs sm:text-sm px-6 py-2.5 rounded-md shadow-lg transition cursor-pointer"
                     >
                       <span>จองคิวตรวจโปรแกรมนี้</span>
                       <ChevronRight className="w-4 h-4" />
