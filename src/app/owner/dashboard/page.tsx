@@ -456,86 +456,84 @@ export default function OwnerDashboardPage() {
 
       {/* ================= MAIN OWNER CONTENT WRAPPER ================= */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 py-10">
-        {/* Modern Welcome Greeting & Quick Profile Stats in Royal Theme */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-sky-900/60">
-          <div className="space-y-2 z-10 max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-sky-500/20 text-sky-300 px-3.5 py-1 rounded-full text-xs font-bold border border-sky-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>ยินดีต้อนรับสู่ระบบดูแลสัตว์เลี้ยง</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              สวัสดี, {currentUser?.name || 'เจ้าของสัตว์เลี้ยง'}
+        {/* Clean Corporate-Style Welcome & Stats Section */}
+        <section className="py-6 sm:py-10 text-center space-y-8 border-b border-slate-800/80">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <h1 className="text-2xl sm:text-3xl font-light tracking-[0.18em] text-slate-200 uppercase leading-relaxed">
+              VETCARE ANIMAL CLINIC
+              <span className="block text-xl sm:text-2xl font-semibold tracking-normal text-white mt-1">
+                สวัสดีคุณ {currentUser?.name || 'เจ้าของสัตว์เลี้ยง'}
+              </span>
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm font-normal leading-relaxed">
-              คุณมีสัตว์เลี้ยงลงทะเบียน <strong className="text-sky-400 font-bold">{myPets.length} ตัว</strong> และมีนัดหมายตรวจที่กำลังจะมาถึง <strong className="text-sky-400 font-bold">{nextAppointment ? 1 : 0} รายการ</strong>
+            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto">
+              คลินิกรักษาสัตว์และดูแลสุขภาพสัตว์เลี้ยงครบวงจรด้วยมาตรฐานการแพทย์สมัยใหม่
+              <br />
+              ขณะนี้คุณมีสัตว์เลี้ยงในระบบ {myPets.length} ตัว และมีนัดหมายที่กำลังจะมาถึง {nextAppointment ? 1 : 0} รายการ
             </p>
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <a
+                href="/owner/booking"
+                className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs sm:text-sm rounded-md transition cursor-pointer"
+              >
+                จองคิวนัดหมายใหม่
+              </a>
+              <a
+                href="/owner/pets"
+                className="px-6 py-2.5 bg-transparent hover:bg-slate-800 text-slate-200 font-semibold text-xs sm:text-sm rounded-md border border-slate-700 transition cursor-pointer"
+              >
+                จัดการสัตว์เลี้ยง
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 z-10">
-            <a
-              href="/owner/booking"
-              className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition transform hover:-translate-y-0.5 text-xs sm:text-sm cursor-pointer"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>จองคิวนัดหมายใหม่</span>
-            </a>
+          {/* 3-Column Minimal Stats with Vertical Dividers */}
+          <div className="max-w-4xl mx-auto pt-4 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-700">
             <a
               href="/owner/pets"
-              className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl border border-slate-700 transition text-xs sm:text-sm cursor-pointer"
+              className="py-4 sm:py-2 px-6 flex flex-col items-center justify-center space-y-1.5 hover:opacity-80 transition"
             >
-              <PawPrint className="w-4 h-4 text-sky-400" />
-              <span>จัดการสัตว์เลี้ยง</span>
+              <span className="text-xs sm:text-sm font-bold text-sky-400 tracking-wide">
+                สัตว์เลี้ยงของฉัน
+              </span>
+              <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+                {myPets.length}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-slate-300">
+                ตัว
+              </span>
+            </a>
+
+            <a
+              href="/owner/appointments"
+              className="py-4 sm:py-2 px-6 flex flex-col items-center justify-center space-y-1.5 hover:opacity-80 transition"
+            >
+              <span className="text-xs sm:text-sm font-bold text-sky-400 tracking-wide">
+                ประวัตินัดหมายทั้งหมด
+              </span>
+              <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+                {myAppointments.length}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-slate-300">
+                ครั้ง
+              </span>
+            </a>
+
+            <a
+              href="/owner/billing"
+              className="py-4 sm:py-2 px-6 flex flex-col items-center justify-center space-y-1.5 hover:opacity-80 transition"
+            >
+              <span className="text-xs sm:text-sm font-bold text-sky-400 tracking-wide">
+                ยอดรอชำระ / รอตรวจ
+              </span>
+              <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+                {pendingBills.length}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-slate-300">
+                รายการ
+              </span>
             </a>
           </div>
-        </div>
-
-        {/* Stats Overview Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <a
-            href="/owner/pets"
-            className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md hover:border-sky-500 transition flex items-center gap-4 group"
-          >
-            <div className="w-14 h-14 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-105 transition">
-              <PawPrint className="w-7 h-7" />
-            </div>
-            <div>
-              <div className="text-xs text-slate-400 font-bold">สัตว์เลี้ยงของฉัน</div>
-              <div className="text-2xl font-black text-white mt-0.5">
-                {myPets.length} <span className="text-xs font-semibold text-slate-400">ตัว</span>
-              </div>
-            </div>
-          </a>
-
-          <a
-            href="/owner/appointments"
-            className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md hover:border-sky-500 transition flex items-center gap-4 group"
-          >
-            <div className="w-14 h-14 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-105 transition">
-              <Calendar className="w-7 h-7" />
-            </div>
-            <div>
-              <div className="text-xs text-slate-400 font-bold">ประวัตินัดหมายทั้งหมด</div>
-              <div className="text-2xl font-black text-white mt-0.5">
-                {myAppointments.length} <span className="text-xs font-semibold text-slate-400">ครั้ง</span>
-              </div>
-            </div>
-          </a>
-
-          <a
-            href="/owner/billing"
-            className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md hover:border-sky-500 transition flex items-center gap-4 group"
-          >
-            <div className="w-14 h-14 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-105 transition">
-              <CreditCard className="w-7 h-7" />
-            </div>
-            <div>
-              <div className="text-xs text-slate-400 font-bold">ยอดรอชำระ / รอตรวจ</div>
-              <div className="text-2xl font-black text-amber-400 mt-0.5">
-                {pendingBills.length} <span className="text-xs font-semibold text-slate-400">รายการ</span>
-              </div>
-            </div>
-          </a>
-        </div>
+        </section>
 
         {/* Main Grid: Upcoming Appointment & My Pets */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
