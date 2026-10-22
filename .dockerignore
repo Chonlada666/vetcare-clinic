@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.github
+*.log
+*.pdf
+.env
+.env.*
+!.env.example

@@ -1,0 +1,15 @@
+# docker-compose.yml — ใช้ได้ทั้งในเครื่องและบน VPS
+services:
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_APP_VERSION: ${NEXT_PUBLIC_APP_VERSION:-dev}
+    image: ${APP_IMAGE:-vetcare-app:local}
+    restart: unless-stopped
+    environment:
+      SLIPOK_API_KEY: ${SLIPOK_API_KEY:-SLIPOKFA1GXI2}
+      SLIPOK_BRANCH_ID: ${SLIPOK_BRANCH_ID:-77947}
+    ports:
+      - "${APP_PORT:-3300}:3000"

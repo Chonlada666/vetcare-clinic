@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased font-sans;
+  }
+}
+
+/* Date & Time Picker Dark Mode Icon Visibility */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  padding: 2px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1 !important;
+  filter: brightness(0) invert(1) drop-shadow(0 0 2px rgba(56, 189, 248, 0.8)) !important;
+  transform: scale(1.1);
+}
+
+/* Custom Sleek Dark Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
+}
+
