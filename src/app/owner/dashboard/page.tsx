@@ -42,8 +42,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*เพิ่ม 50 บาท จากราคาตรวจสุขภาพปกติทุกสายพันธุ์ | ผลตรวจบันทึกออนไลน์ทันที',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_1',
-    bgImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1600&q=80',
-    centerPetImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80',
+    bgImage: '/banner-premier-dog.jpg',
+    centerPetImage: '/banner-premier-dog.jpg',
   },
   {
     id: 2,
@@ -132,8 +132,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*มีตารางสัตวแพทย์เวร Exotic Pets ออกตรวจประจำทุกสัปดาห์',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_6',
-    bgImage: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?auto=format&fit=crop&w=1600&q=80',
-    centerPetImage: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=800&q=80',
+    bgImage: '/banner-exotic-rabbit.jpg',
+    centerPetImage: '/banner-exotic-rabbit.jpg',
   },
 ];
 
