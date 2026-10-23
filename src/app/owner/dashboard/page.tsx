@@ -494,181 +494,220 @@ export default function OwnerDashboardPage() {
           </div>
         </section>
 
-        {/* Main Grid: Upcoming Appointment & My Pets */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column (2 Cols): Next Appointment & Pending Bills */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Next Upcoming Appointment */}
-            <div className="bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-800 shadow-md space-y-5">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-sky-400" />
-                  <span>นัดหมายที่กำลังจะมาถึง</span>
-                </h2>
-                <a href="/owner/appointments" className="text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1">
-                  <span>ดูทั้งหมด ({myAppointments.length})</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
+        {/* ================= CORPORATE 2-COLUMN SPLIT + 3-TILE BANNER (AWC Style) ================= */}
+        <section className="border-t border-slate-800/80">
+          {/* Top 2-Column Split */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 border-b border-slate-800">
+            {/* Left Column: Appointment & Billing Status */}
+            <div className="py-8 sm:py-10 lg:pr-12 flex flex-col justify-between space-y-8">
+              <div className="space-y-5">
+                <div className="space-y-1">
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                    APPOINTMENT &amp; BILLING STATUS
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    สถานะนัดหมายที่กำลังจะมาถึงและรายการชำระเงินล่าสุด
+                  </div>
+                </div>
 
-              {nextAppointment ? (
-                (() => {
-                  const pet = pets.find((p) => p.id === nextAppointment.petId);
-                  const vet = vets.find((v) => v.id === nextAppointment.vetId);
-                  const srv = services.find((s) => s.id === nextAppointment.serviceId);
-                  return (
-                    <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-                        <div className="flex items-center gap-3.5">
-                          <img
-                            src={pet?.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=150&q=80'}
-                            alt={pet?.name}
-                            className="w-14 h-14 rounded-2xl object-cover ring-2 ring-sky-500/50 shadow-md"
-                          />
+                {nextAppointment ? (
+                  (() => {
+                    const pet = pets.find((p) => p.id === nextAppointment.petId);
+                    const vet = vets.find((v) => v.id === nextAppointment.vetId);
+                    const srv = services.find((s) => s.id === nextAppointment.serviceId);
+                    return (
+                      <div className="space-y-3 pt-1">
+                        <div className="flex flex-wrap items-baseline gap-3">
+                          <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">
+                            {formatThaiDate(nextAppointment.date)}
+                          </span>
+                          <span className="text-base sm:text-lg font-normal text-sky-400">
+                            เวลา {nextAppointment.timeSlot} น.
+                          </span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-300 space-y-1">
                           <div>
-                            <div className="font-extrabold text-white text-lg">{pet?.name} <span className="text-xs font-semibold text-slate-400">({pet?.species})</span></div>
-                            <div className="text-xs font-bold text-sky-400">{srv?.name || 'ตรวจสุขภาพทั่วไป'}</div>
+                            สัตว์เลี้ยง: <strong className="text-white">{pet?.name}</strong> ({pet?.species}) &bull; บริการ: <strong className="text-white">{srv?.name || 'ตรวจสุขภาพทั่วไป'}</strong>
+                          </div>
+                          <div className="text-slate-400">
+                            สัตวแพทย์ผู้ตรวจ: {vet?.name || 'สัตวแพทย์ประจำคลินิก'} &bull; สถานะ: {nextAppointment.status === 'pending' ? 'รอเข้ารับบริการ' : 'ยืนยันคิวแล้ว'}
                           </div>
                         </div>
-                        <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-sky-500 text-slate-950 shadow-xs self-start sm:self-auto">
-                          {nextAppointment.status === 'pending' ? 'รอเข้ารับบริการ' : 'ยืนยันคิวแล้ว'}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-slate-300">
-                        <div className="flex items-center gap-2 bg-slate-900 p-3 rounded-xl border border-slate-800">
-                          <Calendar className="w-4 h-4 text-sky-400 shrink-0" />
-                          <span>วันที่นัด: <strong className="text-white">{formatThaiDate(nextAppointment.date)}</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2 bg-slate-900 p-3 rounded-xl border border-slate-800">
-                          <Clock className="w-4 h-4 text-sky-400 shrink-0" />
-                          <span>เวลา: <strong className="text-white">{nextAppointment.timeSlot} น.</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2 sm:col-span-2 bg-slate-900 p-3 rounded-xl border border-slate-800">
-                          <Stethoscope className="w-4 h-4 text-sky-400 shrink-0" />
-                          <span>แพทย์ผู้ตรวจ: <strong className="text-white">{vet?.name || 'สัตวแพทย์ประจำคลินิก'}</strong></span>
-                        </div>
-                        <div className="sm:col-span-2 text-slate-300 bg-slate-900 p-3.5 rounded-xl border border-slate-800">
-                          <span className="font-bold text-sky-400">อาการเบื้องต้นที่ระบุ: </span>
-                          {nextAppointment.initialSymptoms}
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end gap-2 pt-2">
-                        <a
-                          href="/owner/appointments"
-                          className="text-xs font-bold px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer border border-slate-700"
-                        >
-                          จัดการนัดหมาย / เลื่อนนัด
-                        </a>
-                      </div>
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className="text-center py-10 bg-slate-950 rounded-2xl border border-dashed border-slate-800">
-                  <Calendar className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-                  <p className="text-xs text-slate-400 font-medium">ไม่มีนัดหมายที่รอรับบริการในขณะนี้</p>
-                  <a
-                    href="/owner/booking"
-                    className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-bold text-sky-400 hover:text-sky-300 bg-slate-900 px-4 py-2 rounded-full border border-sky-800 transition"
-                  >
-                    <PlusCircle className="w-3.5 h-3.5" /> <span>จองคิวนัดหมายตรวจสุขภาพ</span>
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Pending Bills Alert */}
-            {pendingBills.length > 0 && (
-              <div className="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 space-y-3 shadow-md">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
-                    <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
-                    <span>มีรายการรอชำระเงินหรือตรวจสอบสลิป ({pendingBills.length} รายการ)</span>
-                  </div>
-                  <a href="/owner/billing" className="text-xs font-bold text-amber-300 hover:underline flex items-center gap-1">
-                    <span>ไปหน้าชำระเงิน</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-                <div className="space-y-2">
-                  {pendingBills.map((b) => {
-                    const p = pets.find((pet) => pet.id === b.petId);
-                    return (
-                      <div key={b.id} className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
-                        <div>
-                          <span className="font-bold text-white">{p?.name || 'สัตว์เลี้ยง'}</span>
-                          <span className="text-slate-400 ml-2">ยอดค่าบริการ: <strong className="text-amber-400">{formatCurrency(b.totalAmount)}</strong></span>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full font-bold text-[11px] ${b.status === 'pending_upload' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'}`}>
-                          {b.status === 'pending_upload' ? 'รอแนบสลิปโอนเงิน' : 'กำลังรอตรวจสอบสลิป'}
-                        </span>
                       </div>
                     );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+                  })()
+                ) : (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex flex-wrap items-baseline gap-3">
+                      <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">
+                        ไม่มีนัดหมายในขณะนี้
+                      </span>
+                      <span className="text-sm text-slate-400">
+                        (ประวัติทั้งหมด {myAppointments.length} ครั้ง)
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-400">
+                      คุณสามารถเลือกวันและเวลาที่สะดวกเพื่อจองคิวนัดหมายตรวจสุขภาพล่วงหน้าได้ทันที
+                    </p>
+                  </div>
+                )}
 
-          {/* Right Column (1 Col): My Pets List */}
-          <div className="space-y-6">
-            <div className="bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-800 shadow-md space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h2 className="text-base font-black text-white flex items-center gap-2">
-                  <PawPrint className="w-4 h-4 text-sky-400" />
-                  <span>สัตว์เลี้ยงของฉัน</span>
-                </h2>
-                <a href="/owner/pets" className="text-xs font-bold text-sky-400 hover:underline">
-                  จัดการทั้งหมด
+                {pendingBills.length > 0 && (
+                  <div className="pt-4 border-t border-slate-800/80 space-y-2">
+                    <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                      รายการรอชำระเงิน ({pendingBills.length} รายการ)
+                    </div>
+                    {pendingBills.map((b) => {
+                      const p = pets.find((pet) => pet.id === b.petId);
+                      return (
+                        <div
+                          key={b.id}
+                          className="flex items-center justify-between text-xs sm:text-sm py-1.5 text-slate-300"
+                        >
+                          <span>
+                            {p?.name || 'สัตว์เลี้ยง'} &mdash; ยอดค่าบริการ{' '}
+                            <strong className="text-white font-semibold">{formatCurrency(b.totalAmount)}</strong>
+                          </span>
+                          <a
+                            href="/owner/billing"
+                            className="text-xs font-bold text-sky-400 hover:underline"
+                          >
+                            {b.status === 'pending_upload' ? 'ชำระเงิน / แนบสลิป ↗' : 'รอตรวจสอบสลิป ↗'}
+                          </a>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-6 pt-2">
+                <a
+                  href="/owner/booking"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-white hover:text-sky-400 transition"
+                >
+                  <span>จองคิวนัดหมายตรวจสุขภาพ</span>
+                  <span className="text-sky-400 text-base leading-none">&#8599;</span>
+                </a>
+                <a
+                  href="/owner/appointments"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 hover:text-white transition"
+                >
+                  <span>ดูประวัตินัดหมาย ({myAppointments.length})</span>
+                  <span className="text-sky-400 text-base leading-none">&#8599;</span>
                 </a>
               </div>
+            </div>
 
-              <div className="space-y-3">
-                {myPets.map((pet) => (
-                  <div
-                    key={pet.id}
-                    className="p-3.5 rounded-2xl border border-slate-800 bg-slate-950 hover:border-sky-500 transition flex items-center gap-3.5 group"
-                  >
-                    <img
-                      src={pet.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=150&q=80'}
-                      alt={pet.name}
-                      className="w-12 h-12 rounded-2xl object-cover ring-1 ring-slate-800 group-hover:scale-105 transition shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-extrabold text-white text-sm truncate">{pet.name}</div>
-                      <div className="text-xs text-slate-400 font-medium truncate">
-                        {pet.species} &bull; {pet.breed}
+            {/* Right Column: Clean Row List of My Pets */}
+            <div className="py-8 sm:py-10 lg:pl-12 flex flex-col justify-between space-y-8">
+              <div className="divide-y divide-slate-800/80">
+                {myPets.length > 0 ? (
+                  myPets.map((pet) => (
+                    <a
+                      key={pet.id}
+                      href="/owner/pets"
+                      className="py-4 first:pt-0 flex items-center justify-between gap-4 group hover:opacity-90 transition"
+                    >
+                      <div className="space-y-0.5">
+                        <div className="text-sm sm:text-base font-bold text-white group-hover:text-sky-400 transition">
+                          {pet.name}{' '}
+                          <span className="text-xs font-normal text-slate-400">
+                            ({pet.species} &bull; {pet.breed})
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          อายุ {pet.ageYears} ปี {pet.ageMonths} เดือน &bull; น้ำหนัก {pet.weightKg} กก.
+                        </div>
                       </div>
-                      <div className="text-[11px] text-slate-500 font-medium mt-0.5">
-                        อายุ {pet.ageYears} ปี {pet.ageMonths} เดือน &bull; {pet.weightKg} กก.
-                      </div>
-                    </div>
+                      <span className="w-8 h-8 border border-slate-700 group-hover:border-sky-400 flex items-center justify-center text-slate-400 group-hover:text-sky-400 text-xs transition shrink-0">
+                        &#8599;
+                      </span>
+                    </a>
+                  ))
+                ) : (
+                  <div className="py-4 text-xs sm:text-sm text-slate-400">
+                    ยังไม่มีข้อมูลสัตว์เลี้ยงที่ลงทะเบียนในระบบ
                   </div>
-                ))}
+                )}
+              </div>
 
+              <div className="pt-2">
                 <a
                   href="/owner/pets"
-                  className="block w-full py-3 text-center bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-sky-400 rounded-2xl text-xs font-bold transition border border-slate-700 cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-white hover:text-sky-400 transition"
                 >
-                  + ลงทะเบียนสัตว์เลี้ยงใหม่
+                  <span>จัดการและลงทะเบียนสัตว์เลี้ยง</span>
+                  <span className="text-sky-400 text-base leading-none">&#8599;</span>
                 </a>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* ================= RECOMMENDED SERVICES (Cinema Poster Carousel Style) ================= */}
-        <section id="services" className="space-y-6">
+          {/* Bottom 3 Edge-to-Edge Photo Banner Tiles */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+            <a
+              href="/owner/booking"
+              className="relative h-60 sm:h-72 overflow-hidden group block"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=900&q=80"
+                alt="จองคิวนัดหมาย"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              />
+              <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/20 transition" />
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 py-3.5 px-4 bg-gradient-to-r from-transparent via-slate-950/80 to-transparent text-center">
+                <span className="text-sm sm:text-base font-bold tracking-[0.2em] text-white uppercase">
+                  นัดหมายตรวจรักษา
+                </span>
+              </div>
+            </a>
+
+            <a
+              href="/owner/pets"
+              className="relative h-60 sm:h-72 overflow-hidden group block"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=900&q=80"
+                alt="สัตว์เลี้ยงของฉัน"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              />
+              <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/20 transition" />
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 py-3.5 px-4 bg-gradient-to-r from-transparent via-slate-950/80 to-transparent text-center">
+                <span className="text-sm sm:text-base font-bold tracking-[0.2em] text-white uppercase">
+                  สัตว์เลี้ยงของฉัน
+                </span>
+              </div>
+            </a>
+
+            <a
+              href="/owner/billing"
+              className="relative h-60 sm:h-72 overflow-hidden group block"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=900&q=80"
+                alt="ชำระเงินและใบเสร็จ"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              />
+              <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/20 transition" />
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 py-3.5 px-4 bg-gradient-to-r from-transparent via-slate-950/80 to-transparent text-center">
+                <span className="text-sm sm:text-base font-bold tracking-[0.2em] text-white uppercase">
+                  ชำระเงินและใบเสร็จ
+                </span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        {/* ================= RECOMMENDED SERVICES ================= */}
+        <section id="services" className="space-y-6 pt-4">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-4">
             <div>
-              <div className="text-sky-400 font-extrabold text-xs uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-sky-400" />
-                <span>RECOMMENDED SERVICES</span>
+              <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+                MEDICAL SERVICES
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                บริการและแพ็กเกจตรวจรักษาแนะนำ
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                บริการและแพ็กเกจตรวจรักษา
               </h2>
             </div>
 
@@ -676,13 +715,12 @@ export default function OwnerDashboardPage() {
               href="/owner/services"
               className="text-xs sm:text-sm font-bold text-sky-400 hover:text-sky-300 inline-flex items-center gap-1"
             >
-              ดูรายการบริการทั้งหมด <ChevronRight className="w-4 h-4" />
+              ดูรายการบริการทั้งหมด <span>&#8599;</span>
             </a>
           </div>
 
-          {/* Poster Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            {services.map((service) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.slice(0, 6).map((service) => {
               const posterData = SERVICE_POSTER_IMAGES[service.id] || {
                 image: 'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=600&q=80',
                 ribbon: 'แนะนำ',
@@ -692,51 +730,38 @@ export default function OwnerDashboardPage() {
               return (
                 <div
                   key={service.id}
-                  className="group bg-slate-900 rounded-2xl border border-slate-800 shadow-lg hover:shadow-2xl hover:border-sky-500 transition-all flex flex-col overflow-hidden transform hover:-translate-y-1"
+                  onClick={() => router.push(`/owner/booking?serviceId=${service.id}`)}
+                  className="group border border-slate-800 bg-slate-950 hover:border-slate-600 transition flex flex-col overflow-hidden cursor-pointer"
                 >
-                  {/* Poster Frame with Ribbon Badge */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-950">
+                  <div className="relative h-48 w-full overflow-hidden">
                     <img
                       src={posterData.image}
                       alt={service.name}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 opacity-90"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover:opacity-95 transition" />
-
-                    {/* Corner Ribbon Tag */}
-                    <div className="absolute top-2 right-2">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-md shadow-md uppercase tracking-wider ${posterData.ribbonColor}`}>
-                        {posterData.ribbon}
-                      </span>
-                    </div>
-
-                    {/* Price Tag Overlay on Poster Bottom */}
-                    <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[11px]">
-                      <span className="font-bold text-slate-300">เริ่มต้น</span>
-                      <span className="font-black text-sky-400 text-xs">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
+                      <span className="text-xs text-slate-300">อัตราค่าบริการเริ่มต้น</span>
+                      <span className="font-bold text-sky-400 text-sm">
                         {formatCurrency(service.price)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Card Info & Quick Book */}
-                  <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      <h3 className="font-bold text-white text-xs sm:text-sm line-clamp-1 group-hover:text-sky-400 transition">
+                      <h3 className="font-bold text-white text-sm sm:text-base group-hover:text-sky-400 transition">
                         {service.name}
                       </h3>
-                      <p className="text-[11px] text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+                      <p className="text-xs text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">
                         {service.description}
                       </p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/owner/booking?serviceId=${service.id}`)}
-                      className="block w-full text-center py-2 bg-slate-800 group-hover:bg-sky-500 text-slate-200 group-hover:text-slate-950 rounded-xl text-xs font-black transition shadow-xs cursor-pointer"
-                    >
-                      จองคิวตรวจ
-                    </button>
+                    <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-slate-300 group-hover:text-sky-400 transition">
+                      <span>จองคิวรับบริการนี้</span>
+                      <span>&#8599;</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -744,165 +769,43 @@ export default function OwnerDashboardPage() {
           </div>
         </section>
 
-        {/* ================= CLINIC STANDARDS & TECHNOLOGY PILLARS ================= */}
-        <section className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-sky-400 text-xs font-bold tracking-wider uppercase">
-              CLINIC STANDARDS & DIGITAL SYSTEM
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              มาตรฐานการตรวจรักษาระดับโรงพยาบาลสัตว์
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
-              รวมเทคโนโลยีดิจิทัล EMR และระบบคลาวด์ เพื่อความโปร่งใสและปลอดภัยสูงสุดของสัตว์เลี้ยง
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-3 hover:border-sky-500 transition">
-              <div className="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-white text-base">ระบบจองคิวออนไลน์ 24 ชม.</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                เลือกบริการ วัน และเวลาที่สะดวก จัดสรรคิวตรวจอย่างมีระบบ ไม่ต้องนั่งรอคิวนาน
-              </p>
-            </div>
-
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-3 hover:border-sky-500 transition">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">
-                <HeartPulse className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-white text-base">เวชระเบียน EMR คลาวด์</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                บันทึกประวัติ อาการ ผลวินิจฉัย และใบสั่งยา ตรวจสอบประวัติย้อนหลังได้ตลอดเวลา
-              </p>
-            </div>
-
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-3 hover:border-sky-500 transition">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-white text-base">ทีมแพทย์เฉพาะทางมีใบอนุญาต</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                สัตวแพทย์ทุกท่านมีใบประกอบวิชาชีพการสัตวแพทย์ชั้นหนึ่ง มีความเชี่ยวชาญเฉพาะทาง
-              </p>
-            </div>
-
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-3 hover:border-sky-500 transition">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
-                <Award className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-white text-base">SlipOK ตรวจสลิปอัตโนมัติ</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">
-                สแกนจ่ายผ่าน QR PromptPay และตรวจสลิปทันทีด้วย AI ออกใบเสร็จรับเงินออนไลน์
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* ================= VETERINARIANS SHOWCASE ================= */}
-        <section id="vets" className="space-y-6">
+        <section id="vets" className="space-y-6 pt-4">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-4">
             <div>
-              <div className="text-sky-400 font-extrabold text-xs uppercase tracking-wider mb-1">
+              <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
                 OUR VETERINARIANS
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                ทีมสัตวแพทย์ผู้เชี่ยวชาญ
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                ทีมสัตวแพทย์ประจำคลินิก
               </h2>
             </div>
-            <span className="text-xs text-slate-400 font-semibold">
-              ประจำการตามตารางเวรคลินิก
+            <span className="text-xs text-slate-400">
+              ออกตรวจตามตารางเวรประจำวัน
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-800 border-b border-slate-800 pb-8">
             {vets.map((vet) => (
               <div
                 key={vet.id}
-                className="bg-slate-900 rounded-3xl p-6 border border-slate-800 shadow-lg text-center space-y-4 hover:border-sky-500 transition"
+                className="py-6 sm:py-2 px-6 flex flex-col items-center text-center space-y-3"
               >
                 <img
                   src={vet.avatar}
                   alt={vet.name}
-                  className="w-24 h-24 rounded-2xl mx-auto object-cover ring-4 ring-slate-800 shadow-md"
+                  className="w-24 h-24 rounded-full object-cover border border-slate-700"
                 />
-                <div>
+                <div className="space-y-1">
                   <h4 className="font-bold text-white text-base">{vet.name}</h4>
-                  <p className="text-xs font-bold text-sky-400 mt-0.5">{vet.specialty}</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">ใบอนุญาตเลขที่: {vet.licenseNo}</p>
+                  <p className="text-xs font-semibold text-sky-400">{vet.specialty}</p>
+                  <p className="text-[11px] text-slate-400">ใบอนุญาตเลขที่ {vet.licenseNo}</p>
                 </div>
-
-                <div className="bg-slate-950 rounded-2xl p-3 text-xs text-slate-300 space-y-1 border border-slate-800">
-                  <div className="font-semibold text-slate-200">วันออกตรวจ:</div>
-                  <div className="text-sky-300 font-medium">{vet.availableDays.join(', ')}</div>
-                  <div className="text-[11px] text-slate-400">
-                    เวลา: {vet.workingHours.start} - {vet.workingHours.end} น.
-                  </div>
-                </div>
-
-                <div className="pt-1">
-                  <span className="inline-block w-full py-2 bg-slate-800 text-sky-400 rounded-xl text-xs font-bold border border-slate-700">
-                    ประจำการตามตารางเวร
-                  </span>
+                <div className="text-xs text-slate-300 pt-1">
+                  วันออกตรวจ: <span className="text-white">{vet.availableDays.join(', ')}</span> ({vet.workingHours.start} - {vet.workingHours.end} น.)
                 </div>
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* ================= FAQ SECTION ================= */}
-        <section id="faq" className="space-y-6">
-          <div className="border-b border-slate-800 pb-4">
-            <div className="text-sky-400 font-extrabold text-xs uppercase tracking-wider mb-1">
-              FREQUENTLY ASKED QUESTIONS
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              คำถามที่พบบ่อย (FAQ)
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md space-y-2">
-              <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                <MessageCircleQuestion className="w-4 h-4 text-sky-400 shrink-0" />
-                ต้องจองคิวนัดหมายล่วงหน้าก่อนนำสัตว์เลี้ยงมาหรือไม่?
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed pl-6">
-                แนะนำให้จองคิวล่วงหน้าผ่านระบบออนไลน์ เพื่อความสะดวกรวดเร็วและลดเวลารอตรวจ โดยระบบจะจัดสรรแพทย์เวรประจำวันให้อัตโนมัติ กรณีฉุกเฉินสามารถพามาได้ทันทีตลอดเวลาทำการ
-              </p>
-            </div>
-
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md space-y-2">
-              <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                <MessageCircleQuestion className="w-4 h-4 text-sky-400 shrink-0" />
-                สามารถตรวจดูประวัติการรักษาและใบสั่งยาย้อนหลังได้ที่ไหน?
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed pl-6">
-                เจ้าของสัตว์เลี้ยงสามารถเข้าสู่ระบบเพื่อดูประวัติเวชระเบียน EMR รายการยาที่ได้รับ และใบเสร็จรับเงินย้อนหลังได้ตลอด 24 ชั่วโมง
-              </p>
-            </div>
-
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md space-y-2">
-              <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                <MessageCircleQuestion className="w-4 h-4 text-sky-400 shrink-0" />
-                ระบบชำระเงินรองรับช่องทางใดบ้าง?
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed pl-6">
-                รองรับการโอนชำระผ่าน QR Code PromptPay พร้อมระบบตรวจสอบสลิปอัตโนมัติ (SlipOK) และการชำระด้วยเงินสด/บัตรเครดิตที่หน้าเคาน์เตอร์
-              </p>
-            </div>
-
-            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-md space-y-2">
-              <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                <MessageCircleQuestion className="w-4 h-4 text-sky-400 shrink-0" />
-                หากต้องการเลื่อนหรือยกเลิกคิวนัดหมาย ต้องทำอย่างไร?
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed pl-6">
-                สามารถเข้าไปที่เมนู &ldquo;ประวัตินัดหมาย&rdquo; เพื่อกดเลื่อนวัน-เวลา หรือกดยกเลิกนัดหมายได้ด้วยตนเองอย่างสะดวก
-              </p>
-            </div>
           </div>
         </section>
       </div>
