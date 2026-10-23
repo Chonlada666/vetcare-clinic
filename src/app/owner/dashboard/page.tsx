@@ -288,7 +288,7 @@ export default function OwnerDashboardPage() {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative w-full overflow-hidden bg-slate-950 text-white h-[480px] sm:h-[500px] lg:h-[530px] select-none"
+        className="hero-banner relative w-full overflow-hidden bg-slate-950 text-white h-[480px] sm:h-[500px] lg:h-[530px] select-none"
       >
         {/* Slides Container */}
         {BANNER_SLIDES.map((slideItem, index) => {
@@ -570,9 +570,10 @@ export default function OwnerDashboardPage() {
                           </span>
                           <a
                             href="/owner/billing"
-                            className="text-xs font-bold text-sky-400 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-sky-400 hover:underline"
                           >
-                            {b.status === 'pending_upload' ? 'ชำระเงิน / แนบสลิป ↗' : 'รอตรวจสอบสลิป ↗'}
+                            <span>{b.status === 'pending_upload' ? 'ชำระเงิน / แนบสลิป' : 'รอตรวจสอบสลิป'}</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
                           </a>
                         </div>
                       );
@@ -584,17 +585,17 @@ export default function OwnerDashboardPage() {
               <div className="flex flex-wrap items-center gap-6 pt-2">
                 <a
                   href="/owner/booking"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-white hover:text-sky-400 transition"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-sky-400 hover:text-sky-300 transition"
                 >
                   <span>จองคิวนัดหมายตรวจสุขภาพ</span>
-                  <span className="text-sky-400 text-base leading-none">&#8599;</span>
+                  <ArrowRight className="w-4 h-4" />
                 </a>
                 <a
                   href="/owner/appointments"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 hover:text-white transition"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-300 hover:text-white transition"
                 >
                   <span>ดูประวัตินัดหมาย ({myAppointments.length})</span>
-                  <span className="text-sky-400 text-base leading-none">&#8599;</span>
+                  <ChevronRight className="w-4 h-4 text-sky-400" />
                 </a>
               </div>
             </div>
@@ -620,8 +621,9 @@ export default function OwnerDashboardPage() {
                           อายุ {pet.ageYears} ปี {pet.ageMonths} เดือน &bull; น้ำหนัก {pet.weightKg} กก.
                         </div>
                       </div>
-                      <span className="w-8 h-8 border border-slate-700 group-hover:border-sky-400 flex items-center justify-center text-slate-400 group-hover:text-sky-400 text-xs transition shrink-0">
-                        &#8599;
+                      <span className="px-3 py-1.5 rounded-md border border-slate-700 group-hover:border-sky-400 inline-flex items-center gap-1 text-slate-300 group-hover:text-sky-400 text-xs font-semibold transition shrink-0">
+                        <span>ดูข้อมูล</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </a>
                   ))
@@ -635,67 +637,13 @@ export default function OwnerDashboardPage() {
               <div className="pt-2">
                 <a
                   href="/owner/pets"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-white hover:text-sky-400 transition"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-sky-400 hover:text-sky-300 transition"
                 >
                   <span>จัดการและลงทะเบียนสัตว์เลี้ยง</span>
-                  <span className="text-sky-400 text-base leading-none">&#8599;</span>
+                  <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </div>
-          </div>
-
-          {/* Bottom 3 Edge-to-Edge Photo Banner Tiles */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-            <a
-              href="/owner/booking"
-              className="relative h-60 sm:h-72 overflow-hidden group block"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=900&q=80"
-                alt="จองคิวนัดหมาย"
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-              />
-              <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/20 transition" />
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 py-3.5 px-4 bg-gradient-to-r from-transparent via-slate-950/80 to-transparent text-center">
-                <span className="text-sm sm:text-base font-bold tracking-[0.2em] text-white uppercase">
-                  นัดหมายตรวจรักษา
-                </span>
-              </div>
-            </a>
-
-            <a
-              href="/owner/pets"
-              className="relative h-60 sm:h-72 overflow-hidden group block"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=900&q=80"
-                alt="สัตว์เลี้ยงของฉัน"
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-              />
-              <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/20 transition" />
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 py-3.5 px-4 bg-gradient-to-r from-transparent via-slate-950/80 to-transparent text-center">
-                <span className="text-sm sm:text-base font-bold tracking-[0.2em] text-white uppercase">
-                  สัตว์เลี้ยงของฉัน
-                </span>
-              </div>
-            </a>
-
-            <a
-              href="/owner/billing"
-              className="relative h-60 sm:h-72 overflow-hidden group block"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=900&q=80"
-                alt="ชำระเงินและใบเสร็จ"
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-              />
-              <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/20 transition" />
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 py-3.5 px-4 bg-gradient-to-r from-transparent via-slate-950/80 to-transparent text-center">
-                <span className="text-sm sm:text-base font-bold tracking-[0.2em] text-white uppercase">
-                  ชำระเงินและใบเสร็จ
-                </span>
-              </div>
-            </a>
           </div>
         </section>
 
@@ -715,7 +663,8 @@ export default function OwnerDashboardPage() {
               href="/owner/services"
               className="text-xs sm:text-sm font-bold text-sky-400 hover:text-sky-300 inline-flex items-center gap-1"
             >
-              ดูรายการบริการทั้งหมด <span>&#8599;</span>
+              <span>ดูรายการบริการทั้งหมด</span>
+              <ChevronRight className="w-4 h-4" />
             </a>
           </div>
 
@@ -760,7 +709,7 @@ export default function OwnerDashboardPage() {
 
                     <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-slate-300 group-hover:text-sky-400 transition">
                       <span>จองคิวรับบริการนี้</span>
-                      <span>&#8599;</span>
+                      <ChevronRight className="w-4 h-4" />
                     </div>
                   </div>
                 </div>

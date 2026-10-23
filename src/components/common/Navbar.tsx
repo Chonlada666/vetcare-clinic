@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useClinic } from '@/lib/store';
 import {
   User,
@@ -10,6 +10,8 @@ import {
   PawPrint,
   Stethoscope,
   Shield,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -22,8 +24,23 @@ interface NavLink {
 export function Navbar() {
   const { currentUser, logout, bills } = useClinic();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem('vetcare_theme') as 'dark' | 'light' | null;
+    const initial = saved === 'light' ? 'light' : 'dark';
+    setTheme(initial);
+    document.documentElement.classList.toggle('light', initial === 'light');
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('vetcare_theme', next);
+    document.documentElement.classList.toggle('light', next === 'light');
+  };
 
   const handleLogout = () => {
     logout();
@@ -128,49 +145,70 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Right Side: User Profile / Logout (Only shown when logged in) */}
-          {currentUser && (
-            <div className="hidden md:flex items-center gap-4 shrink-0 whitespace-nowrap">
-              <div className="flex items-center gap-3 pl-3 border-l border-slate-800 shrink-0 whitespace-nowrap">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white ring-2 ring-sky-500/30 shrink-0 shadow-xs">
-                  {currentUser.role === 'owner' ? (
-                    <User className="w-4 h-4" />
-                  ) : currentUser.role === 'vet' ? (
-                    <Stethoscope className="w-4 h-4" />
-                  ) : (
-                    <Shield className="w-4 h-4" />
-                  )}
-                </div>
-                <div className="text-left whitespace-nowrap">
-                  <div className="text-xs font-bold text-white whitespace-nowrap max-w-[140px] truncate leading-tight">
-                    {currentUser.name}
+          {/* Right Side: Theme Toggle + User Profile / Logout */}
+          <div className="flex items-center gap-3 shrink-0 whitespace-nowrap">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง (Light Mode)' : 'เปลี่ยนเป็นโหมดมืด (Dark Mode)'}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition cursor-pointer shrink-0"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span className="hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-sky-600" />
+                  <span className="hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
+
+            {currentUser && (
+              <div className="hidden md:flex items-center gap-4 shrink-0 whitespace-nowrap">
+                <div className="flex items-center gap-3 pl-3 border-l border-slate-800 shrink-0 whitespace-nowrap">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white ring-2 ring-sky-500/30 shrink-0 shadow-xs">
+                    {currentUser.role === 'owner' ? (
+                      <User className="w-4 h-4" />
+                    ) : currentUser.role === 'vet' ? (
+                      <Stethoscope className="w-4 h-4" />
+                    ) : (
+                      <Shield className="w-4 h-4" />
+                    )}
                   </div>
-                  <div className="text-[10px] text-sky-400 whitespace-nowrap leading-tight mt-0.5">
-                    {currentUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : currentUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
+                  <div className="text-left whitespace-nowrap">
+                    <div className="text-xs font-bold text-white whitespace-nowrap max-w-[140px] truncate leading-tight">
+                      {currentUser.name}
+                    </div>
+                    <div className="text-[10px] text-sky-400 whitespace-nowrap leading-tight mt-0.5">
+                      {currentUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : currentUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
+                    </div>
                   </div>
+                  <button
+                    onClick={handleLogout}
+                    title="ออกจากระบบ"
+                    className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition cursor-pointer shrink-0"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
                 </div>
+              </div>
+            )}
+
+            {/* Mobile menu button */}
+            {currentUser && (
+              <div className="flex md:hidden items-center shrink-0">
                 <button
-                  onClick={handleLogout}
-                  title="ออกจากระบบ"
-                  className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition cursor-pointer shrink-0"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 focus:outline-hidden"
                 >
-                  <LogOut className="w-4 h-4" />
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Mobile menu button */}
-          {currentUser && (
-            <div className="flex md:hidden items-center shrink-0">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 focus:outline-hidden"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
