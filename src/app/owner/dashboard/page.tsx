@@ -78,8 +78,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*บริการฉีดและตรวจสุขภาพโดยสัตวแพทย์มีใบอนุญาตถูกต้องทุกเคส',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_2',
-    bgImage: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1600&q=80',
-    centerPetImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+    bgImage: '/banner-dog-cat.jpg',
+    centerPetImage: '/banner-dog-cat.jpg',
   },
   {
     id: 4,
@@ -318,32 +318,38 @@ export default function OwnerDashboardPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
               </div>
 
-              {/* Right-Only Content Layout */}
+              {/* Right-Only Content Layout: Each sentence on its own single line */}
               <div className="relative z-10 w-full max-w-7xl mx-auto px-12 sm:px-20 lg:px-24 py-8 flex items-center justify-end">
-                <div className="w-full max-w-lg text-right space-y-3 z-10">
-                  <span className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-sky-300 uppercase block drop-shadow">
+                <div className="w-full max-w-4xl text-right space-y-2.5 z-10">
+                  <div className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-sky-300 uppercase drop-shadow sm:whitespace-nowrap">
                     {slideItem.leftLogo.sub}
-                  </span>
+                  </div>
 
-                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight drop-shadow-lg">
+                  <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-snug drop-shadow-lg sm:whitespace-nowrap">
                     {slideItem.leftLogo.title}{' '}
                     <span className="text-sky-300">{slideItem.leftLogo.titleHighlight}</span>
                   </h2>
 
-                  <div className="text-lg sm:text-2xl font-semibold text-white drop-shadow">
+                  <div className="text-base sm:text-xl lg:text-2xl font-semibold text-white drop-shadow sm:whitespace-nowrap">
                     {slideItem.highlightPrice}{' '}
-                    <span className="text-sm sm:text-base font-normal text-slate-200">
+                    <span className="text-xs sm:text-base font-normal text-slate-200">
                       ({slideItem.priceSub})
                     </span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed drop-shadow">
-                    {slideItem.systemText} {slideItem.systemBadge} &bull; {slideItem.ribbonText}
-                  </p>
+                  <div className="space-y-1 text-xs sm:text-sm text-slate-100 drop-shadow">
+                    <p className="sm:whitespace-nowrap">
+                      {slideItem.systemText} <span className="font-semibold text-sky-300">{slideItem.systemBadge}</span>
+                    </p>
+                    <p className="sm:whitespace-nowrap">
+                      {slideItem.ribbonText}
+                    </p>
+                  </div>
 
-                  <p className="text-[11px] text-slate-300/90 font-light">
-                    {slideItem.disclaimer1}
-                  </p>
+                  <div className="space-y-0.5 text-[11px] text-slate-300/90 font-light">
+                    <p className="sm:whitespace-nowrap">{slideItem.disclaimer1}</p>
+                    <p className="sm:whitespace-nowrap">{slideItem.disclaimer2}</p>
+                  </div>
 
                   <div className="pt-2 flex justify-end">
                     <button
