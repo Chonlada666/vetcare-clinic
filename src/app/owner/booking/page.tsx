@@ -244,7 +244,6 @@ function BookingContent() {
           <div className="space-y-6">
             <div className="border-b border-slate-800 pb-4">
               <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <PawPrint className="w-5 h-5 text-sky-400" />
                 ขั้นตอนที่ 1: เลือกสัตว์เลี้ยงและระบุอาการเบื้องต้น
               </h2>
               <p className="text-xs text-slate-400 mt-1">

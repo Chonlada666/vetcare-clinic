@@ -99,20 +99,45 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16 sm:h-20 gap-6">
           {/* Left Side: Brand Logo followed by navigation links */}
           <div className="flex items-center gap-6 sm:gap-8 lg:gap-10 min-w-0 flex-1">
-            {/* Brand Logo */}
+            {/* Brand Logo - Formal Veterinary Hospital Crest */}
             <a
               href={currentUser ? `/${currentUser.role}/dashboard` : '/login'}
-              className="flex items-center gap-2.5 group shrink-0 whitespace-nowrap"
+              className="flex items-center gap-3 group shrink-0 whitespace-nowrap"
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20 group-hover:scale-105 transition shrink-0">
-                <PawPrint className="w-5 h-5" />
+              <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                <svg
+                  viewBox="0 0 44 44"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-10 h-10"
+                >
+                  {/* Formal Architectural Shield / Crest */}
+                  <path
+                    d="M22 3L6 9.5V20.5C6 30.8 12.8 39.8 22 42C31.2 39.8 38 30.8 38 20.5V9.5L22 3Z"
+                    fill="#0284c7"
+                    fillOpacity="0.15"
+                    stroke="#0284c7"
+                    strokeWidth="2.2"
+                  />
+                  <path
+                    d="M22 6.5L9.5 11.6V20.3C9.5 28.5 14.8 35.8 22 37.8C29.2 35.8 34.5 28.5 34.5 20.3V11.6L22 6.5Z"
+                    stroke="#38bdf8"
+                    strokeWidth="1"
+                    strokeOpacity="0.6"
+                  />
+                  {/* Official Medical Cross */}
+                  <path
+                    d="M19.5 14H24.5V19.5H30V24.5H24.5V30H19.5V24.5H14V19.5H19.5V14Z"
+                    fill="#0284c7"
+                  />
+                </svg>
               </div>
               <div className="whitespace-nowrap">
-                <span className="font-black text-lg sm:text-xl text-white tracking-tight block leading-tight whitespace-nowrap">
-                  VetCare
+                <span className="font-bold text-lg sm:text-xl text-white tracking-[0.14em] uppercase block leading-tight whitespace-nowrap">
+                  VETCARE
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-bold text-sky-400 uppercase tracking-widest block whitespace-nowrap">
-                  ANIMAL CLINIC & HOSPITAL
+                <span className="text-[9px] sm:text-[10px] font-semibold text-sky-400 uppercase tracking-[0.18em] block whitespace-nowrap">
+                  VETERINARY HOSPITAL
                 </span>
               </div>
             </a>

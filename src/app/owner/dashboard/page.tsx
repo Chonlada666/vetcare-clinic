@@ -42,8 +42,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*เพิ่ม 50 บาท จากราคาตรวจสุขภาพปกติทุกสายพันธุ์ | ผลตรวจบันทึกออนไลน์ทันที',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_1',
-    bgImage: '/banner-premier-dog.jpg',
-    centerPetImage: '/banner-premier-dog.jpg',
+    bgImage: '/banner-premier-puppy.jpg',
+    centerPetImage: '/banner-premier-puppy.jpg',
   },
   {
     id: 2,
