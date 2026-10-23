@@ -169,23 +169,22 @@ html.light [class*="divide-slate-700"] > :not([hidden]) ~ :not([hidden]) {
   border-color: #cbd5e1 !important;
 }
 
-/* Text colors in Light Mode */
-html.light :not(.hero-banner) > .text-white,
-html.light :not(.hero-banner) .text-white:not(.bg-sky-500):not(.bg-blue-600):not(.bg-rose-500):not(.bg-emerald-500):not(.from-sky-500),
-html.light .text-slate-100,
-html.light .text-slate-200 {
+/* Text colors in Light Mode (excluding Hero Banner which sits on dark photo overlay) */
+html.light .text-white:not(.hero-banner *):not(.bg-sky-500):not(.bg-blue-600):not(.bg-rose-500):not(.bg-emerald-500):not(.from-sky-500),
+html.light .text-slate-100:not(.hero-banner *),
+html.light .text-slate-200:not(.hero-banner *) {
   color: #0f172a !important;
 }
 
-html.light .text-slate-300,
-html.light .text-slate-400,
-html.light .text-slate-500 {
+html.light .text-slate-300:not(.hero-banner *),
+html.light .text-slate-400:not(.hero-banner *),
+html.light .text-slate-500:not(.hero-banner *) {
   color: #334155 !important;
 }
 
-html.light .text-sky-400,
-html.light .text-sky-300,
-html.light .text-sky-200 {
+html.light .text-sky-400:not(.hero-banner *),
+html.light .text-sky-300:not(.hero-banner *),
+html.light .text-sky-200:not(.hero-banner *) {
   color: #0284c7 !important;
 }
 
@@ -214,16 +213,36 @@ html.light .bg-sky-500:hover {
   background-color: #0369a1 !important;
 }
 
-/* Preserve white text on Hero Banner photo overlay & gradient badges in Light Mode */
-html.light .hero-banner,
-html.light .hero-banner h2,
-html.light .hero-banner p,
-html.light .hero-banner div:not(button) {
+/* Preserve crisp white & sky-blue text on Hero Banner photo overlay in Light Mode */
+html.light .hero-banner .text-white,
+html.light .hero-banner .text-slate-100,
+html.light .photo-overlay-bar,
+html.light .photo-overlay-bar .text-slate-200 {
   color: #ffffff !important;
 }
 
-html.light .hero-banner .text-sky-300 {
+html.light .hero-banner .text-slate-200,
+html.light .hero-banner [class*="text-slate-300"] {
+  color: #e2e8f0 !important;
+}
+
+html.light .hero-banner .text-sky-300,
+html.light .photo-overlay-bar .text-sky-300 {
   color: #7dd3fc !important;
+}
+
+html.light .hero-banner button.bg-white\/95,
+html.light .hero-banner button.bg-white\/95 * {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light .hero-banner button[aria-label="Previous Slide"],
+html.light .hero-banner button[aria-label="Next Slide"],
+html.light .hero-banner button[aria-label="Previous Slide"] *,
+html.light .hero-banner button[aria-label="Next Slide"] * {
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  color: #ffffff !important;
 }
 
 html.light .from-sky-500,

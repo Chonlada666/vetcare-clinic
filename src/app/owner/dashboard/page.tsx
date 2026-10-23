@@ -695,9 +695,9 @@ export default function OwnerDashboardPage() {
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
-                    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-                      <span className="text-xs text-slate-300">อัตราค่าบริการเริ่มต้น</span>
-                      <span className="font-bold text-sky-400 text-sm">
+                    <div className="photo-overlay-bar absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
+                      <span className="text-xs text-slate-200">อัตราค่าบริการเริ่มต้น</span>
+                      <span className="font-bold text-sky-300 text-sm">
                         {formatCurrency(service.price)}
                       </span>
                     </div>
