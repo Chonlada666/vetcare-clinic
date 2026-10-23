@@ -41,12 +41,11 @@ export default function ServicesCataloguePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="border-b border-slate-800 pb-4">
-        <div className="text-sky-400 font-black text-xs uppercase tracking-widest mb-1">
-          SERVICES & PRICE CATALOGUE
+      <div className="border-b border-slate-800 pb-5">
+        <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+          SERVICES &amp; PRICE CATALOGUE
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
-          <HeartPulse className="w-8 h-8 text-sky-400" />
+        <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
           รายการบริการและอัตราค่าบริการคลินิก
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">

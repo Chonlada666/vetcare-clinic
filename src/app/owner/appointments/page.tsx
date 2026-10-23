@@ -87,10 +87,12 @@ export default function OwnerAppointmentsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <Calendar className="w-7 h-7 text-sky-400" />
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            APPOINTMENT MANAGEMENT
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
             ประวัติและการจัดการนัดหมาย
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -100,9 +102,9 @@ export default function OwnerAppointmentsPage() {
 
         <a
           href="/owner/booking"
-          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 text-xs sm:text-sm transition transform hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-5 py-2.5 rounded-md text-xs sm:text-sm transition"
         >
-          <CalendarCheck className="w-4 h-4" /> จองคิวนัดหมายใหม่
+          <span>จองคิวนัดหมายใหม่</span>
         </a>
       </div>
 
@@ -196,10 +198,10 @@ export default function OwnerAppointmentsPage() {
                       </div>
                       <div className="text-[11px] text-sky-300">
                         {relatedBill.status === 'paid'
-                          ? '✓ ชำระเงินเรียบร้อยแล้ว (SlipOK Verified)'
+                          ? 'ชำระเงินเรียบร้อยแล้ว (SlipOK Verified)'
                           : relatedBill.status === 'verifying'
-                          ? '⏳ แนบสลิปแล้ว กำลังรอตรวจสอบ'
-                          : '⚠️ หมอตรวจเสร็จสิ้นแล้ว กรุณากดชำระเงินและแนบสลิป'}
+                          ? 'แนบสลิปแล้ว กำลังรอตรวจสอบ'
+                          : 'หมอตรวจเสร็จสิ้นแล้ว กรุณากดชำระเงินและแนบสลิป'}
                       </div>
                     </div>
 

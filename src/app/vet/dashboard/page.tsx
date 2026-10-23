@@ -38,45 +38,85 @@ export default function VetDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-white pb-16">
-      {/* Vet Welcome Header - Unified Midnight Navy Dark Theme */}
-      <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
+      {/* Vet Corporate Welcome & Stats Section */}
+      <section className="py-6 sm:py-8 text-center space-y-8 border-b border-slate-800/80">
+        <div className="max-w-2xl mx-auto space-y-4">
           <img
             src={activeVet.avatar}
             alt={activeVet.name}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-4 ring-sky-500/20 shadow-md"
+            className="w-20 h-20 rounded-full object-cover border border-slate-700 mx-auto"
           />
-          <div>
-            <div className="inline-flex items-center gap-2 bg-sky-500/20 text-sky-300 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border border-sky-500/30">
-              <Stethoscope className="w-3.5 h-3.5" /> พอร์ทัลสัตวแพทย์ (Veterinarian Portal)
+          <div className="space-y-1">
+            <div className="text-xs font-bold tracking-[0.2em] text-sky-400 uppercase">
+              VETERINARIAN CLINICAL PORTAL
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black mt-1 text-white">{activeVet.name}</h1>
-            <p className="text-slate-300 text-xs sm:text-sm">{activeVet.specialty} &bull; ใบอนุญาต {activeVet.licenseNo}</p>
+            <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide">
+              {activeVet.name}
+            </h1>
+            <p className="text-slate-400 text-xs sm:text-sm">
+              {activeVet.specialty} &bull; ใบอนุญาตประกอบวิชาชีพ {activeVet.licenseNo}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-center gap-4 pt-2">
+            <a
+              href="/vet/schedule"
+              className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs sm:text-sm rounded-md transition cursor-pointer"
+            >
+              ดูตารางออกตรวจ
+            </a>
+            <a
+              href="/vet/treatments"
+              className="px-6 py-2.5 bg-transparent hover:bg-slate-800 text-slate-200 font-semibold text-xs sm:text-sm rounded-md border border-slate-700 transition cursor-pointer"
+            >
+              ห้องตรวจรักษา (EMR)
+            </a>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="/vet/schedule"
-            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-4 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-xs sm:text-sm cursor-pointer"
-          >
-            <Calendar className="w-4 h-4 stroke-[2.5]" />
-            ดูตารางออกตรวจ
-          </a>
-          <a
-            href="/vet/treatments"
-            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl border border-slate-700 transition text-xs sm:text-sm cursor-pointer"
-          >
-            <PawPrint className="w-4 h-4 text-sky-400" />
-            ห้องตรวจรักษา
-          </a>
+        {/* 3-Column Minimal Stats with Vertical Dividers */}
+        <div className="max-w-4xl mx-auto pt-2 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
+          <div className="py-4 sm:py-2 px-6 flex flex-col items-center justify-center space-y-1.5">
+            <span className="text-xs sm:text-sm font-bold text-amber-400 tracking-wide">
+              คิวตรวจรอพบแพทย์
+            </span>
+            <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+              {waitingPatients.length}
+            </span>
+            <span className="text-xs sm:text-sm font-bold text-slate-300">
+              เคส
+            </span>
+          </div>
+
+          <div className="py-4 sm:py-2 px-6 flex flex-col items-center justify-center space-y-1.5">
+            <span className="text-xs sm:text-sm font-bold text-emerald-400 tracking-wide">
+              ตรวจเสร็จสิ้นแล้ว
+            </span>
+            <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+              {completedToday.length}
+            </span>
+            <span className="text-xs sm:text-sm font-bold text-slate-300">
+              เคส
+            </span>
+          </div>
+
+          <div className="py-4 sm:py-2 px-6 flex flex-col items-center justify-center space-y-1.5">
+            <span className="text-xs sm:text-sm font-bold text-sky-400 tracking-wide">
+              นัดหมายทั้งหมด
+            </span>
+            <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+              {myAppointments.length}
+            </span>
+            <span className="text-xs sm:text-sm font-bold text-slate-300">
+              เคส
+            </span>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Date Filter Bar - Dynamic Date Picker */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
         <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-sky-400" />
           <span className="text-xs sm:text-sm font-bold text-white">เลือกดูคิวตรวจประจำวันที่:</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -89,56 +129,25 @@ export default function VetDashboardPage() {
               } catch {}
             }}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3.5 py-2 rounded-xl border border-slate-700 text-xs sm:text-sm font-bold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden cursor-pointer [color-scheme:dark]"
+            className="px-3.5 py-2 rounded-md border border-slate-700 text-xs sm:text-sm font-bold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden cursor-pointer [color-scheme:dark]"
           />
-          <span className="text-xs font-semibold text-sky-300 bg-sky-500/20 px-3 py-2 rounded-xl border border-sky-500/30">
+          <span className="text-xs font-semibold text-sky-300 bg-sky-500/20 px-3 py-2 rounded-md border border-sky-500/30">
             {formatThaiDate(selectedDate)}
           </span>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold">
-            <Clock className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-medium">คิวตรวจรอพบแพทย์</div>
-            <div className="text-2xl font-black text-amber-400">{waitingPatients.length} <span className="text-xs font-normal text-slate-500">เคส</span></div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-medium">ตรวจเสร็จสิ้นแล้ว</div>
-            <div className="text-2xl font-black text-emerald-400">{completedToday.length} <span className="text-xs font-normal text-slate-500">เคส</span></div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center font-bold">
-            <Calendar className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 font-medium">นัดหมายทั้งหมด</div>
-            <div className="text-2xl font-black text-white">{myAppointments.length} <span className="text-xs font-normal text-slate-500">เคส</span></div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Treatment Queue Section */}
-      <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
+      <div className="bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-800 space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Clock className="w-5 h-5 text-sky-400" />
+            <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+              DAILY PATIENT QUEUE
+            </div>
+            <h2 className="text-lg sm:text-xl font-light text-white tracking-wide">
               คิวตรวจรักษาประจำวัน ({formatThaiDate(selectedDate)})
             </h2>
-            <p className="text-xs text-slate-400">รายชื่อสัตว์เลี้ยงที่นัดหมายเข้ารับการตรวจกับแพทย์</p>
+            <p className="text-xs text-slate-400 mt-0.5">รายชื่อสัตว์เลี้ยงที่นัดหมายเข้ารับการตรวจกับแพทย์</p>
           </div>
           <a href="/vet/treatments" className="text-xs font-bold text-sky-400 hover:underline">
             ดูห้องตรวจทั้งหมด

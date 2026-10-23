@@ -46,11 +46,13 @@ export default function VetTreatmentsQueuePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-white pb-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <Stethoscope className="w-7 h-7 text-sky-400" />
-            ห้องตรวจรักษา & รายชื่อคิวตรวจ (EMR Queue)
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            CLINICAL EMR QUEUE
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
+            ห้องตรวจรักษา &amp; รายชื่อคิวตรวจ
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             เลือกเคสสัตว์เลี้ยงเพื่อเข้าสู่หน้าจอบันทึกการตรวจรักษาและการสั่งจ่ายยา

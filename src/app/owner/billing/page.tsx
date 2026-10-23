@@ -174,10 +174,12 @@ export default function OwnerBillingPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <CreditCard className="w-7 h-7 text-sky-400" />
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            BILLING &amp; OFFICIAL RECEIPTS
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
             ระบบชำระเงินและใบเสร็จรับเงิน
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -187,12 +189,12 @@ export default function OwnerBillingPage() {
       </div>
 
       {/* Modern Midnight Blue Payment Information Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-sky-900/60 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2.5">
-          <div className="text-xs font-black text-sky-400 uppercase tracking-widest flex items-center gap-2">
-            <Building2 className="w-4 h-4" /> ข้อมูลบัญชีสำหรับโอนเงิน (PAYMENT INFORMATION)
+          <div className="text-xs font-bold text-sky-400 uppercase tracking-[0.2em]">
+            PAYMENT INFORMATION
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white">คลินิกรักษาสัตว์ VetCare จำกัด</h2>
+          <h2 className="text-xl sm:text-2xl font-light text-white tracking-wide">คลินิกรักษาสัตว์ VetCare จำกัด</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300 pt-1">
             <div>ธนาคาร: <strong className="text-white">ธนาคารกสิกรไทย (KBANK)</strong></div>
             <div>เลขที่บัญชี: <strong className="text-sky-300 font-mono text-sm bg-slate-950/80 border border-slate-800 px-2.5 py-0.5 rounded-md">090-8-46418-4</strong></div>
@@ -201,12 +203,12 @@ export default function OwnerBillingPage() {
           </div>
         </div>
 
-        <div className="p-3 bg-slate-950 rounded-2xl shrink-0 text-center shadow-xl border border-slate-800 flex flex-col items-center">
-          <div className="w-28 h-28 bg-white p-1.5 rounded-xl shadow-md flex items-center justify-center">
+        <div className="p-3 bg-slate-950 rounded-xl shrink-0 text-center shadow-md border border-slate-800 flex flex-col items-center">
+          <div className="w-28 h-28 bg-white p-1.5 rounded-lg shadow-sm flex items-center justify-center">
             <img
               src="https://promptpay.io/0955506741.png"
               alt="PromptPay QR Code 0955506741"
-              className="w-full h-full object-contain rounded-lg"
+              className="w-full h-full object-contain rounded"
             />
           </div>
           <span className="text-[10px] font-bold text-sky-400 block mt-1.5">QR พร้อมเพย์ 095-550-6741</span>
@@ -215,8 +217,7 @@ export default function OwnerBillingPage() {
 
       {/* Bills List Section */}
       <div className="space-y-4 pt-2">
-        <h2 className="text-lg font-black text-white flex items-center gap-2">
-          <FileText className="w-5 h-5 text-sky-400" />
+        <h2 className="text-lg font-bold text-white tracking-wide">
           รายการบิลค่ารักษาพยาบาล
         </h2>
 
@@ -280,8 +281,7 @@ export default function OwnerBillingPage() {
                   {bill.status === 'paid' && tr && tr.prescriptions.length > 0 && (
                     <div className="p-3.5 bg-emerald-950/40 border border-emerald-800/50 rounded-xl text-xs text-emerald-300 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 font-bold">
-                        <Pill className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>💊 กรุณาติดต่อรับยาและเวชภัณฑ์ที่เคาน์เตอร์จ่ายยา (ช่องบริการที่ 1)</span>
+                        <span>กรุณาติดต่อรับยาและเวชภัณฑ์ที่เคาน์เตอร์จ่ายยา (ช่องบริการที่ 1)</span>
                       </div>
                       <span className="text-[11px] text-emerald-400 font-semibold hidden sm:inline">
                         มีรายการยา {tr.prescriptions.length} รายการ
@@ -555,10 +555,7 @@ export default function OwnerBillingPage() {
                             <span>กำลังตรวจสอบสลิป...</span>
                           </>
                         ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            <span>ตรวจสอบสลิปและยืนยันการชำระเงิน</span>
-                          </>
+                          <span>ตรวจสอบสลิปและยืนยันการชำระเงิน</span>
                         )}
                       </button>
 

@@ -163,11 +163,34 @@ function LoginForm() {
   return (
     <div className="max-w-md mx-auto my-6 sm:my-10 px-4 space-y-6">
       {/* Brand Header */}
-      <div className="text-center space-y-2">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 mx-auto flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
-          <HeartPulse className="w-8 h-8" />
+      <div className="text-center space-y-2.5">
+        <div className="w-14 h-14 mx-auto flex items-center justify-center">
+          <svg
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+          >
+            <path
+              d="M20 3L6 8.5V19.5C6 28.4 11.95 35.85 20 38C28.05 35.85 34 28.4 34 19.5V8.5L20 3Z"
+              className="fill-slate-900 stroke-sky-500"
+              strokeWidth="2.2"
+            />
+            <path
+              d="M20 6.2L9 10.5V19.2C9 26.4 13.7 32.5 20 34.4C26.3 32.5 31 26.4 31 19.2V10.5L20 6.2Z"
+              className="stroke-sky-400/30"
+              strokeWidth="1"
+            />
+            <path
+              d="M18 13H22V18H27V22H22V27H18V22H13V18H18V13Z"
+              className="fill-sky-400"
+            />
+          </svg>
         </div>
-        <h1 className="text-2xl font-black text-white tracking-tight">
+        <div className="text-sky-400 font-bold text-[11px] uppercase tracking-[0.2em]">
+          VETCARE VETERINARY HOSPITAL
+        </div>
+        <h1 className="text-2xl font-light text-white tracking-wide uppercase">
           {mode === 'login'
             ? 'เข้าสู่ระบบ VetCare Clinic'
             : mode === 'register'

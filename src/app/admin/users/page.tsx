@@ -248,11 +248,13 @@ export default function AdminUsersAndVetsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-white pb-16">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <Users className="w-7 h-7 text-sky-400" />
-            จัดการผู้ใช้งาน & สัตวแพทย์
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            USERS &amp; VETERINARY STAFF
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
+            จัดการผู้ใช้งาน &amp; สัตวแพทย์
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             บริหารจัดการบัญชีผู้ใช้งาน เจ้าของสัตว์เลี้ยง แอดมิน และข้อมูลตารางออกตรวจของสัตวแพทย์
@@ -263,17 +265,17 @@ export default function AdminUsersAndVetsPage() {
         {activeTab === 'users' ? (
           <button
             onClick={openAddUserModal}
-            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-xs sm:text-sm cursor-pointer"
+            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-5 py-2.5 rounded-md transition text-xs sm:text-sm cursor-pointer"
           >
-            <UserPlus className="w-4 h-4 stroke-[2.5]" />
+            <UserPlus className="w-4 h-4" />
             <span>เพิ่มผู้ใช้งานใหม่</span>
           </button>
         ) : (
           <button
             onClick={openAddVetModal}
-            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-xs sm:text-sm cursor-pointer"
+            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-5 py-2.5 rounded-md transition text-xs sm:text-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <Plus className="w-4 h-4" />
             <span>เพิ่มสัตวแพทย์ใหม่</span>
           </button>
         )}

@@ -142,11 +142,13 @@ export default function AdminServicesAndMedsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-white pb-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <FileText className="w-7 h-7 text-sky-400" />
-            จัดการรายการบริการ & คลังยาเวชภัณฑ์
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            SERVICES &amp; PHARMACY INVENTORY
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
+            จัดการรายการบริการ &amp; คลังยาเวชภัณฑ์
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             กำหนดอัตราค่าบริการ และจัดการสต็อกยา/วัคซีนของคลินิก
@@ -156,16 +158,16 @@ export default function AdminServicesAndMedsPage() {
         {activeTab === 'services' ? (
           <button
             onClick={openAddService}
-            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-xs sm:text-sm cursor-pointer"
+            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-5 py-2.5 rounded-md transition text-xs sm:text-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" /> เพิ่มรายการบริการใหม่
+            <Plus className="w-4 h-4" /> เพิ่มรายการบริการใหม่
           </button>
         ) : (
           <button
             onClick={openAddMed}
-            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 transition text-xs sm:text-sm cursor-pointer"
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-2.5 rounded-md transition text-xs sm:text-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" /> เพิ่มรายการยาใหม่
+            <Plus className="w-4 h-4" /> เพิ่มรายการยาใหม่
           </button>
         )}
       </div>

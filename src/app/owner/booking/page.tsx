@@ -197,8 +197,11 @@ function BookingContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8 pb-12">
       {/* Page Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+      <div className="text-center space-y-2 border-b border-slate-800 pb-6">
+        <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em]">
+          ONLINE APPOINTMENT RESERVATION
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
           ระบบจองคิวนัดหมายตรวจรักษา
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto">
@@ -320,8 +323,7 @@ function BookingContent() {
         {step === 2 && (
           <div className="space-y-6">
             <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <Stethoscope className="w-5 h-5 text-sky-400" />
+              <h2 className="text-lg font-bold text-white">
                 ขั้นตอนที่ 2: เลือกบริการตรวจรักษา
               </h2>
               <p className="text-xs text-slate-400 mt-1">
@@ -379,8 +381,7 @@ function BookingContent() {
         {step === 3 && (
           <div className="space-y-6">
             <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-sky-400" />
+              <h2 className="text-lg font-bold text-white">
                 ขั้นตอนที่ 3: เลือกวันและช่วงเวลาตรวจ
               </h2>
               <p className="text-xs text-slate-400 mt-1">
@@ -489,8 +490,7 @@ function BookingContent() {
         {step === 4 && (
           <div className="space-y-6">
             <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-lg font-bold text-white">
                 ขั้นตอนที่ 4: ตรวจสอบและยืนยันการจองคิว
               </h2>
               <p className="text-xs text-slate-400 mt-1">

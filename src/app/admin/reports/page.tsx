@@ -59,13 +59,12 @@ export default function AdminReportsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-white pb-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <div className="text-sky-400 font-bold text-xs uppercase tracking-wider mb-1">
-            ANALYTICS & REPORTING
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            ANALYTICS &amp; REPORTING
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <TrendingUp className="w-8 h-8 text-sky-400" />
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
             รายงานสถิติและผลการดำเนินงานคลินิก
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -75,38 +74,34 @@ export default function AdminReportsPage() {
 
         <button
           onClick={handleExportCSV}
-          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 text-xs sm:text-sm transition cursor-pointer"
+          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-5 py-2.5 rounded-md text-xs sm:text-sm transition cursor-pointer"
         >
-          <Download className="w-4 h-4 stroke-[2.5]" /> ส่งออกรายงาน (CSV)
+          <Download className="w-4 h-4" /> ส่งออกรายงาน (CSV)
         </button>
       </div>
 
       {/* Report Selector Tabs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { key: 'revenue', label: '1. รายงานรายได้', icon: DollarSign, color: 'text-emerald-400' },
-          { key: 'queue', label: '2. รายงานการจองคิว', icon: Calendar, color: 'text-sky-400' },
-          { key: 'medicines', label: '3. รายงานการใช้ยา', icon: Pill, color: 'text-purple-400' },
-          { key: 'pets', label: '4. รายงานสัตว์เลี้ยง', icon: PawPrint, color: 'text-amber-400' },
+          { key: 'revenue', label: '1. รายงานรายได้' },
+          { key: 'queue', label: '2. รายงานการจองคิว' },
+          { key: 'medicines', label: '3. รายงานการใช้ยา' },
+          { key: 'pets', label: '4. รายงานสัตว์เลี้ยง' },
         ].map((tab) => {
-          const Icon = tab.icon;
           const isActive = selectedReport === tab.key;
           return (
             <button
               key={tab.key}
               onClick={() => setSelectedReport(tab.key as any)}
-              className={`p-4 rounded-2xl border text-left transition flex items-center gap-3 cursor-pointer ${
+              className={`p-4 rounded-xl border text-left transition cursor-pointer ${
                 isActive
-                  ? 'bg-slate-900 border-sky-500 ring-2 ring-sky-500/30 text-white shadow-md'
-                  : 'bg-slate-900 border-slate-800 hover:bg-slate-800 text-slate-400 shadow-xs'
+                  ? 'bg-slate-900 border-sky-500 ring-1 ring-sky-500/30 text-white'
+                  : 'bg-slate-900 border-slate-800 hover:bg-slate-800 text-slate-400'
               }`}
             >
-              <div className={`p-2.5 rounded-xl bg-slate-950 border border-slate-800 ${tab.color}`}>
-                <Icon className="w-5 h-5" />
-              </div>
               <div>
                 <div className="text-xs font-bold text-white">{tab.label}</div>
-                <div className="text-[11px] text-slate-400">คลิกเพื่อดูสถิติ</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">คลิกเพื่อดูสถิติ</div>
               </div>
             </button>
           );
@@ -325,9 +320,8 @@ export default function AdminReportsPage() {
               </div>
             </div>
 
-            <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-4">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <PawPrint className="w-5 h-5 text-sky-400" />
+            <div className="bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-800 space-y-4">
+              <h3 className="font-bold text-white text-base">
                 รายชื่อสัตว์เลี้ยงล่าสุด
               </h3>
 

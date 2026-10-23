@@ -179,26 +179,22 @@ export default function DatabaseExplorerPage() {
   return (
     <div className="space-y-6 text-white pb-16">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-800">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/30 shrink-0">
-            <Database className="w-8 h-8" />
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-slate-800 pb-5">
+        <div>
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            GOOGLE CLOUD FIRESTORE DATABASE EXPLORER
           </div>
-          <div>
-            <div className="inline-flex items-center gap-2 bg-sky-500/20 text-sky-300 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border border-sky-400/30">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>Google Cloud Firestore Database Explorer</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black mt-1">ฐานข้อมูลคลาวด์สด (Live Database)</h1>
-            <p className="text-slate-300 text-xs sm:text-sm mt-0.5">
-              โปรเจกต์: <code className="text-sky-300 font-bold bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">it-project-c699e</code> &bull; ซิงค์ข้อมูล Real-Time โดยตรง ไม่ต้องล็อกอิน 2SV
-            </p>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
+            ฐานข้อมูลคลาวด์สด (Live Database)
+          </h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-1">
+            โปรเจกต์: <code className="text-sky-300 font-bold bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">it-project-c699e</code> &bull; ซิงค์ข้อมูล Real-Time โดยตรง
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold border border-emerald-500/30 shadow-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 px-3.5 py-2 rounded-md text-xs font-bold border border-emerald-500/30">
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span>สถานะ: เชื่อมต่อ Real-Time</span>
           </span>
           <button
@@ -207,7 +203,7 @@ export default function DatabaseExplorerPage() {
                 resetToMockData();
               }
             }}
-            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-4 py-2 rounded-xl border border-slate-700 transition cursor-pointer"
+            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-4 py-2 rounded-md border border-slate-700 transition cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5 text-sky-400" />
             <span>รีเฟรชฐานข้อมูล</span>

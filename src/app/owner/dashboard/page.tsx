@@ -78,8 +78,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*บริการฉีดและตรวจสุขภาพโดยสัตวแพทย์มีใบอนุญาตถูกต้องทุกเคส',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_2',
-    bgImage: '/banner-dog-cat.jpg',
-    centerPetImage: '/banner-dog-cat.jpg',
+    bgImage: '/banner-vaccine-sugarglider.jpg',
+    centerPetImage: '/banner-vaccine-sugarglider.jpg',
   },
   {
     id: 4,

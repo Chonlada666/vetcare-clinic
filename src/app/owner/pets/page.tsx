@@ -177,10 +177,12 @@ export default function OwnerPetsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <PawPrint className="w-7 h-7 text-sky-400" />
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            PET REGISTRY &amp; PROFILES
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
             สัตว์เลี้ยงของฉัน
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -190,9 +192,9 @@ export default function OwnerPetsPage() {
 
         <button
           onClick={openAddModal}
-          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition transform hover:-translate-y-0.5 text-xs sm:text-sm cursor-pointer"
+          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-5 py-2.5 rounded-md transition text-xs sm:text-sm cursor-pointer"
         >
-          <Plus className="w-4 h-4 stroke-[3]" />
+          <Plus className="w-4 h-4" />
           <span>เพิ่มสัตว์เลี้ยงใหม่</span>
         </button>
       </div>
@@ -299,7 +301,7 @@ export default function OwnerPetsPage() {
 
                     {pet.allergies && (
                       <div className="text-xs p-2.5 rounded-xl bg-rose-950/40 border border-rose-800/40 text-rose-300">
-                        <strong className="block text-[11px] text-rose-400 font-bold">⚠️ ประวัติแพ้ยา/อาหาร:</strong>
+                        <strong className="block text-[11px] text-rose-400 font-bold">ประวัติแพ้ยา/อาหาร:</strong>
                         <span className="text-[11px]">{pet.allergies}</span>
                       </div>
                     )}
@@ -310,9 +312,8 @@ export default function OwnerPetsPage() {
                 <div className="p-5 pt-0">
                   <a
                     href={`/owner/booking?petId=${pet.id}`}
-                    className="w-full py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-sky-400 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-slate-700 cursor-pointer"
+                    className="w-full py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-sky-400 font-bold rounded-md text-xs flex items-center justify-center gap-1.5 transition border border-slate-700 cursor-pointer"
                   >
-                    <Calendar className="w-4 h-4" />
                     <span>จองคิวตรวจให้น้อง {pet.name}</span>
                   </a>
                 </div>
@@ -321,13 +322,12 @@ export default function OwnerPetsPage() {
           })}
         </div>
       ) : (
-        <div className="bg-slate-900 rounded-3xl border border-dashed border-slate-800 p-12 text-center space-y-3">
-          <PawPrint className="w-12 h-12 text-slate-600 mx-auto" />
+        <div className="bg-slate-900 rounded-2xl border border-dashed border-slate-800 p-12 text-center space-y-3">
           <h3 className="font-bold text-white text-base">ไม่พบข้อมูลสัตว์เลี้ยง</h3>
           <p className="text-xs text-slate-400">คุณยังไม่ได้ลงทะเบียนสัตว์เลี้ยง หรือไม่พบข้อมูลตามคำค้นหา</p>
           <button
             onClick={openAddModal}
-            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black px-4 py-2 rounded-xl mt-2 transition cursor-pointer"
+            className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold px-4 py-2 rounded-md mt-2 transition cursor-pointer"
           >
             <Plus className="w-4 h-4" /> เพิ่มสัตว์เลี้ยงตัวแรก
           </button>
@@ -342,10 +342,9 @@ export default function OwnerPetsPage() {
             if (e.target === e.currentTarget) setIsModalOpen(false);
           }}
         >
-          <div className="bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-800 my-8 text-white">
+          <div className="bg-slate-900 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-800 my-8 text-white">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="font-black text-white text-lg flex items-center gap-2">
-                <PawPrint className="w-5 h-5 text-sky-400" />
+              <h3 className="font-bold text-white text-lg">
                 {editingPet ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'ลงทะเบียนสัตว์เลี้ยงใหม่'}
               </h3>
               <button
@@ -389,9 +388,8 @@ export default function OwnerPetsPage() {
               </div>
 
               {species === 'อื่นๆ' && (
-                <div className="p-3.5 bg-sky-950/40 border border-sky-800/50 rounded-2xl space-y-1.5 animate-fadeIn">
-                  <label className="block text-xs font-bold text-sky-300 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                <div className="p-3.5 bg-sky-950/40 border border-sky-800/50 rounded-xl space-y-1.5 animate-fadeIn">
+                  <label className="block text-xs font-bold text-sky-300">
                     ระบุชนิดสัตว์เลี้ยง (อื่นๆ) *
                   </label>
                   <input

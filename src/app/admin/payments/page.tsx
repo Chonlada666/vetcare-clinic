@@ -128,11 +128,13 @@ export default function AdminPaymentsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <CreditCard className="w-7 h-7 text-sky-400" />
-            ระบบตรวจสอบการชำระเงิน & ออกใบเสร็จ
+          <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-1">
+            PAYMENT VERIFICATION &amp; RECEIPTS
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide uppercase">
+            ระบบตรวจสอบการชำระเงิน &amp; ออกใบเสร็จ
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             ตรวจสอบความถูกต้องของสลิปโอนเงิน อนุมัติยอด และออกใบเสร็จรับเงินให้แก่เจ้าของสัตว์เลี้ยง
@@ -141,7 +143,7 @@ export default function AdminPaymentsPage() {
 
         <button
           onClick={() => setIsConfigModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-4 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition text-xs cursor-pointer"
+          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2.5 rounded-md transition text-xs cursor-pointer"
         >
           <KeyRound className="w-4 h-4" />
           <span>ตั้งค่าเชื่อมต่อ SlipOK ของจริง</span>
@@ -149,11 +151,11 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* SlipOK API Integration Status Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white">
         <div className="space-y-1.5 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" /> SLIPOK OFFICIAL API INTEGRATION
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-sky-400">
+              SLIPOK OFFICIAL API INTEGRATION
             </span>
             {slipOkStatus?.isConfigured ? (
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">

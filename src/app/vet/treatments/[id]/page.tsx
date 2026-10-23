@@ -269,29 +269,29 @@ export default function ClinicalEMRPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-white pb-16">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/vet/treatments')}
-            className="p-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl border border-slate-700 transition cursor-pointer"
+            className="p-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-md border border-slate-700 transition cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <div className="text-sky-400 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-              <Stethoscope className="w-4 h-4" /> บันทึกการตรวจรักษา (EMR)
+            <div className="text-sky-400 font-bold text-xs uppercase tracking-[0.2em] mb-0.5">
+              ELECTRONIC MEDICAL RECORD (EMR)
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide">
               ห้องตรวจเคส: {pet.name} ({petSpeciesDisplay})
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="font-mono px-3 py-1.5 bg-slate-800 text-slate-300 rounded-xl font-bold border border-slate-700">
+          <span className="font-mono px-3 py-1.5 bg-slate-800 text-slate-300 rounded-md font-bold border border-slate-700">
             รหัสคิว: {appointment.id}
           </span>
-          <span className="px-3 py-1.5 bg-sky-500/20 text-sky-300 rounded-xl font-bold border border-sky-500/30">
+          <span className="px-3 py-1.5 bg-sky-500/20 text-sky-300 rounded-md font-bold border border-sky-500/30">
             เวลานัด: {appointment.timeSlot} น.
           </span>
         </div>
@@ -331,7 +331,7 @@ export default function ClinicalEMRPage() {
 
             {pet.allergies && (
               <div className="p-3 bg-rose-950/40 border border-rose-800/60 rounded-xl text-rose-200 text-xs">
-                <strong className="block text-rose-400">⚠️ ประวัติแพ้ยา/อาหาร:</strong>
+                <strong className="block text-rose-400">ประวัติแพ้ยา/อาหาร:</strong>
                 <span>{pet.allergies}</span>
               </div>
             )}
