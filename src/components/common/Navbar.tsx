@@ -191,7 +191,7 @@ export function Navbar() {
               )}
             </button>
 
-            {currentUser ? (
+            {currentUser && (
               <div className="hidden md:flex items-center gap-4 shrink-0 whitespace-nowrap">
                 <div className="flex items-center gap-3 pl-3 border-l border-slate-800 shrink-0 whitespace-nowrap">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white ring-2 ring-sky-500/30 shrink-0 shadow-xs">
@@ -219,21 +219,6 @@ export function Navbar() {
                     <LogOut className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 sm:gap-2.5 pl-2 border-l border-slate-800 shrink-0 whitespace-nowrap">
-                <a
-                  href="/login"
-                  className="px-3.5 py-1.5 rounded-md border border-slate-700 bg-transparent hover:bg-slate-800 text-slate-200 text-xs font-bold transition whitespace-nowrap"
-                >
-                  เข้าสู่ระบบ
-                </a>
-                <a
-                  href="/register"
-                  className="px-3.5 py-1.5 rounded-md bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold transition whitespace-nowrap shadow-xs"
-                >
-                  สมัครสมาชิก
-                </a>
               </div>
             )}
 

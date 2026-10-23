@@ -349,22 +349,6 @@ function LoginForm() {
               <span>เข้าสู่ระบบ</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-
-            <div className="pt-3 border-t border-slate-800 space-y-2.5 text-center">
-              <div className="text-xs text-slate-400">ยังไม่มีบัญชีสมาชิกเจ้าของสัตว์เลี้ยง?</div>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('register');
-                  setErrorMsg('');
-                  setSuccessMsg('');
-                }}
-                className="w-full py-2.5 bg-transparent hover:bg-slate-800 text-sky-400 border border-sky-500/40 hover:border-sky-400 font-bold rounded-xl transition flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer"
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>สมัครสมาชิกใหม่ (ลงทะเบียนฟรี)</span>
-              </button>
-            </div>
           </form>
         )}
 
