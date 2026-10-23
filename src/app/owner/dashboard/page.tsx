@@ -96,8 +96,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*ขูดหินปูนด้วยเครื่องสั่นอัลตราโซนิกประสิทธิภาพสูง ลดการระคายเคือง',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_4',
-    bgImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1600&q=80',
-    centerPetImage: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=800&q=80',
+    bgImage: '/banner-dental-cat.jpg',
+    centerPetImage: '/banner-dental-cat.jpg',
   },
   {
     id: 5,
@@ -114,8 +114,8 @@ const BANNER_SLIDES = [
     disclaimer1: '*ใช้กล้องจุลทรรศน์และชุดตรวจแล็บมาตรฐานความแม่นยำสูง',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_5',
-    bgImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1600&q=80',
-    centerPetImage: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&w=800&q=80',
+    bgImage: '/banner-derma-cat.jpg',
+    centerPetImage: '/banner-derma-cat.jpg',
   },
   {
     id: 6,
