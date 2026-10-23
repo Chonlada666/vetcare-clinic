@@ -158,8 +158,8 @@ const SERVICE_POSTER_IMAGES: Record<string, { image: string; ribbon: string; rib
     ribbonColor: 'bg-indigo-500 text-white',
   },
   srv_4: {
-    // ฉีดวัคซีนพิษสุนัขบ้า (Rabies Vaccine) - Rabies vaccine vial & injection syringe
-    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80',
+    // ฉีดวัคซีนพิษสุนัขบ้า (Rabies Vaccine) - Veterinarian vaccinating a dog on exam table
+    image: '/service-rabies-vaccine.jpg',
     ribbon: 'แนะนำ',
     ribbonColor: 'bg-emerald-500 text-slate-950',
   },
