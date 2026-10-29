@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useClinic } from '@/lib/store';
+import { useRouter } from 'next/navigation';
 import { Pet } from '@/types';
 import {
   PawPrint,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export default function OwnerPetsPage() {
+  const router = useRouter();
   const { currentUser, pets, addPet, updatePet, deletePet } = useClinic();
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -310,12 +312,13 @@ export default function OwnerPetsPage() {
 
                 {/* Footer Action */}
                 <div className="p-5 pt-0">
-                  <a
-                    href={`/owner/booking?petId=${pet.id}`}
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/owner/booking?petId=${pet.id}`)}
                     className="w-full py-2.5 bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-sky-400 font-bold rounded-md text-xs flex items-center justify-center gap-1.5 transition border border-slate-700 cursor-pointer"
                   >
                     <span>จองคิวตรวจให้น้อง {pet.name}</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             );

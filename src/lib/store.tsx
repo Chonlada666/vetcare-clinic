@@ -254,7 +254,10 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
           }
 
           try {
-            const activeSessionId = typeof window !== 'undefined' ? sessionStorage.getItem(SESSION_USER_KEY) : null;
+            const activeSessionId =
+              typeof window !== 'undefined'
+                ? sessionStorage.getItem(SESSION_USER_KEY) || localStorage.getItem(SESSION_USER_KEY)
+                : null;
             if (activeSessionId) {
               const activeU = (parsed.users || INITIAL_USERS).find((user: User) => user.id === activeSessionId);
               setCurrentUser(activeU || null);
@@ -505,6 +508,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       try {
         if (typeof window !== 'undefined') {
           sessionStorage.setItem(SESSION_USER_KEY, targetUser.id);
+          localStorage.setItem(SESSION_USER_KEY, targetUser.id);
         }
       } catch (e) {}
     }
@@ -515,6 +519,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     try {
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem(SESSION_USER_KEY);
+        localStorage.removeItem(SESSION_USER_KEY);
       }
     } catch (e) {}
   };
@@ -529,6 +534,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       try {
         if (typeof window !== 'undefined') {
           sessionStorage.setItem(SESSION_USER_KEY, user.id);
+          localStorage.setItem(SESSION_USER_KEY, user.id);
         }
       } catch (e) {}
     }
@@ -665,7 +671,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   // Pets Operations
   const addPet = (petData: Omit<Pet, 'id'>): Pet => {
     const newPet: Pet = { ...petData, id: generateId('pet') };
-    setPets((prev) => [...prev, newPet]);
+    setPets((prev) => {
+      const updated = [...prev, newPet];
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.pets = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.error('LocalStorage sync error in addPet:', e);
+      }
+      return updated;
+    });
     if (isFirebaseConfigured() && db) {
       try {
         setDoc(doc(db, 'pets', newPet.id), sanitizeForFirestore(newPet)).catch((err) =>
@@ -679,7 +696,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updatePet = (id: string, data: Partial<Pet>) => {
-    setPets((prev) => prev.map((p) => (p.id === id ? { ...p, ...data } : p)));
+    setPets((prev) => {
+      const updated = prev.map((p) => (p.id === id ? { ...p, ...data } : p));
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.pets = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.error('LocalStorage sync error in updatePet:', e);
+      }
+      return updated;
+    });
     if (isFirebaseConfigured() && db) {
       try {
         updateDoc(doc(db, 'pets', id), sanitizeForFirestore(data)).catch((err) =>
@@ -692,7 +720,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deletePet = (id: string) => {
-    setPets((prev) => prev.filter((p) => p.id !== id));
+    setPets((prev) => {
+      const updated = prev.filter((p) => p.id !== id);
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.pets = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.error('LocalStorage sync error in deletePet:', e);
+      }
+      return updated;
+    });
     if (isFirebaseConfigured() && db) {
       try {
         deleteDoc(doc(db, 'pets', id)).catch((err) => console.warn('Firestore sync error:', err));
@@ -758,7 +797,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       status: 'pending',
       createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
     };
-    setAppointments((prev) => [newAppointment, ...prev]);
+    setAppointments((prev) => {
+      const updated = [newAppointment, ...prev];
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.appointments = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.error('LocalStorage sync error in createAppointment:', e);
+      }
+      return updated;
+    });
 
     // Real-Time Cloud Firestore Sync
     if (isFirebaseConfigured() && db) {

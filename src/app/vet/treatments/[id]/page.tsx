@@ -449,20 +449,12 @@ export default function ClinicalEMRPage() {
                               ? 'bg-rose-950/80 text-rose-300 border-rose-800'
                               : isOverStock
                               ? 'bg-rose-950/80 text-rose-300 border-rose-700 animate-pulse'
-                              : projectedRemaining < 30
+                              : selectedBaseAvailable < 30
                               ? 'bg-amber-950/60 text-amber-300 border-amber-800'
                               : 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
                           }`}
                         >
-                          {selectedBaseAvailable <= 0 ? (
-                            `❌ หมดสต็อก (เหลือ 0 ${selectedMed.unit})`
-                          ) : isOverStock ? (
-                            `⚠️ สต็อกไม่พอ! มี ${selectedBaseAvailable} ${selectedMed.unit} (ขาด ${typedQty - selectedBaseAvailable})`
-                          ) : typedQty > 0 ? (
-                            `คงเหลือในคลัง: ${selectedBaseAvailable} ${selectedMed.unit} (จ่าย ${typedQty} ➔ เหลือ ${projectedRemaining} ${selectedMed.unit})`
-                          ) : (
-                            `คงเหลือในคลัง: ${selectedBaseAvailable} ${selectedMed.unit}`
-                          )}
+                          คงเหลือในคลัง: {selectedBaseAvailable} {selectedMed.unit}
                         </span>
                       )}
                     </div>
@@ -473,10 +465,9 @@ export default function ClinicalEMRPage() {
                     >
                       {medicines.map((m) => {
                         const available = getBaseAvailableStock(m.id);
-                        const inCurrentRx = prescriptions.find((p) => p.medicineId === m.id)?.quantity || 0;
                         return (
                           <option key={m.id} value={m.id} disabled={available <= 0} className="bg-slate-800 text-white">
-                            {m.name} — [คงเหลือ: {available} {m.unit}{inCurrentRx > 0 ? ` (สั่งจ่ายแล้ว ${inCurrentRx})` : ''}] ({formatCurrency(m.unitPrice)}/{m.unit})
+                            {m.name} — คงเหลือ: {available} {m.unit} ({formatCurrency(m.unitPrice)}/{m.unit})
                           </option>
                         );
                       })}

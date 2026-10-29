@@ -237,11 +237,7 @@ function LoginForm() {
       login(newUser);
 
       setTimeout(() => {
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        } else {
-          router.push('/owner/dashboard');
-        }
+        router.push('/owner/dashboard');
       }, 500);
     } catch (err) {
       console.error('Registration error:', err);

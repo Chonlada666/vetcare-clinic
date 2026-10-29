@@ -10,8 +10,19 @@ export default function HomePage() {
   const { currentUser, isLoaded } = useClinic();
 
   useEffect(() => {
-    router.replace('/login');
-  }, [router]);
+    if (!isLoaded) return;
+    if (currentUser) {
+      if (currentUser.role === 'vet') {
+        router.replace('/vet/dashboard');
+      } else if (currentUser.role === 'admin') {
+        router.replace('/admin/dashboard');
+      } else {
+        router.replace('/owner/dashboard');
+      }
+    } else {
+      router.replace('/login');
+    }
+  }, [currentUser, isLoaded, router]);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-slate-900 text-white">

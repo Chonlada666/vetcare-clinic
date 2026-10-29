@@ -18,6 +18,10 @@ import {
   Sparkles,
   AlertCircle,
   HeartPulse,
+  Plus,
+  X,
+  Upload,
+  Tag,
 } from 'lucide-react';
 
 // Helper to get current today date string YYYY-MM-DD
@@ -58,9 +62,90 @@ function BookingContent() {
   const preSelectedServiceId = searchParams.get('serviceId');
   const preSelectedDate = searchParams.get('date');
 
-  const { currentUser, isLoaded, pets, vets, services, appointments, createAppointment } = useClinic();
+  const { currentUser, isLoaded, pets, vets, services, appointments, createAppointment, addPet } = useClinic();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+
+  // Quick Add Pet modal state
+  const [isAddPetModalOpen, setIsAddPetModalOpen] = useState(false);
+  const [newPetName, setNewPetName] = useState('');
+  const [newPetSpecies, setNewPetSpecies] = useState('สุนัข');
+  const [newPetOtherSpecies, setNewPetOtherSpecies] = useState('');
+  const [newPetBreed, setNewPetBreed] = useState('');
+  const [newPetGender, setNewPetGender] = useState<'male' | 'female'>('male');
+  const [newPetAgeYears, setNewPetAgeYears] = useState<string | number>(1);
+  const [newPetAgeMonths, setNewPetAgeMonths] = useState<string | number>(0);
+  const [newPetWeightKg, setNewPetWeightKg] = useState<string | number>('3.5');
+  const [newPetAllergies, setNewPetAllergies] = useState('');
+  const [newPetPhotoUrl, setNewPetPhotoUrl] = useState('https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=400&q=80');
+  const [newPetNotes, setNewPetNotes] = useState('');
+  const [isSavingPet, setIsSavingPet] = useState(false);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert('ขนาดไฟล์รูปภาพต้องไม่เกิน 10MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewPetPhotoUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleQuickAddPet = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser) return;
+    if (!newPetName.trim()) {
+      alert('กรุณากรอกชื่อสัตว์เลี้ยง');
+      return;
+    }
+    if (newPetSpecies === 'อื่นๆ' && !newPetOtherSpecies.trim()) {
+      alert('กรุณาระบุชนิดสัตว์เลี้ยง');
+      return;
+    }
+
+    setIsSavingPet(true);
+    try {
+      const parsedWeight = parseFloat(String(newPetWeightKg)) || 0;
+      const parsedYears = parseInt(String(newPetAgeYears), 10) || 0;
+      const parsedMonths = parseInt(String(newPetAgeMonths), 10) || 0;
+
+      const payload: any = {
+        ownerId: currentUser.id,
+        name: newPetName.trim(),
+        species: newPetSpecies,
+        breed: newPetBreed.trim(),
+        gender: newPetGender,
+        ageYears: parsedYears,
+        ageMonths: parsedMonths,
+        weightKg: parsedWeight,
+        allergies: newPetAllergies.trim(),
+        photoUrl: newPetPhotoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=400&q=80',
+        notes: newPetNotes.trim(),
+      };
+      if (newPetSpecies === 'อื่นๆ' && newPetOtherSpecies.trim()) {
+        payload.exoticType = newPetOtherSpecies.trim();
+      }
+
+      const created = addPet(payload);
+      setSelectedPetId(created.id);
+      setIsAddPetModalOpen(false);
+
+      // Reset form
+      setNewPetName('');
+      setNewPetBreed('');
+      setNewPetAllergies('');
+      setNewPetNotes('');
+    } catch (err) {
+      console.error('Failed to quick add pet:', err);
+    } finally {
+      setIsSavingPet(false);
+    }
+  };
 
   // Redirect to login if user is not authenticated
   useEffect(() => {
@@ -256,7 +341,19 @@ function BookingContent() {
 
             {/* Select Pet */}
             <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-300">เลือกสัตว์เลี้ยง *</label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-300">เลือกสัตว์เลี้ยง *</label>
+                {myPets.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddPetModalOpen(true)}
+                    className="text-xs text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1 transition cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>เพิ่มสัตว์เลี้ยงใหม่</span>
+                  </button>
+                )}
+              </div>
               {myPets.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {myPets.map((pet) => {
@@ -285,16 +382,34 @@ function BookingContent() {
                       </div>
                     );
                   })}
+                  <button
+                    type="button"
+                    onClick={() => setIsAddPetModalOpen(true)}
+                    className="p-3.5 rounded-2xl border-2 border-dashed border-slate-800 hover:border-sky-500/60 bg-slate-950/60 hover:bg-slate-900 cursor-pointer flex items-center justify-center gap-2 transition text-slate-400 hover:text-sky-300 min-h-[72px]"
+                  >
+                    <Plus className="w-4 h-4 text-sky-400" />
+                    <span className="text-xs font-bold">+ เพิ่มสัตว์เลี้ยงตัวใหม่</span>
+                  </button>
                 </div>
               ) : (
-                <div className="p-6 bg-slate-950 rounded-2xl border border-dashed border-slate-800 text-center space-y-2">
-                  <p className="text-xs text-slate-400">คุณยังไม่มีสัตว์เลี้ยงที่ลงทะเบียน</p>
-                  <a
-                    href="/owner/pets"
-                    className="inline-block px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-xl text-xs font-black transition"
+                <div className="p-8 bg-slate-950 rounded-2xl border-2 border-dashed border-slate-800 text-center space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-sky-500/10 text-sky-400 mx-auto flex items-center justify-center">
+                    <PawPrint className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">คุณยังไม่มีสัตว์เลี้ยงที่ลงทะเบียน</h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      ลงทะเบียนสัตว์เลี้ยงตอนนี้เพื่อเริ่มจองคิวตรวจรักษาได้ทันที สะดวก ไม่ต้องสลับหน้า
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddPetModalOpen(true)}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-xl text-xs font-black transition cursor-pointer shadow-lg shadow-sky-500/20"
                   >
-                    + ไปลงทะเบียนสัตว์เลี้ยงก่อน
-                  </a>
+                    <Plus className="w-4 h-4 stroke-[3]" />
+                    <span>+ ลงทะเบียนสัตว์เลี้ยงทันที</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -580,6 +695,196 @@ function BookingContent() {
           )}
         </div>
       </div>
+
+      {/* Quick Add Pet Modal */}
+      {isAddPetModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-5 text-white shadow-2xl relative my-8">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                  <PawPrint className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">ลงทะเบียนสัตว์เลี้ยงใหม่</h3>
+                  <p className="text-[11px] text-slate-400">กรอกข้อมูลสัตว์เลี้ยงเพื่อจองคิวนัดหมายทันที</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddPetModalOpen(false)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickAddPet} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">ชื่อสัตว์เลี้ยง *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="เช่น น้องโบโก้, มอมแมม"
+                  value={newPetName}
+                  onChange={(e) => setNewPetName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">ชนิดสัตว์เลี้ยง *</label>
+                  <select
+                    value={newPetSpecies}
+                    onChange={(e) => setNewPetSpecies(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  >
+                    <option value="สุนัข">สุนัข (Dog)</option>
+                    <option value="แมว">แมว (Cat)</option>
+                    <option value="กระต่าย">กระต่าย (Rabbit)</option>
+                    <option value="นก">นก (Bird)</option>
+                    <option value="อื่นๆ">อื่นๆ (Exotic Pet)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">เพศ *</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setNewPetGender('male')}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                        newPetGender === 'male'
+                          ? 'border-sky-500 bg-sky-950/60 text-sky-300'
+                          : 'border-slate-800 bg-slate-950 text-slate-400'
+                      }`}
+                    >
+                      เพศผู้ ♂
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewPetGender('female')}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                        newPetGender === 'female'
+                          ? 'border-pink-500 bg-pink-950/60 text-pink-300'
+                          : 'border-slate-800 bg-slate-950 text-slate-400'
+                      }`}
+                    >
+                      เพศเมีย ♀
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {newPetSpecies === 'อื่นๆ' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">ระบุชนิดสัตว์เลี้ยงพิเศษ *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="เช่น ชูการ์ไกลเดอร์, ชินชิลล่า, เต่าซูคาต้า"
+                    value={newPetOtherSpecies}
+                    onChange={(e) => setNewPetOtherSpecies(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">สายพันธุ์</label>
+                <input
+                  type="text"
+                  placeholder="เช่น โกลเด้น รีทรีฟเวอร์, บริติช ช็อตแฮร์"
+                  value={newPetBreed}
+                  onChange={(e) => setNewPetBreed(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">อายุ (ปี)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="50"
+                    value={newPetAgeYears}
+                    onChange={(e) => setNewPetAgeYears(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-950 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">อายุ (เดือน)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="11"
+                    value={newPetAgeMonths}
+                    onChange={(e) => setNewPetAgeMonths(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-950 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">น้ำหนัก (กก.)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    value={newPetWeightKg}
+                    onChange={(e) => setNewPetWeightKg(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-950 text-white text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">ประวัติแพ้ยา / แพ้อาหาร (ถ้ามี)</label>
+                <input
+                  type="text"
+                  placeholder="เช่น แพ้ยาแก้แพ้บางกลุ่ม หรือระบุ - ไม่มี -"
+                  value={newPetAllergies}
+                  onChange={(e) => setNewPetAllergies(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">รูปถ่ายสัตว์เลี้ยง</label>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={newPetPhotoUrl}
+                    alt="Preview"
+                    className="w-12 h-12 rounded-xl object-cover border border-slate-700 bg-slate-950 shrink-0"
+                  />
+                  <label className="flex-1 px-3 py-2 border border-dashed border-slate-700 hover:border-sky-500 rounded-xl text-center text-xs text-slate-400 hover:text-sky-300 cursor-pointer transition flex items-center justify-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>อัปโหลดรูปภาพจากเครื่อง</span>
+                    <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsAddPetModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-xs font-bold transition cursor-pointer"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingPet}
+                  className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black shadow-lg shadow-sky-500/20 transition cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingPet ? 'กำลังบันทึก...' : 'บันทึกและเลือกทันที'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

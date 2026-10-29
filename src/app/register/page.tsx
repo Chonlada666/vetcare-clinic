@@ -122,11 +122,7 @@ function RegisterForm() {
       login(newUser);
 
       setTimeout(() => {
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        } else {
-          router.push('/owner/dashboard');
-        }
+        router.push('/owner/dashboard');
       }, 600);
     } catch (err) {
       console.error('Registration error:', err);
@@ -161,11 +157,7 @@ function RegisterForm() {
     setIsGoogleModalOpen(false);
     setSuccessMsg(`ลงทะเบียนและเข้าสู่ระบบด้วย Google (${cleanEmail}) สำเร็จ! กำลังนำคุณเข้าสู่ระบบ...`);
     setTimeout(() => {
-      if (redirectUrl) {
-        router.push(redirectUrl);
-      } else {
-        router.push('/owner/dashboard');
-      }
+      router.push('/owner/dashboard');
     }, 500);
   };
 
