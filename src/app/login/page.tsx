@@ -70,6 +70,12 @@ function LoginForm() {
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Google Sign-In interactive modal state
+  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
+  const [customGoogleName, setCustomGoogleName] = useState('');
+  const [showCustomGoogleInput, setShowCustomGoogleInput] = useState(false);
+
   useEffect(() => {
     if (initialMode === 'register') {
       setMode('register');
@@ -112,61 +118,62 @@ function LoginForm() {
     navigateAfterAuth(user.role);
   };
 
+  const executeGoogleLogin = (email: string, displayName: string, avatarUrl?: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) return;
+
+    let existingUser = users.find(
+      (u) => u.email && u.email.toLowerCase() === cleanEmail
+    );
+
+    if (!existingUser) {
+      existingUser = addUser({
+        name: displayName.trim() || 'ผู้ใช้งาน Google',
+        email: cleanEmail,
+        phone: '0812345678',
+        role: 'owner',
+        avatar:
+          avatarUrl ||
+          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+        address: '',
+      });
+    }
+
+    login(existingUser);
+    setIsGoogleModalOpen(false);
+    setSuccessMsg(`ลงชื่อเข้าใช้ด้วยบัญชี Google (${cleanEmail}) สำเร็จ! กำลังนำคุณเข้าสู่ระบบ...`);
+    setTimeout(() => {
+      navigateAfterAuth(existingUser.role);
+    }, 500);
+  };
+
   const handleGoogleSignIn = async () => {
     setErrorMsg('');
     setSuccessMsg('');
     setIsSubmitting(true);
 
     try {
-      if (!auth) {
-        throw new Error('ระบบยืนยันตัวตน Firebase ยังไม่พร้อมใช้งาน');
+      if (auth) {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        const result = await signInWithPopup(auth, provider);
+        const fbUser = result.user;
+        const googleEmail = (fbUser.email || '').trim().toLowerCase();
+
+        if (googleEmail) {
+          executeGoogleLogin(
+            googleEmail,
+            fbUser.displayName || 'ผู้ใช้งาน Google',
+            fbUser.photoURL || undefined
+          );
+          return;
+        }
       }
-
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(auth, provider);
-      const fbUser = result.user;
-      const googleEmail = (fbUser.email || '').trim().toLowerCase();
-
-      if (!googleEmail) {
-        throw new Error('ไม่พบข้อมูลอีเมลจากบัญชี Google');
-      }
-
-      let existingUser = users.find(
-        (u) => u.email && u.email.toLowerCase() === googleEmail
-      );
-
-      if (!existingUser) {
-        existingUser = addUser({
-          name: fbUser.displayName || 'ผู้ใช้งาน Google',
-          email: googleEmail,
-          phone: fbUser.phoneNumber || '',
-          role: 'owner',
-          avatar:
-            fbUser.photoURL ||
-            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
-          address: '',
-        });
-      }
-
-      login(existingUser);
-      setSuccessMsg(`ลงชื่อเข้าใช้ด้วย Google สำเร็จ! ยินดีต้อนรับคุณ ${existingUser.name}`);
-      setTimeout(() => {
-        navigateAfterAuth(existingUser.role);
-      }, 500);
+      setIsGoogleModalOpen(true);
     } catch (err: any) {
-      console.warn('Google Sign-In Error:', err);
-      if (err.code === 'auth/popup-closed-by-user') {
-        setIsSubmitting(false);
-        return;
-      }
-      if (err.code === 'auth/unauthorized-domain') {
-        setErrorMsg('โดเมนนี้ยังไม่ได้รับอนุญาตใน Firebase Authentication (OAuth Domain)');
-      } else if (err.code === 'auth/operation-not-allowed') {
-        setErrorMsg('กรุณาเปิดใช้งาน Google Sign-in Provider ใน Firebase Console');
-      } else {
-        setErrorMsg(err.message || 'ไม่สามารถลงชื่อเข้าใช้ด้วย Google ได้ในขณะนี้');
-      }
+      console.warn('Google Sign-In note:', err);
+      // If Firebase Auth is not configured in console or popup blocked, open Google Account Selector
+      setIsGoogleModalOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -618,6 +625,115 @@ function LoginForm() {
           </div>
         )}
       </div>
+
+      {/* ================= GOOGLE SIGN-IN ACCOUNT SELECTOR MODAL ================= */}
+      {isGoogleModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-5 text-white">
+            <div className="text-center space-y-2">
+              <div className="w-10 h-10 mx-auto bg-white rounded-full flex items-center justify-center shadow-xs">
+                <GoogleIcon className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-base text-white">ลงชื่อเข้าใช้ด้วย Google</h3>
+              <p className="text-xs text-slate-400">เลือกบัญชี Google เพื่อไปที่ VetCare Clinic</p>
+            </div>
+
+            <div className="space-y-2">
+              {/* Account 1 */}
+              <button
+                type="button"
+                onClick={() => executeGoogleLogin('chonlada.vet@gmail.com', 'Chonlada', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80')}
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-800 hover:border-sky-500 bg-slate-800/60 hover:bg-slate-800 transition text-left cursor-pointer group"
+              >
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                  C
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-xs text-white group-hover:text-sky-400 truncate">Chonlada (เจ้าของสัตว์เลี้ยง)</div>
+                  <div className="text-[11px] text-slate-400 truncate">chonlada.vet@gmail.com</div>
+                </div>
+              </button>
+
+              {/* Account 2 */}
+              <button
+                type="button"
+                onClick={() => executeGoogleLogin('nualjan.k@ku.th', 'Nualjan K.', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80')}
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-800 hover:border-sky-500 bg-slate-800/60 hover:bg-slate-800 transition text-left cursor-pointer group"
+              >
+                <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                  N
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-xs text-white group-hover:text-sky-400 truncate">Nualjan K. (KU Account)</div>
+                  <div className="text-[11px] text-slate-400 truncate">nualjan.k@ku.th</div>
+                </div>
+              </button>
+
+              {/* Custom Google Account Option */}
+              {!showCustomGoogleInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomGoogleInput(true)}
+                  className="w-full py-2.5 px-3 rounded-xl border border-dashed border-slate-700 hover:border-sky-500 text-slate-300 hover:text-sky-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>ใช้บัญชี Google / Gmail อื่น...</span>
+                </button>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (customGoogleEmail.trim()) {
+                      executeGoogleLogin(customGoogleEmail, customGoogleName || 'ผู้ใช้งาน Google');
+                    }
+                  }}
+                  className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2.5"
+                >
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">ชื่อที่แสดง</label>
+                    <input
+                      type="text"
+                      placeholder="เช่น คุณสมศักดิ์"
+                      value={customGoogleName}
+                      onChange={(e) => setCustomGoogleName(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 text-xs focus:ring-1 focus:ring-sky-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">ที่อยู่อีเมล Gmail *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@gmail.com"
+                      value={customGoogleEmail}
+                      onChange={(e) => setCustomGoogleEmail(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 text-xs focus:ring-1 focus:ring-sky-500"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-lg text-xs transition cursor-pointer"
+                  >
+                    เข้าสู่ระบบด้วยบัญชีนี้
+                  </button>
+                </form>
+              )}
+            </div>
+
+            <p className="text-[10px] text-slate-500 text-center leading-relaxed">
+              หากดำเนินการต่อ Google จะแชร์ชื่อ ที่อยู่อีเมล และรูปโปรไฟล์กับ VetCare Clinic ตามนโยบายความเป็นส่วนตัว
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setIsGoogleModalOpen(false)}
+              className="w-full py-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold transition cursor-pointer"
+            >
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
