@@ -188,36 +188,36 @@ export default function OwnerBillingPage() {
         </div>
       </div>
 
-      {/* Modern High-Contrast Payment Information Banner */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950/50 text-white rounded-3xl p-6 sm:p-8 border-2 border-sky-400 shadow-xl shadow-sky-500/20 ring-2 ring-sky-400/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition hover:border-sky-300 hover:shadow-2xl hover:shadow-sky-500/25">
+      {/* Modern High-Contrast Payment Information Banner (Solid Clean Border - No Glow) */}
+      <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border-2 border-sky-500 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/40 text-xs font-bold text-sky-400 uppercase tracking-[0.2em]">
-            <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-950 border border-sky-500/60 text-xs font-bold text-sky-400 uppercase tracking-[0.2em]">
+            <span className="w-2 h-2 rounded-full bg-sky-400"></span>
             PAYMENT INFORMATION
           </div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">คลินิกรักษาสัตว์ VetCare จำกัด</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-slate-300 pt-1">
             <div className="flex items-center gap-2">
               <span className="text-slate-400">ธนาคาร:</span>
-              <strong className="text-white font-bold bg-slate-950/70 border border-slate-700/80 px-2.5 py-1 rounded-lg">ธนาคารกสิกรไทย (KBANK)</strong>
+              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">ธนาคารกสิกรไทย (KBANK)</strong>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-400">เลขที่บัญชี:</span>
-              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border-2 border-sky-400/60 px-3 py-1 rounded-xl shadow-xs">090-8-46418-4</strong>
+              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">090-8-46418-4</strong>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-400">พร้อมเพย์:</span>
-              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border-2 border-sky-400/60 px-3 py-1 rounded-xl shadow-xs">095-550-6741</strong>
+              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">095-550-6741</strong>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-400">ชื่อบัญชี:</span>
-              <strong className="text-white font-bold bg-slate-950/70 border border-slate-700/80 px-2.5 py-1 rounded-lg">VetCare Animal Clinic Co., Ltd.</strong>
+              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">VetCare Animal Clinic Co., Ltd.</strong>
             </div>
           </div>
         </div>
 
-        <div className="p-3.5 bg-slate-950 rounded-2xl shrink-0 text-center shadow-xl border-2 border-sky-400 flex flex-col items-center ring-2 ring-sky-400/30">
-          <div className="w-28 h-28 bg-white p-1.5 rounded-xl shadow-sm flex items-center justify-center">
+        <div className="p-3.5 bg-slate-950 rounded-2xl shrink-0 text-center border-2 border-sky-500 flex flex-col items-center">
+          <div className="w-28 h-28 bg-white p-1.5 rounded-xl flex items-center justify-center">
             <img
               src="https://promptpay.io/0955506741.png"
               alt="PromptPay QR Code 0955506741"
