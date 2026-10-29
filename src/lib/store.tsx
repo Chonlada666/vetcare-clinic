@@ -875,7 +875,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
             const updatedStock = Math.max(0, med.stock - deduct);
             if (isFirebaseConfigured() && db) {
               try {
-                updateDoc(doc(db, 'medicines', med.id), { stock: updatedStock }).catch((err) =>
+                setDoc(doc(db, 'medicines', med.id), { ...sanitizeForFirestore(med), stock: updatedStock }, { merge: true }).catch((err) =>
                   console.warn('Firestore stock sync error:', err)
                 );
               } catch (err) {
@@ -1111,7 +1111,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     setMedicines((prev) => prev.map((m) => (m.id === id ? { ...m, ...data } : m)));
     if (isFirebaseConfigured() && db) {
       try {
-        updateDoc(doc(db, 'medicines', id), sanitizeForFirestore(data)).catch((err) =>
+        setDoc(doc(db, 'medicines', id), sanitizeForFirestore(data), { merge: true }).catch((err) =>
           console.warn('Firestore sync error:', err)
         );
       } catch (err) {

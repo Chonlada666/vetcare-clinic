@@ -59,16 +59,6 @@ export default function ClinicalEMRPage() {
     afterStock: number;
   }[]>([]);
 
-  // Calculate live remaining stock subtracting currently prescribed items + currently typed quantity
-  const getDynamicStock = (medId: string, subtractCurrentInput: boolean = true) => {
-    const baseMed = medicines.find((item) => item.id === medId);
-    if (!baseMed) return 0;
-    const alreadyPrescribed = prescriptions.find((p) => p.medicineId === medId);
-    const alreadyUsed = alreadyPrescribed ? alreadyPrescribed.quantity : 0;
-    const currentInput = subtractCurrentInput && selectedMedId === medId ? Number(medQuantity || 0) : 0;
-    return Math.max(0, baseMed.stock - alreadyUsed - currentInput);
-  };
-
   // Base available stock in warehouse minus already added prescriptions
   const getBaseAvailableStock = (medId: string) => {
     const baseMed = medicines.find((item) => item.id === medId);
@@ -78,10 +68,12 @@ export default function ClinicalEMRPage() {
     return Math.max(0, baseMed.stock - alreadyUsed);
   };
 
-  // Selected med info
+  // Selected med info & live real-time stock computation
   const selectedMed = medicines.find((m) => m.id === selectedMedId);
-  const selectedRemainingStock = selectedMed ? getDynamicStock(selectedMed.id, true) : 0;
   const selectedBaseAvailable = selectedMed ? getBaseAvailableStock(selectedMed.id) : 0;
+  const typedQty = Number(medQuantity || 0);
+  const projectedRemaining = Math.max(0, selectedBaseAvailable - typedQty);
+  const isOverStock = selectedMed && typedQty > selectedBaseAvailable;
 
   // Handle medicine selector change
   const handleMedSelect = (id: string) => {
@@ -134,6 +126,37 @@ export default function ClinicalEMRPage() {
     });
 
     setMedQuantity('1');
+  };
+
+  const handleUpdateRxQuantity = (index: number, delta: number) => {
+    setPrescriptions((prev) => {
+      const copy = [...prev];
+      const item = copy[index];
+      if (!item) return prev;
+
+      const med = medicines.find((m) => m.id === item.medicineId);
+      const totalInWarehouse = med ? med.stock : 0;
+      const otherPrescriptionsUsed = prev
+        .filter((_, i) => i !== index && _.medicineId === item.medicineId)
+        .reduce((sum, p) => sum + p.quantity, 0);
+      const maxAllowed = totalInWarehouse - otherPrescriptionsUsed;
+
+      const newQty = item.quantity + delta;
+      if (newQty <= 0) {
+        return prev.filter((_, i) => i !== index);
+      }
+      if (newQty > maxAllowed) {
+        alert(`สต็อกยาไม่เพียงพอ! "${item.name}" มีคงเหลือในคลังให้จ่ายได้สูงสุด ${maxAllowed} ${item.unit}`);
+        return prev;
+      }
+
+      copy[index] = {
+        ...item,
+        quantity: newQty,
+        totalPrice: item.unitPrice * newQty,
+      };
+      return copy;
+    });
   };
 
   const handleRemoveMedicine = (index: number) => {
@@ -417,19 +440,29 @@ export default function ClinicalEMRPage() {
               <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                   <div className="sm:col-span-5">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
                       <label className="block text-[11px] font-bold text-slate-300">เลือกตัวยา/วัคซีน *</label>
                       {selectedMed && (
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
-                            selectedRemainingStock <= 0
-                              ? 'bg-rose-950/60 text-rose-300 border-rose-800'
-                              : selectedRemainingStock < 30
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition-all ${
+                            selectedBaseAvailable <= 0
+                              ? 'bg-rose-950/80 text-rose-300 border-rose-800'
+                              : isOverStock
+                              ? 'bg-rose-950/80 text-rose-300 border-rose-700 animate-pulse'
+                              : projectedRemaining < 30
                               ? 'bg-amber-950/60 text-amber-300 border-amber-800'
                               : 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
                           }`}
                         >
-                          คงเหลือในคลัง: {selectedRemainingStock} {selectedMed.unit}
+                          {selectedBaseAvailable <= 0 ? (
+                            `❌ หมดสต็อก (เหลือ 0 ${selectedMed.unit})`
+                          ) : isOverStock ? (
+                            `⚠️ สต็อกไม่พอ! มี ${selectedBaseAvailable} ${selectedMed.unit} (ขาด ${typedQty - selectedBaseAvailable})`
+                          ) : typedQty > 0 ? (
+                            `คงเหลือในคลัง: ${selectedBaseAvailable} ${selectedMed.unit} (จ่าย ${typedQty} ➔ เหลือ ${projectedRemaining} ${selectedMed.unit})`
+                          ) : (
+                            `คงเหลือในคลัง: ${selectedBaseAvailable} ${selectedMed.unit}`
+                          )}
                         </span>
                       )}
                     </div>
@@ -439,10 +472,11 @@ export default function ClinicalEMRPage() {
                       className="w-full px-3 py-2 rounded-xl border border-slate-700 text-xs font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
                     >
                       {medicines.map((m) => {
-                        const baseAvailable = getBaseAvailableStock(m.id);
+                        const available = getBaseAvailableStock(m.id);
+                        const inCurrentRx = prescriptions.find((p) => p.medicineId === m.id)?.quantity || 0;
                         return (
-                          <option key={m.id} value={m.id} disabled={baseAvailable <= 0} className="bg-slate-800 text-white">
-                            {m.name} ({formatCurrency(m.unitPrice)}/{m.unit})
+                          <option key={m.id} value={m.id} disabled={available <= 0} className="bg-slate-800 text-white">
+                            {m.name} — [คงเหลือ: {available} {m.unit}{inCurrentRx > 0 ? ` (สั่งจ่ายแล้ว ${inCurrentRx})` : ''}] ({formatCurrency(m.unitPrice)}/{m.unit})
                           </option>
                         );
                       })}
@@ -450,7 +484,12 @@ export default function ClinicalEMRPage() {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-[11px] font-bold text-slate-300 mb-1">จำนวนจ่าย *</label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-[11px] font-bold text-slate-300">จำนวนจ่าย *</label>
+                      {selectedMed && selectedBaseAvailable > 0 && (
+                        <span className="text-[10px] text-slate-400">สูงสุด {selectedBaseAvailable}</span>
+                      )}
+                    </div>
                     <input
                       type="number"
                       min="1"
@@ -464,7 +503,11 @@ export default function ClinicalEMRPage() {
                       onBlur={() => {
                         if (!medQuantity || Number(medQuantity) < 1) setMedQuantity('1');
                       }}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-700 text-xs font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                      className={`w-full px-3 py-2 rounded-xl border text-xs font-semibold bg-slate-800 text-white focus:ring-2 focus:outline-hidden transition ${
+                        isOverStock
+                          ? 'border-rose-500 focus:ring-rose-500 text-rose-300 bg-rose-950/30'
+                          : 'border-slate-700 focus:ring-sky-500'
+                      }`}
                     />
                   </div>
 
@@ -484,51 +527,131 @@ export default function ClinicalEMRPage() {
                   <button
                     type="button"
                     onClick={handleAddMedicine}
-                    disabled={!selectedMed || selectedBaseAvailable <= 0}
+                    disabled={!selectedMed || selectedBaseAvailable <= 0 || isOverStock || typedQty <= 0}
                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-600 disabled:cursor-not-allowed text-slate-950 font-black rounded-xl text-xs transition shadow-md cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5" /> เพิ่มรายการยานี้
+                    <Plus className="w-3.5 h-3.5" /> เพิ่มรายการยานี้ (ตัดยอด Real-Time)
                   </button>
                 </div>
               </div>
 
               {/* Prescribed Items Table */}
               {prescriptions.length > 0 ? (
-                <div className="border border-slate-800 rounded-2xl overflow-hidden shadow-md bg-slate-950">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950 text-slate-400 font-bold border-b border-slate-800">
-                      <tr>
-                        <th className="p-3">รายการยา/วัคซีน</th>
-                        <th className="p-3">จำนวนจ่าย</th>
-                        <th className="p-3">วิธีใช้</th>
-                        <th className="p-3 text-right">ราคา</th>
-                        <th className="p-3 text-center">ลบ</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800 bg-slate-900">
-                      {prescriptions.map((rx, idx) => (
-                        <tr key={idx} className="hover:bg-slate-800/50">
-                          <td className="p-3 font-semibold text-white">{rx.name}</td>
-                          <td className="p-3 text-slate-300 font-bold">
-                            {rx.quantity} {rx.unit}
-                          </td>
-                          <td className="p-3 text-slate-400 text-[11px] max-w-xs truncate">{rx.instruction}</td>
-                          <td className="p-3 text-right font-mono font-bold text-sky-400">
-                            {formatCurrency(rx.totalPrice)}
-                          </td>
-                          <td className="p-3 text-center">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMedicine(idx)}
-                              className="p-1 text-rose-400 hover:bg-rose-950/60 rounded-lg cursor-pointer transition"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
+                <div className="space-y-3">
+                  <div className="border border-slate-800 rounded-2xl overflow-hidden shadow-md bg-slate-950">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 font-bold border-b border-slate-800">
+                        <tr>
+                          <th className="p-3">รายการยา/วัคซีน</th>
+                          <th className="p-3">จำนวนจ่าย</th>
+                          <th className="p-3">สต็อกคลังหลังจ่าย</th>
+                          <th className="p-3">วิธีใช้</th>
+                          <th className="p-3 text-right">ราคา</th>
+                          <th className="p-3 text-center">ลบ</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800 bg-slate-900">
+                        {prescriptions.map((rx, idx) => {
+                          const medInDb = medicines.find((m) => m.id === rx.medicineId);
+                          const totalWarehouseStock = medInDb ? medInDb.stock : 0;
+                          const remainingStockAfterPrescribed = Math.max(0, totalWarehouseStock - rx.quantity);
+
+                          return (
+                            <tr key={idx} className="hover:bg-slate-800/50 transition">
+                              <td className="p-3">
+                                <div className="font-semibold text-white">{rx.name}</div>
+                                <div className="text-[10px] text-slate-400">
+                                  สต็อกเดิม: {totalWarehouseStock} {rx.unit}
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateRxQuantity(idx, -1)}
+                                    className="w-5 h-5 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white flex items-center justify-center font-bold text-xs cursor-pointer transition"
+                                    title="ลดจำนวน"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="font-bold text-white px-1">
+                                    {rx.quantity} {rx.unit}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    disabled={remainingStockAfterPrescribed <= 0}
+                                    onClick={() => handleUpdateRxQuantity(idx, 1)}
+                                    className="w-5 h-5 rounded-md bg-slate-800 hover:bg-slate-700 disabled:opacity-30 border border-slate-700 text-white flex items-center justify-center font-bold text-xs cursor-pointer transition"
+                                    title="เพิ่มจำนวน"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                                  remainingStockAfterPrescribed < 30
+                                    ? 'bg-amber-950/60 text-amber-300 border-amber-800'
+                                    : 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
+                                }`}>
+                                  เหลือ {remainingStockAfterPrescribed} {rx.unit}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-400 text-[11px] max-w-xs truncate">{rx.instruction}</td>
+                              <td className="p-3 text-right font-mono font-bold text-sky-400">
+                                {formatCurrency(rx.totalPrice)}
+                              </td>
+                              <td className="p-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveMedicine(idx)}
+                                  className="p-1 text-rose-400 hover:bg-rose-950/60 rounded-lg cursor-pointer transition"
+                                  title="ลบรายการและคืนสต็อก"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Real-Time Stock Deduction Impact Summary */}
+                  <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800/90 space-y-2">
+                    <div className="text-[11px] font-bold text-slate-300 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-sky-400">
+                        <Boxes className="w-3.5 h-3.5" />
+                        <span>สรุปการตัดสต็อกยาในคลังแบบ Real-Time ({prescriptions.length} รายการ):</span>
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800">
+                        ● หักยอดอัตโนมัติ Real-Time
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      {prescriptions.map((rx, idx) => {
+                        const m = medicines.find((item) => item.id === rx.medicineId);
+                        const before = m ? m.stock : 0;
+                        const after = Math.max(0, before - rx.quantity);
+                        return (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800 shadow-xs"
+                          >
+                            <span className="text-white truncate font-medium max-w-[150px]">{rx.name}</span>
+                            <div className="flex items-center gap-2 text-[11px]">
+                              <span className="text-rose-400 font-bold">-{rx.quantity}</span>
+                              <span className="text-slate-600">➔</span>
+                              <span className="text-emerald-300 font-bold bg-slate-950 px-2 py-0.5 rounded-md border border-slate-800">
+                                คงเหลือ {after} {rx.unit}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="p-4 text-center text-slate-500 text-xs bg-slate-950 rounded-xl border border-dashed border-slate-800">
