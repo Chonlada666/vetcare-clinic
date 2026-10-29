@@ -589,6 +589,8 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateUser = (id: string, data: Partial<User>) => {
+    const prevUser = users.find((u) => u.id === id);
+
     setUsers((prev) => {
       const updated = prev.map((u) => (u.id === id ? { ...u, ...data } : u));
       try {
@@ -602,6 +604,30 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
 
     if (currentUser?.id === id) {
       setCurrentUser((prev) => (prev ? { ...prev, ...data } : null));
+    }
+
+    // If user is a vet, also keep the matching vet profile in sync
+    if (prevUser && prevUser.role === 'vet') {
+      const matchingVet = vets.find(
+        (v) =>
+          (v.email && prevUser.email && v.email.toLowerCase() === prevUser.email.toLowerCase()) ||
+          v.name === prevUser.name
+      );
+      if (matchingVet) {
+        const vetUpdates: Partial<Vet> = {};
+        if (data.name !== undefined) vetUpdates.name = data.name;
+        if (data.email !== undefined) vetUpdates.email = data.email;
+        if (data.phone !== undefined) vetUpdates.phone = data.phone;
+        if (data.avatar !== undefined) vetUpdates.avatar = data.avatar;
+        if (Object.keys(vetUpdates).length > 0) {
+          setVets((prev) => prev.map((v) => (v.id === matchingVet.id ? { ...v, ...vetUpdates } : v)));
+          if (isFirebaseConfigured() && db) {
+            try {
+              updateDoc(doc(db, 'vets', matchingVet.id), sanitizeForFirestore(vetUpdates)).catch(() => {});
+            } catch {}
+          }
+        }
+      }
     }
 
     if (isFirebaseConfigured() && db) {

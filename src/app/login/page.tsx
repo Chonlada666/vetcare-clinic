@@ -41,12 +41,6 @@ function LoginForm() {
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [address, setAddress] = useState('');
 
-  // Optional initial pet registration inside login-register tab
-  const [includePet, setIncludePet] = useState(false);
-  const [petName, setPetName] = useState('');
-  const [petSpecies, setPetSpecies] = useState('สุนัข');
-  const [petBreed, setPetBreed] = useState('');
-  const { addPet } = useClinic();
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,23 +140,6 @@ function LoginForm() {
         role: 'owner',
         avatar: defaultAvatar,
       });
-
-      if (includePet && petName.trim()) {
-        addPet({
-          ownerId: newUser.id,
-          name: petName.trim(),
-          species: petSpecies,
-          breed: petBreed.trim() || 'ไม่ระบุสายพันธุ์',
-          gender: 'male',
-          ageYears: 1,
-          ageMonths: 0,
-          weightKg: 3.5,
-          photoUrl:
-            petSpecies === 'แมว'
-              ? 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80'
-              : 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=400&q=80',
-        });
-      }
 
       setSuccessMsg('สมัครสมาชิกสำเร็จเรียบร้อย! กำลังนำคุณเข้าสู่หน้าหลัก...');
       login(newUser);
@@ -449,62 +426,6 @@ function LoginForm() {
                 onChange={(e) => setAddress(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 font-medium text-xs focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
               />
-            </div>
-
-            {/* Optional Pet Registration Toggle */}
-            <div className="pt-2 border-t border-slate-800">
-              <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={includePet}
-                  onChange={(e) => setIncludePet(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-700 text-sky-500 focus:ring-sky-500 cursor-pointer"
-                />
-                <span className="text-xs font-bold text-sky-400">
-                  ลงทะเบียนสัตว์เลี้ยงตัวแรกพร้อมการสมัครสมาชิก (ไม่บังคับ)
-                </span>
-              </label>
-
-              {includePet && (
-                <div className="mt-3 p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">ชื่อสัตว์เลี้ยง *</label>
-                      <input
-                        type="text"
-                        placeholder="เช่น ทองเอก, มอมแมม"
-                        value={petName}
-                        onChange={(e) => setPetName(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 text-xs focus:ring-2 focus:ring-sky-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">ประเภทสัตว์เลี้ยง</label>
-                      <select
-                        value={petSpecies}
-                        onChange={(e) => setPetSpecies(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-800 text-white text-xs focus:ring-2 focus:ring-sky-500 cursor-pointer"
-                      >
-                        <option value="สุนัข">สุนัข (Dog)</option>
-                        <option value="แมว">แมว (Cat)</option>
-                        <option value="กระต่าย">กระต่าย (Rabbit)</option>
-                        <option value="นก">นก (Bird)</option>
-                        <option value="อื่นๆ">สัตว์พิเศษ (Exotic)</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">สายพันธุ์ (ไม่บังคับ)</label>
-                    <input
-                      type="text"
-                      placeholder="เช่น โกลเด้น รีทรีฟเวอร์, สก็อตติช โฟลด์"
-                      value={petBreed}
-                      onChange={(e) => setPetBreed(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 text-xs focus:ring-2 focus:ring-sky-500"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             <button

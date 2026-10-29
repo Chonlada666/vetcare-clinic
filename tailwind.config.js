@@ -7,6 +7,19 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"SF Pro Text"',
+          '"SF Pro Display"',
+          '"SF Pro"',
+          '"Sukhumvit Set"',
+          '"Prompt"',
+          'system-ui',
+          'sans-serif',
+        ],
+      },
       colors: {
         brand: {
           50: '#f0f9ff',

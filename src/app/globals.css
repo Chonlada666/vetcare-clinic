@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.cdnfonts.com/css/sf-pro-display');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +8,19 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Sukhumvit Set", "Prompt", system-ui, sans-serif;
+  }
+
+  html,
+  body {
+    font-family: var(--font-apple) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  button, input, optgroup, select, textarea {
+    font-family: inherit;
   }
 
   body {
