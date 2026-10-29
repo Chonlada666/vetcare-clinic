@@ -17,6 +17,20 @@ export default function RootLayout({
   return (
     <html lang="th">
       <head>
+        <link
+          rel="preload"
+          href="/fonts/sukhumvit-set/SukhumvitSet-Text.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/sukhumvit-set/SukhumvitSet-SemiBold.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
