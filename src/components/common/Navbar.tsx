@@ -241,18 +241,13 @@ export function Navbar() {
                 type="button"
                 onClick={toggleTheme}
                 title={theme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง (Light Mode)' : 'เปลี่ยนเป็นโหมดมืด (Dark Mode)'}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition cursor-pointer shrink-0"
+                aria-label={theme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
+                className="p-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer shrink-0 flex items-center justify-center"
               >
                 {theme === 'dark' ? (
-                  <>
-                    <Sun className="w-4 h-4 text-amber-400" />
-                    <span className="hidden sm:inline">Light</span>
-                  </>
+                  <Sun className="w-4 h-4 text-amber-400" />
                 ) : (
-                  <>
-                    <Moon className="w-4 h-4 text-sky-600" />
-                    <span className="hidden sm:inline">Dark</span>
-                  </>
+                  <Moon className="w-4 h-4 text-sky-600" />
                 )}
               </button>
 
