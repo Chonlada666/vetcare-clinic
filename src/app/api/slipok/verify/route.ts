@@ -91,9 +91,6 @@ export async function POST(req: NextRequest) {
     if (expectedAmount !== null && !isNaN(expectedAmount)) {
       slipOkFormData.append('amount', String(expectedAmount));
     }
-    // ใช้ log: 'false' เพื่อให้ SlipOK ตรวจสอบสลิปและถอดข้อมูลยอดเงิน (amount) ออกมาตรวจสอบ
-    // โดยไม่ติดขัดที่ Error 1014 ทำให้ระบบสามารถตรวจยอดเงินก่อนได้อย่างแม่นยำ
-    slipOkFormData.append('log', 'false');
 
     const response = await fetch(`https://api.slipok.com/api/line/apikey/${branchId}`, {
       method: 'POST',
@@ -155,15 +152,24 @@ export async function POST(req: NextRequest) {
     }
 
     // SlipOK ตอบกลับมาว่าไม่ผ่าน หรือเกิดข้อผิดพลาดในการตรวจสอบ
+    const rawSlipData = json.data || {};
+    const slipAmount = typeof rawSlipData.amount === 'number' ? rawSlipData.amount : parseFloat(rawSlipData.amount || '0');
+
     let friendlyMsg = json.message || 'การตรวจสอบสลิปไม่ผ่าน';
-    if (json.code === 1013 || json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
-      friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระตามบิล';
+    if (json.code === 1013 || json.message?.includes('ยอดที่ส่งมาไม่ตรง') || json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
+      if (slipAmount > 0 && expectedAmount) {
+        friendlyMsg = `ยอดเงินในสลิป (${slipAmount} บาท) ไม่ตรงกับยอดที่ต้องชำระ (${expectedAmount} บาท)`;
+      } else {
+        friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระตามบิล';
+      }
     } else if (json.code === 1014 || json.message?.includes('บัญชีผู้รับ')) {
-      friendlyMsg = 'บัญชีผู้รับเงินในสลิปไม่ตรงกับบัญชีของคลินิก';
+      if (slipAmount > 0 && expectedAmount && Math.abs(slipAmount - expectedAmount) > 0.01) {
+        friendlyMsg = `ยอดเงินในสลิป (${slipAmount} บาท) ไม่ตรงกับยอดที่ต้องชำระ (${expectedAmount} บาท)`;
+      } else {
+        friendlyMsg = 'บัญชีผู้รับเงินในสลิปไม่ตรงกับบัญชีของคลินิก';
+      }
     } else if (json.code === 1001 || json.message?.includes('duplicate')) {
       friendlyMsg = 'สลิปนี้เคยถูกใช้งานในระบบแล้ว (สลิปซ้ำ)';
-    } else if (json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
-      friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระตามบิล';
     } else if (json.code === 1003 || json.message?.includes('qrcode') || json.message?.includes('not found')) {
       friendlyMsg = 'ไม่พบ QR Code ในภาพสลิป หรือภาพไม่ชัดเจน กรุณาอัปโหลดภาพสลิปใหม่';
     } else if (json.code === 1004 || json.message?.includes('expired') || json.message?.includes('old')) {
