@@ -198,11 +198,11 @@ export function Navbar() {
                   </svg>
                 </div>
                 <div className="whitespace-nowrap">
-                  <span className="font-bold text-lg sm:text-xl text-white tracking-[0.14em] uppercase block leading-tight whitespace-nowrap">
-                    VETCARE
+                  <span className="font-bold text-lg sm:text-xl text-white tracking-wide block leading-tight whitespace-nowrap">
+                    VetCare
                   </span>
                   <span className="text-[9px] sm:text-[10px] font-semibold text-sky-400 uppercase tracking-[0.18em] block whitespace-nowrap">
-                    VETERINARY CLINIC
+                    ANIMAL CLINIC
                   </span>
                 </div>
               </a>

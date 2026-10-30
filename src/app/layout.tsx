@@ -5,7 +5,7 @@ import { Navbar } from '@/components/common/Navbar';
 import { Phone, Clock, MapPin, ShieldCheck, HeartPulse } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'VetCare Clinic - ระบบจัดการคลินิกรักษาสัตว์ครบวงจร',
+  title: 'VetCare Animal Clinic - ระบบจัดการคลินิกรักษาสัตว์ครบวงจร',
   description: 'ระบบบริหารจัดการคลินิกรักษาสัตว์ครบวงจร จองคิวนัดหมาย ตรวจรักษา เวชระเบียน EMR ดิจิทัล และชำระเงินออนไลน์',
 };
 
