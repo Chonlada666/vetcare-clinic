@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const apiKey = (process.env.SLIPOK_API_KEY || 'SLIPOKFA1GXI2').trim();
+    const apiKey = (process.env.SLIPOK_API_KEY || 'SLIPOK9O5I79X').trim();
     const branchId = (process.env.SLIPOK_BRANCH_ID || process.env.NEXT_PUBLIC_SLIPOK_BRANCH_ID || '77947').trim();
     const isRealSlipOkConfigured =
       apiKey &&
