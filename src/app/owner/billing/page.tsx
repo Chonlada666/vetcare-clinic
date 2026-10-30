@@ -292,11 +292,11 @@ export default function OwnerBillingPage() {
 
                   {/* Pharmacy Pickup Banner if Paid */}
                   {bill.status === 'paid' && tr && tr.prescriptions.length > 0 && (
-                    <div className="p-3.5 bg-emerald-950/40 border border-emerald-800/50 rounded-xl text-xs text-emerald-300 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 font-bold">
+                    <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/50 rounded-[10px] text-xs text-slate-800 dark:text-emerald-300 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 font-bold text-emerald-950 dark:text-emerald-200">
                         <span>กรุณาติดต่อรับยาและเวชภัณฑ์ที่เคาน์เตอร์จ่ายยา (ช่องบริการที่ 1)</span>
                       </div>
-                      <span className="text-[11px] text-emerald-400 font-semibold hidden sm:inline">
+                      <span className="text-[11px] text-emerald-800 dark:text-emerald-400 font-bold hidden sm:inline">
                         มีรายการยา {tr.prescriptions.length} รายการ
                       </span>
                     </div>
@@ -607,13 +607,13 @@ export default function OwnerBillingPage() {
                 {/* Tab 2: Cash Payment */}
                 {paymentMethodTab === 'cash' && (
                   <div className="space-y-4 pt-1">
-                    <div className="p-4 bg-emerald-950/40 border border-emerald-800/50 rounded-2xl space-y-2 text-emerald-300">
-                      <div className="font-bold text-sm flex items-center gap-2 text-emerald-200">
-                        <Banknote className="w-5 h-5 text-emerald-400" />
+                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/50 rounded-[10px] space-y-2 text-slate-800 dark:text-emerald-100">
+                      <div className="font-bold text-sm flex items-center gap-2 text-emerald-950 dark:text-emerald-200">
+                        <Banknote className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
                         <span>ชำระเงินสดที่เคาน์เตอร์คลินิก</span>
                       </div>
-                      <p className="text-xs text-emerald-300/80 leading-relaxed">
-                        ท่านสามารถยื่นชำระเงินสดจำนวน <strong className="text-emerald-200 font-mono">{formatCurrency(selectedBillForSlip.totalAmount)}</strong> ได้โดยตรงที่เคาน์เตอร์การเงินของคลินิก
+                      <p className="text-xs text-slate-800 dark:text-emerald-200 leading-relaxed font-semibold">
+                        ท่านสามารถยื่นชำระเงินสดจำนวน <strong className="text-emerald-950 dark:text-white font-mono font-black text-sm">{formatCurrency(selectedBillForSlip.totalAmount)}</strong> ได้โดยตรงที่เคาน์เตอร์การเงินของคลินิก
                       </p>
                     </div>
 
