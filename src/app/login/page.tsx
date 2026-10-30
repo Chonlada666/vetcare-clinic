@@ -275,7 +275,7 @@ function LoginForm() {
           </svg>
         </div>
         <div className="text-sky-400 font-bold text-[11px] uppercase tracking-[0.2em]">
-          VETCARE VETERINARY HOSPITAL
+          VETCARE VETERINARY CLINIC
         </div>
         <h1 className="text-2xl font-light text-white tracking-wide uppercase">
           {mode === 'login'

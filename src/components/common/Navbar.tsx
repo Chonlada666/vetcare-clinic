@@ -164,7 +164,7 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16 sm:h-20 gap-6">
             {/* Left Side: Brand Logo followed by navigation links */}
             <div className="flex items-center gap-6 sm:gap-8 lg:gap-10 min-w-0 flex-1">
-              {/* Brand Logo - Formal Veterinary Hospital Crest */}
+              {/* Brand Logo - Formal Veterinary Clinic Crest */}
               <a
                 href={currentUser ? `/${currentUser.role}/dashboard` : '/login'}
                 className="flex items-center gap-3 group shrink-0 whitespace-nowrap"
@@ -202,7 +202,7 @@ export function Navbar() {
                     VETCARE
                   </span>
                   <span className="text-[9px] sm:text-[10px] font-semibold text-sky-400 uppercase tracking-[0.18em] block whitespace-nowrap">
-                    VETERINARY HOSPITAL
+                    VETERINARY CLINIC
                   </span>
                 </div>
               </a>
