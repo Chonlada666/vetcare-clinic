@@ -686,7 +686,7 @@ export default function OwnerDashboardPage() {
                 <div
                   key={service.id}
                   onClick={() => router.push(`/owner/booking?serviceId=${service.id}`)}
-                  className="group border border-slate-800 bg-slate-950 hover:border-slate-600 transition flex flex-col overflow-hidden cursor-pointer"
+                  className="group rounded-2xl border border-slate-800 bg-slate-950 hover:border-slate-600 transition flex flex-col overflow-hidden cursor-pointer shadow-md"
                 >
                   <div className="relative h-48 w-full overflow-hidden">
                     <img
