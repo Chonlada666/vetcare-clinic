@@ -18,6 +18,12 @@ module.exports = {
           'sans-serif',
         ],
       },
+      borderRadius: {
+        'lg': '10px',
+        'xl': '10px',
+        '2xl': '10px',
+        '3xl': '10px',
+      },
       colors: {
         brand: {
           50: '#f0f9ff',

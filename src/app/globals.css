@@ -290,5 +290,43 @@ html.light input[type="time"] {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E") !important;
 }
 
+/* ================= GLOBAL CORNER RADIUS STANDARDIZATION (~10px) ================= */
+.rounded-3xl,
+.rounded-2xl,
+.rounded-xl,
+.rounded-lg,
+div[class*="rounded-3xl"],
+div[class*="rounded-2xl"],
+div[class*="rounded-xl"],
+div[class*="rounded-lg"],
+section[class*="rounded-3xl"],
+section[class*="rounded-2xl"],
+section[class*="rounded-xl"],
+form[class*="rounded-3xl"],
+form[class*="rounded-2xl"],
+input[class*="rounded-2xl"],
+input[class*="rounded-xl"],
+textarea[class*="rounded-2xl"],
+textarea[class*="rounded-xl"],
+select[class*="rounded-2xl"],
+select[class*="rounded-xl"] {
+  border-radius: 10px !important;
+}
+
+[class*="rounded-t-3xl"],
+[class*="rounded-t-2xl"],
+[class*="rounded-t-xl"] {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+}
+
+[class*="rounded-b-3xl"],
+[class*="rounded-b-2xl"],
+[class*="rounded-b-xl"] {
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+
 
 
