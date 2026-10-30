@@ -25,6 +25,38 @@ function base64ToBlob(base64DataUrl: string): Blob | null {
   }
 }
 
+// ตรวจสอบบัญชีผู้รับเงิน: ต้องเป็นบัญชีของคลินิก / ชลลดา นักรบ เท่านั้น
+function validateClinicReceiver(receiver: any): boolean {
+  if (!receiver) return false;
+  const nameStr = ((receiver.displayName || '') + ' ' + (receiver.name || '')).toLowerCase();
+  const accStr = (receiver.account?.value || '').replace(/[^0-9]/g, '');
+  const proxyStr = (receiver.proxy?.value || '').replace(/[^0-9]/g, '');
+
+  // 1. ตรวจสอบชื่อบัญชีปลายทาง: ต้องมีชื่อคุณชลลดา หรือนามสกุลนักรบ หรือชื่อคลินิก
+  if (
+    nameStr.includes('ชลลดา') ||
+    nameStr.includes('chonlada') ||
+    nameStr.includes('นักรบ') ||
+    nameStr.includes('nakrob') ||
+    nameStr.includes('vetcare') ||
+    nameStr.includes('vet care')
+  ) {
+    return true;
+  }
+
+  // 2. ตรวจสอบเลขบัญชีปลายทาง: กสิกรไทย 0908464184
+  if (accStr.includes('0908464184') || accStr.endsWith('4184') || accStr.endsWith('418')) {
+    return true;
+  }
+
+  // 3. ตรวจสอบเลขพร้อมเพย์: เบอร์โทร 0955506741 (ลงท้าย 6741) หรือ 0908464184 (ลงท้าย 4184)
+  if (proxyStr.endsWith('6741') || proxyStr.endsWith('4184')) {
+    return true;
+  }
+
+  return false;
+}
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
@@ -107,9 +139,22 @@ export async function POST(req: NextRequest) {
       const senderObj = slipData.sender || {};
       const receiverObj = slipData.receiver || {};
 
+      // 1. ตรวจสอบบัญชีผู้รับเงินอย่างเข้มงวด: ต้องเป็นบัญชีของคลินิก / ชลลดา นักรบ เท่านั้น
+      const isClinicReceiver = validateClinicReceiver(receiverObj);
+      const receiverDisplayName = receiverObj.displayName || receiverObj.name || 'ไม่ระบุ';
+
+      if (!isClinicReceiver) {
+        return NextResponse.json({
+          success: false,
+          isRealApi: true,
+          message: `บัญชีผู้รับเงินในสลิป (${receiverDisplayName}) ไม่ใช่บัญชีของทางคลินิก (ต้องโอนเข้าบัญชีคุณชลลดา นักรบ เท่านั้น)`,
+          rawSlipOk: slipData,
+        });
+      }
+
       const actualAmount = typeof slipData.amount === 'number' ? slipData.amount : parseFloat(slipData.amount || '0');
 
-      // ตรวจสอบยอดเงินซ้ำอีกชั้นเพื่อความปลอดภัยสูงสุด 100%
+      // 2. ตรวจสอบยอดเงินซ้ำอีกชั้นเพื่อความปลอดภัยสูงสุด 100%
       if (expectedAmount !== null && !isNaN(expectedAmount) && actualAmount > 0) {
         if (Math.abs(actualAmount - expectedAmount) > 0.01) {
           return NextResponse.json({
