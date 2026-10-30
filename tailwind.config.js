@@ -9,13 +9,12 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
-          '"Sukhumvit Set"',
+          '"Inter"',
+          '"Prompt"',
           '-apple-system',
           'BlinkMacSystemFont',
-          '"SF Pro Text"',
-          '"SF Pro Display"',
-          '"SF Pro"',
-          '"Prompt"',
+          '"Segoe UI"',
+          'Roboto',
           'sans-serif',
         ],
       },

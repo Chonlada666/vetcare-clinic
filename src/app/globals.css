@@ -1,53 +1,4 @@
-@font-face {
-  font-family: 'Sukhumvit Set';
-  src: url('/fonts/sukhumvit-set/SukhumvitSet-Thin.ttf') format('truetype');
-  font-weight: 100 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sukhumvit Set';
-  src: url('/fonts/sukhumvit-set/SukhumvitSet-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sukhumvit Set';
-  src: url('/fonts/sukhumvit-set/SukhumvitSet-Text.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sukhumvit Set';
-  src: url('/fonts/sukhumvit-set/SukhumvitSet-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sukhumvit Set';
-  src: url('/fonts/sukhumvit-set/SukhumvitSet-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sukhumvit Set';
-  src: url('/fonts/sukhumvit-set/SukhumvitSet-Bold.ttf') format('truetype');
-  font-weight: 700 800 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
-@import url('https://fonts.cdnfonts.com/css/sf-pro-display');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -56,12 +7,12 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --font-apple: 'Sukhumvit Set', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'SF Pro', 'Prompt', sans-serif;
+    --font-inter: 'Inter', 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   html,
   body {
-    font-family: var(--font-apple) !important;
+    font-family: var(--font-inter) !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -70,11 +21,11 @@
   *,
   *::before,
   *::after {
-    font-family: var(--font-apple);
+    font-family: var(--font-inter);
   }
 
   button, input, optgroup, select, textarea {
-    font-family: var(--font-apple) !important;
+    font-family: var(--font-inter) !important;
   }
 
   body {
