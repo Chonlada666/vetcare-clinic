@@ -88,6 +88,7 @@ jobs:
           script: |
             set -e
             cd ~/app
+            sed -i 's/SLIPOK_API_KEY=.*/SLIPOK_API_KEY=SLIPOKV0M0RA8/' .env || true
             docker compose pull
             docker compose up -d
             docker image prune -f

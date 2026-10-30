@@ -102,9 +102,9 @@ export default function OwnerBillingPage() {
         body: formData,
       });
 
-      const json = await res.json();
+      const json = await res.json().catch(() => ({ success: false, message: 'การตอบกลับจากเซิร์ฟเวอร์ขัดข้อง' }));
 
-      if (json.success) {
+      if (res.ok && json.success) {
         setSlipOkResult(json.data);
         uploadPaymentSlip(selectedBillForSlip.id, slipUrl);
         verifyPayment(selectedBillForSlip.id, true);
@@ -113,7 +113,7 @@ export default function OwnerBillingPage() {
       }
     } catch (err: any) {
       console.error(err);
-      setErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ SlipOK API');
+      setErrorMessage(`เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้'}`);
     } finally {
       setIsVerifyingSlipOK(false);
     }
@@ -554,6 +554,17 @@ export default function OwnerBillingPage() {
                         )}
                       </div>
                     </div>
+
+                    {/* Error Alert placed directly above the action button so the user sees it immediately */}
+                    {errorMessage && (
+                      <div className="p-3 bg-rose-950/80 border-2 border-rose-500/80 text-rose-200 text-xs rounded-xl flex items-start gap-2 shadow-lg">
+                        <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                        <div className="space-y-0.5">
+                          <strong className="block text-rose-300 font-bold">ผลการตรวจสอบสลิป:</strong>
+                          <span>{errorMessage}</span>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Submit button with SlipOK Auto Verify */}
                     <div className="space-y-2 pt-1 border-t border-slate-800">
