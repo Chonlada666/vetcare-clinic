@@ -339,13 +339,14 @@ export default function OwnerPetsPage() {
 
       {/* Add / Edit Modal */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsModalOpen(false);
-          }}
-        >
-          <div className="bg-slate-900 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-800 my-8 text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <button
+            type="button"
+            aria-label="ปิดหน้าต่างจัดการสัตว์เลี้ยง"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm -z-10 cursor-default"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div className="bg-slate-900 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-800 my-8 text-white relative z-10">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="font-bold text-white text-lg">
                 {editingPet ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'ลงทะเบียนสัตว์เลี้ยงใหม่'}

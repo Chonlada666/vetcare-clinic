@@ -305,10 +305,12 @@ function BookingContent() {
           const isActive = step === s.num;
           const isPassed = step > s.num;
           return (
-            <div
+            <button
+              type="button"
               key={s.num}
+              disabled={!isPassed}
               onClick={() => isPassed && setStep(s.num as any)}
-              className={`p-3 sm:p-3.5 rounded-2xl border-2 transition ${
+              className={`text-left p-3 sm:p-3.5 rounded-2xl border-2 transition ${
                 isActive
                   ? 'border-sky-500 bg-sky-950/70 text-sky-200'
                   : isPassed
@@ -320,7 +322,7 @@ function BookingContent() {
                 {isPassed ? '✓ ' : ''}ขั้นที่ {s.num}
               </div>
               <div className="text-[11px] font-semibold truncate mt-0.5">{s.title}</div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -359,10 +361,11 @@ function BookingContent() {
                   {myPets.map((pet) => {
                     const isSelected = selectedPetId === pet.id;
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={pet.id}
                         onClick={() => setSelectedPetId(pet.id)}
-                        className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center gap-3 transition ${
+                        className={`text-left p-3.5 rounded-2xl border-2 cursor-pointer flex items-center gap-3 transition ${
                           isSelected
                             ? 'border-sky-500 bg-sky-950/70 text-white'
                             : 'border-slate-800 hover:border-slate-700 bg-slate-950'
@@ -379,7 +382,7 @@ function BookingContent() {
                             {pet.species === 'อื่นๆ' && pet.exoticType ? pet.exoticType : pet.species} &bull; {pet.breed || '-'}
                           </div>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                   <button
@@ -455,10 +458,11 @@ function BookingContent() {
                   const isPrimaryCheckup = idx === 0 || srv.id === 'srv_1';
 
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={srv.id}
                       onClick={() => setSelectedServiceId(srv.id)}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between ${
+                      className={`text-left p-4 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between ${
                         isSelected
                           ? 'border-sky-500 bg-sky-950/70 text-white'
                           : isPrimaryCheckup
@@ -484,7 +488,7 @@ function BookingContent() {
                         </span>
                         <span className="text-sky-400 font-bold">{formatCurrency(srv.price)}</span>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

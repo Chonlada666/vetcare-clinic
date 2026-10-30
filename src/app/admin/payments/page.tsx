@@ -313,13 +313,14 @@ export default function AdminPaymentsPage() {
 
       {/* SlipOK Config Modal */}
       {isConfigModalOpen && (
-        <div
-          className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsConfigModalOpen(false);
-          }}
-        >
-          <div className="bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-800 my-8 text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <button
+            type="button"
+            aria-label="ปิดหน้าต่างตั้งค่า SlipOK"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm -z-10 cursor-default"
+            onClick={() => setIsConfigModalOpen(false)}
+          />
+          <div className="bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-800 my-8 text-white relative z-10">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">

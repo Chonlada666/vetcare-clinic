@@ -683,10 +683,11 @@ export default function OwnerDashboardPage() {
               };
 
               return (
-                <div
+                <button
+                  type="button"
                   key={service.id}
                   onClick={() => router.push(`/owner/booking?serviceId=${service.id}`)}
-                  className="group rounded-2xl border border-slate-800 bg-slate-950 hover:border-slate-600 transition flex flex-col overflow-hidden cursor-pointer shadow-md"
+                  className="text-left w-full group rounded-2xl border border-slate-800 bg-slate-950 hover:border-slate-600 transition flex flex-col overflow-hidden cursor-pointer shadow-md"
                 >
                   <div className="relative h-48 w-full overflow-hidden">
                     <img
@@ -718,7 +719,7 @@ export default function OwnerDashboardPage() {
                       <ChevronRight className="w-4 h-4" />
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
