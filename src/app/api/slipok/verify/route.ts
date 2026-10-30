@@ -51,125 +51,118 @@ export async function POST(req: NextRequest) {
       apiKey !== 'your_api_key_here' &&
       branchId !== 'demo_branch';
 
-    // ================= REAL SLIPOK API CALL =================
-    if (isRealSlipOkConfigured) {
-      const slipOkFormData = new FormData();
+    // ================= REAL SLIPOK API CALL ONLY (NO MOCK/FALLBACK) =================
+    if (!isRealSlipOkConfigured) {
+      return NextResponse.json(
+        {
+          success: false,
+          isRealApi: false,
+          message: 'ยังไม่ได้ตั้งค่า SlipOK API Key และ Branch ID ของจริงในระบบ กรุณาติดต่อผู้ดูแลระบบ',
+        },
+        { status: 503 }
+      );
+    }
 
-      if (file) {
-        slipOkFormData.append('files', file, file.name || 'slip.jpg');
-      } else if (slipBase64) {
-        const blob = base64ToBlob(slipBase64);
-        if (blob) {
-          slipOkFormData.append('files', blob, 'slip.jpg');
-        } else {
-          return NextResponse.json(
-            { success: false, message: 'รูปแบบภาพสลิป Base64 ไม่ถูกต้อง' },
-            { status: 400 }
-          );
-        }
-      }
+    const slipOkFormData = new FormData();
 
-      if (amount) {
-        slipOkFormData.append('amount', String(parseFloat(amount)));
-      }
-      slipOkFormData.append('log', 'true');
-
-      try {
-        const response = await fetch(`https://api.slipok.com/api/line/apikey/${branchId}`, {
-          method: 'POST',
-          headers: {
-            'x-authorization': apiKey,
-          },
-          body: slipOkFormData,
-        });
-
-        const json = await response.json();
-
-        if (response.ok && json.success) {
-          const slipData = json.data || {};
-          const senderObj = slipData.sender || {};
-          const receiverObj = slipData.receiver || {};
-
-          const senderName =
-            senderObj.name?.th ||
-            senderObj.name?.en ||
-            senderObj.displayName ||
-            senderObj.name ||
-            'ผู้โอนเงิน';
-
-          const receiverName =
-            receiverObj.name?.th ||
-            receiverObj.name?.en ||
-            receiverObj.displayName ||
-            receiverObj.name ||
-            'VetCare Animal Clinic';
-
-          return NextResponse.json({
-            success: true,
-            isRealApi: true,
-            message: 'ตรวจสอบสลิปสำเร็จผ่าน SlipOK API (ระบบจริง)',
-            data: {
-              transRef: slipData.transRef || `REF_${Date.now()}`,
-              transDate: slipData.transDate,
-              transTime: slipData.transTime,
-              senderName,
-              receiverName,
-              amount: typeof slipData.amount === 'number' ? slipData.amount : parseFloat(amount || '0'),
-              rawSlipOk: slipData,
-            },
-          });
-        }
-
-        // If the API key works (not 401/auth error) and SlipOK rejected the slip itself, return the SlipOK error
-        const isAuthOrQuotaError =
-          response.status === 401 ||
-          response.status === 403 ||
-          json.message?.includes('Authorization') ||
-          json.message?.includes('Package') ||
-          json.message?.includes('โควต้า');
-
-        if (!isAuthOrQuotaError) {
-          let friendlyMsg = json.message || 'การตรวจสอบสลิปไม่ผ่าน';
-          if (json.code === 1001 || json.message?.includes('duplicate')) {
-            friendlyMsg = 'สลิปนี้เคยถูกใช้งานในระบบแล้ว (สลิปซ้ำ)';
-          } else if (json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
-            friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระ';
-          } else if (json.code === 1003 || json.message?.includes('qrcode') || json.message?.includes('not found')) {
-            friendlyMsg = 'ไม่พบ QR Code ในภาพสลิป หรือภาพไม่ชัดเจน กรุณาอัปโหลดภาพสลิปใหม่';
-          } else if (json.code === 1004 || json.message?.includes('expired') || json.message?.includes('old')) {
-            friendlyMsg = 'สลิปการโอนเงินนี้เก่าเกินกำหนดเวลา';
-          }
-
-          return NextResponse.json({
-            success: false,
-            isRealApi: true,
-            message: friendlyMsg,
-            rawSlipOk: json,
-          });
-        }
-      } catch (apiErr) {
-        console.warn('SlipOK remote call fallback:', apiErr);
+    if (file) {
+      slipOkFormData.append('files', file, file.name || 'slip.jpg');
+    } else if (slipBase64) {
+      const blob = base64ToBlob(slipBase64);
+      if (blob) {
+        slipOkFormData.append('files', blob, 'slip.jpg');
+      } else {
+        return NextResponse.json(
+          { success: false, message: 'รูปแบบภาพสลิป Base64 ไม่ถูกต้อง' },
+          { status: 400 }
+        );
       }
     }
 
-    // ================= FALLBACK VERIFICATION =================
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const expectedAmount = amount ? parseFloat(amount) : null;
+    if (expectedAmount !== null && !isNaN(expectedAmount)) {
+      slipOkFormData.append('amount', String(expectedAmount));
+    }
+    slipOkFormData.append('log', 'true');
 
-    const numericAmount = amount ? parseFloat(amount) : 300;
-    const mockRef = `SLIPOK_${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${Math.floor(100000 + Math.random() * 900000)}`;
+    const response = await fetch(`https://api.slipok.com/api/line/apikey/${branchId}`, {
+      method: 'POST',
+      headers: {
+        'x-authorization': apiKey,
+      },
+      body: slipOkFormData,
+    });
+
+    const json = await response.json();
+
+    if (response.ok && json.success) {
+      const slipData = json.data || {};
+      const senderObj = slipData.sender || {};
+      const receiverObj = slipData.receiver || {};
+
+      const actualAmount = typeof slipData.amount === 'number' ? slipData.amount : parseFloat(slipData.amount || '0');
+
+      // ตรวจสอบยอดเงินซ้ำอีกชั้นเพื่อความปลอดภัยสูงสุด 100%
+      if (expectedAmount !== null && !isNaN(expectedAmount) && actualAmount > 0) {
+        if (Math.abs(actualAmount - expectedAmount) > 0.01) {
+          return NextResponse.json({
+            success: false,
+            isRealApi: true,
+            message: `ยอดเงินในสลิป (${actualAmount} บาท) ไม่ตรงกับยอดที่ต้องชำระ (${expectedAmount} บาท)`,
+            rawSlipOk: slipData,
+          });
+        }
+      }
+
+      const senderName =
+        senderObj.name?.th ||
+        senderObj.name?.en ||
+        senderObj.displayName ||
+        senderObj.name ||
+        'ผู้โอนเงิน';
+
+      const receiverName =
+        receiverObj.name?.th ||
+        receiverObj.name?.en ||
+        receiverObj.displayName ||
+        receiverObj.name ||
+        'VetCare Animal Clinic';
+
+      return NextResponse.json({
+        success: true,
+        isRealApi: true,
+        message: 'ตรวจสอบสลิปสำเร็จผ่าน SlipOK API (ระบบจริง)',
+        data: {
+          transRef: slipData.transRef || `REF_${Date.now()}`,
+          transDate: slipData.transDate,
+          transTime: slipData.transTime,
+          senderName,
+          receiverName,
+          amount: actualAmount,
+          rawSlipOk: slipData,
+        },
+      });
+    }
+
+    // SlipOK ตอบกลับมาว่าไม่ผ่าน หรือเกิดข้อผิดพลาดในการตรวจสอบ
+    let friendlyMsg = json.message || 'การตรวจสอบสลิปไม่ผ่าน';
+    if (json.code === 1001 || json.message?.includes('duplicate')) {
+      friendlyMsg = 'สลิปนี้เคยถูกใช้งานในระบบแล้ว (สลิปซ้ำ)';
+    } else if (json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
+      friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระตามบิล';
+    } else if (json.code === 1003 || json.message?.includes('qrcode') || json.message?.includes('not found')) {
+      friendlyMsg = 'ไม่พบ QR Code ในภาพสลิป หรือภาพไม่ชัดเจน กรุณาอัปโหลดภาพสลิปใหม่';
+    } else if (json.code === 1004 || json.message?.includes('expired') || json.message?.includes('old')) {
+      friendlyMsg = 'สลิปการโอนเงินนี้เก่าเกินกำหนดเวลา';
+    } else if (json.code === 1002 || json.message?.includes('Authorization') || response.status === 401) {
+      friendlyMsg = 'การเชื่อมต่อ SlipOK ผิดพลาด (API Key หรือ Branch ID ไม่ถูกต้อง กรุณาติดต่อผู้ดูแลระบบ)';
+    }
 
     return NextResponse.json({
-      success: true,
+      success: false,
       isRealApi: true,
-      message: 'ตรวจสอบสลิปสำเร็จผ่าน SlipOK API',
-      data: {
-        transRef: mockRef,
-        transDate: new Date().toISOString().split('T')[0],
-        transTime: new Date().toTimeString().split(' ')[0],
-        senderName: 'ผู้โอนเงิน (ตรวจสอบผ่าน SlipOK)',
-        receiverName: 'คลินิกรักษาสัตว์ VetCare จำกัด (090-8-46418-4)',
-        amount: numericAmount,
-      },
+      message: friendlyMsg,
+      rawSlipOk: json,
     });
   } catch (error: any) {
     console.error('SlipOK verification error:', error);
