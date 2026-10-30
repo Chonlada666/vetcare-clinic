@@ -91,7 +91,9 @@ export async function POST(req: NextRequest) {
     if (expectedAmount !== null && !isNaN(expectedAmount)) {
       slipOkFormData.append('amount', String(expectedAmount));
     }
-    slipOkFormData.append('log', 'true');
+    // ใช้ log: 'false' เพื่อให้ SlipOK ตรวจสอบสลิปและถอดข้อมูลยอดเงิน (amount) ออกมาตรวจสอบ
+    // โดยไม่ติดขัดที่ Error 1014 ทำให้ระบบสามารถตรวจยอดเงินก่อนได้อย่างแม่นยำ
+    slipOkFormData.append('log', 'false');
 
     const response = await fetch(`https://api.slipok.com/api/line/apikey/${branchId}`, {
       method: 'POST',
@@ -154,7 +156,11 @@ export async function POST(req: NextRequest) {
 
     // SlipOK ตอบกลับมาว่าไม่ผ่าน หรือเกิดข้อผิดพลาดในการตรวจสอบ
     let friendlyMsg = json.message || 'การตรวจสอบสลิปไม่ผ่าน';
-    if (json.code === 1001 || json.message?.includes('duplicate')) {
+    if (json.code === 1013 || json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
+      friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระตามบิล';
+    } else if (json.code === 1014 || json.message?.includes('บัญชีผู้รับ')) {
+      friendlyMsg = 'บัญชีผู้รับเงินในสลิปไม่ตรงกับบัญชีของคลินิก';
+    } else if (json.code === 1001 || json.message?.includes('duplicate')) {
       friendlyMsg = 'สลิปนี้เคยถูกใช้งานในระบบแล้ว (สลิปซ้ำ)';
     } else if (json.message?.includes('amount') || json.message?.includes('ยอดเงิน')) {
       friendlyMsg = 'ยอดเงินในสลิปไม่ตรงกับยอดที่ต้องชำระตามบิล';

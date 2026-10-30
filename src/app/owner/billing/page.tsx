@@ -207,11 +207,11 @@ export default function OwnerBillingPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-400">พร้อมเพย์:</span>
-              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">095-550-6741</strong>
+              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">090-846-4184</strong>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-400">ชื่อบัญชี:</span>
-              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">VetCare Animal Clinic Co., Ltd.</strong>
+              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">ชลลดา นักรบ (VetCare Animal Clinic)</strong>
             </div>
           </div>
         </div>
@@ -219,12 +219,12 @@ export default function OwnerBillingPage() {
         <div className="p-3.5 bg-slate-950 rounded-2xl shrink-0 text-center border-2 border-sky-500 flex flex-col items-center">
           <div className="w-28 h-28 bg-white p-1.5 rounded-xl flex items-center justify-center">
             <img
-              src="https://promptpay.io/0955506741.png"
-              alt="PromptPay QR Code 0955506741"
+              src="https://promptpay.io/0908464184.png"
+              alt="PromptPay QR Code 0908464184"
               className="w-full h-full object-contain rounded-lg"
             />
           </div>
-          <span className="text-[10px] font-black text-sky-400 block mt-2 tracking-wide">QR พร้อมเพย์ 095-550-6741</span>
+          <span className="text-[10px] font-black text-sky-400 block mt-2 tracking-wide">QR พร้อมเพย์ 090-846-4184</span>
         </div>
       </div>
 
@@ -499,7 +499,7 @@ export default function OwnerBillingPage() {
                       {/* Official PromptPay QR Code with amount */}
                       <div className="bg-white p-3 rounded-2xl shadow-xl border-2 border-sky-400/40 inline-block">
                         <img
-                          src={`https://promptpay.io/0955506741/${selectedBillForSlip.totalAmount}.png`}
+                          src={`https://promptpay.io/0908464184/${selectedBillForSlip.totalAmount}.png`}
                           alt={`PromptPay QR ฿${selectedBillForSlip.totalAmount}`}
                           className="w-44 h-44 object-contain rounded-lg mx-auto"
                         />
@@ -510,8 +510,8 @@ export default function OwnerBillingPage() {
 
                       <div className="text-xs space-y-1 text-slate-300">
                         <div>ยอดชำระ: <strong className="text-sky-400 font-mono text-base font-black">{formatCurrency(selectedBillForSlip.totalAmount)}</strong></div>
-                        <div>ชื่อบัญชี: <strong className="text-white">VetCare Animal Clinic Co., Ltd.</strong></div>
-                        <div>พร้อมเพย์: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">095-550-6741</strong></div>
+                        <div>ชื่อบัญชี: <strong className="text-white">ชลลดา นักรบ (VetCare Clinic)</strong></div>
+                        <div>พร้อมเพย์ / เบอร์โทร: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">090-846-4184</strong></div>
                         <div>หรือโอนเข้า: <strong className="text-slate-200 font-mono">ธ.กสิกรไทย 090-8-46418-4</strong></div>
                       </div>
                     </div>
