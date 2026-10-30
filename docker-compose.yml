@@ -9,7 +9,7 @@ services:
     image: ${APP_IMAGE:-vetcare-app:local}
     restart: unless-stopped
     environment:
-      SLIPOK_API_KEY: ${SLIPOK_API_KEY:-SLIPOK9O5I79X}
+      SLIPOK_API_KEY: ${SLIPOK_API_KEY:-SLIPOKZLET8N3}
       SLIPOK_BRANCH_ID: ${SLIPOK_BRANCH_ID:-77947}
     ports:
       - "${APP_PORT:-3300}:3000"
