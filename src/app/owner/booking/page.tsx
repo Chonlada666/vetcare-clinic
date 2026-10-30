@@ -540,7 +540,7 @@ function BookingContent() {
             {assignedVet && (
               <div className="p-3.5 bg-slate-950 border border-sky-800/50 rounded-2xl flex items-center gap-3 text-xs">
                 <img
-                  src={assignedVet.avatar || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=150&q=80'}
+                  src={assignedVet.avatar || '/images/vets/vet_panwad.jpg'}
                   alt={assignedVet.name}
                   className="w-10 h-10 rounded-xl object-cover ring-2 ring-sky-500/40"
                 />

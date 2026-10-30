@@ -160,8 +160,11 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
           if (parsed.users) {
             const mergedU = [...parsed.users];
             INITIAL_USERS.forEach((initU) => {
-              if (!mergedU.some((u: User) => u.id === initU.id)) {
+              const existing = mergedU.find((u: User) => u.id === initU.id);
+              if (!existing) {
                 mergedU.push(initU);
+              } else if (existing.avatar?.includes('unsplash') && initU.avatar) {
+                existing.avatar = initU.avatar;
               }
             });
             setUsers(mergedU);
@@ -172,8 +175,11 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
           if (parsed.vets) {
             const mergedV = [...parsed.vets];
             INITIAL_VETS.forEach((initV) => {
-              if (!mergedV.some((v: Vet) => v.id === initV.id)) {
+              const existing = mergedV.find((v: Vet) => v.id === initV.id);
+              if (!existing) {
                 mergedV.push(initV);
+              } else if (existing.avatar?.includes('unsplash') || !existing.avatar?.startsWith('/images/vets/')) {
+                existing.avatar = initV.avatar;
               }
             });
             setVets(mergedV);
