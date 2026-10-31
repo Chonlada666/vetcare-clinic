@@ -36,12 +36,40 @@ function getTodayDateString() {
 // Helper to automatically assign on-duty vet according to day of week
 const THAI_DAYS = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
-function getAssignedVet(dateStr: string, vetsList: Vet[]): Vet | undefined {
+function getAssignedVet(dateStr: string, vetsList: Vet[], serviceId?: string): Vet | undefined {
   if (!vetsList || vetsList.length === 0) return undefined;
-  if (!dateStr) return vetsList[0];
+
+  // 1. Match preferred vet by service specialty
+  let targetVet: Vet | undefined = undefined;
+  if (serviceId) {
+    if (['srv_3', 'srv_4', 'srv_8'].includes(serviceId)) {
+      // Vaccines & Dentistry -> หมอนก (vet_3)
+      targetVet = vetsList.find((v) => v.id === 'vet_3' || v.specialty?.includes('วัคซีน') || v.specialty?.includes('ทันตกรรม'));
+    } else if (['srv_6', 'srv_7', 'srv_9'].includes(serviceId)) {
+      // Surgery & Orthopedics -> หมอกิต (vet_1)
+      targetVet = vetsList.find((v) => v.id === 'vet_1' || v.specialty?.includes('ศัลยกรรม') || v.specialty?.includes('กระดูก'));
+    } else if (['srv_1', 'srv_2', 'srv_5'].includes(serviceId)) {
+      // Medicine & Skin -> หมอป่าน (vet_2)
+      targetVet = vetsList.find((v) => v.id === 'vet_2' || v.specialty?.includes('อายุรกรรม') || v.specialty?.includes('ผิวหนัง'));
+    }
+  }
+
+  if (!dateStr) return targetVet || vetsList[0];
+
   try {
     const d = new Date(dateStr + 'T00:00:00');
     const dayName = THAI_DAYS[d.getDay()];
+
+    // If preferred specialist is on duty on this day, use them!
+    if (
+      targetVet &&
+      targetVet.availableDays &&
+      targetVet.availableDays.some((day) => day.includes(dayName) || dayName.includes(day) || day.toLowerCase().includes('ทุกวัน'))
+    ) {
+      return targetVet;
+    }
+
+    // Otherwise find on-duty vets for that day
     const onDutyVets = vetsList.filter(
       (v) =>
         v.availableDays &&
@@ -49,11 +77,12 @@ function getAssignedVet(dateStr: string, vetsList: Vet[]): Vet | undefined {
           (day) => day.includes(dayName) || dayName.includes(day) || day.toLowerCase().includes('ทุกวัน')
         )
     );
-    if (onDutyVets.length === 0) return vetsList[0];
-    const dayNum = d.getDate() + d.getMonth();
-    return onDutyVets[dayNum % onDutyVets.length];
+
+    if (onDutyVets.length === 0) return targetVet || vetsList[0];
+    if (targetVet && onDutyVets.some((v) => v.id === targetVet!.id)) return targetVet;
+    return onDutyVets[0];
   } catch {
-    return vetsList[0];
+    return targetVet || vetsList[0];
   }
 }
 
@@ -209,7 +238,7 @@ function BookingContent() {
   ];
 
   // Dynamic assigned vet based on duty schedule
-  const effectiveVet = getAssignedVet(selectedDate, vets) || vets[0];
+  const effectiveVet = getAssignedVet(selectedDate, vets, selectedServiceId) || vets[0];
 
   // Dynamic slot availability calculation
   const getSlotStatus = (time: string) => {
