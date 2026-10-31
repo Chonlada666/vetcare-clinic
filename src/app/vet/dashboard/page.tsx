@@ -35,15 +35,6 @@ export default function VetDashboardPage() {
     return `${year}-${month}-${day}`;
   })();
 
-  const dayAfterNextStr = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 2);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  })();
-
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
   // Find which doctor matches currentUser, if any
@@ -219,17 +210,6 @@ export default function VetDashboardPage() {
               }`}
             >
               วันถัดไป (พรุ่งนี้)
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedDate(dayAfterNextStr)}
-              className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
-                selectedDate === dayAfterNextStr
-                  ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              มะรืนนี้
             </button>
           </div>
 

@@ -77,19 +77,6 @@ export default function VetSchedulePage() {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       })(),
     },
-    {
-      label: (() => {
-        const d = new Date();
-        d.setDate(d.getDate() + 2);
-        const day2Str = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        return `${formatThaiDate(day2Str)} (มะรืนนี้)`;
-      })(),
-      val: (() => {
-        const d = new Date();
-        d.setDate(d.getDate() + 2);
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      })(),
-    },
   ];
 
   return (
