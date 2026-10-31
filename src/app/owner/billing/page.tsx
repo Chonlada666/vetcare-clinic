@@ -151,6 +151,9 @@ export default function OwnerBillingPage() {
       formData.append('amount', String(selectedBillForSlip.totalAmount));
       formData.append('billId', selectedBillForSlip.id);
       formData.append('slipBase64', slipUrl);
+      if (selectedBillForSlip.createdAt) {
+        formData.append('billCreatedAt', selectedBillForSlip.createdAt);
+      }
 
       const res = await fetch('/api/slipok/verify', {
         method: 'POST',
