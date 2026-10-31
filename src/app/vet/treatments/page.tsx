@@ -36,7 +36,6 @@ export default function VetTreatmentsQueuePage() {
 
   const [filterDate, setFilterDate] = useState<string>(todayStr);
   const [search, setSearch] = useState('');
-  const [selectedVetId, setSelectedVetId] = useState<string>('all');
 
   const activeVet =
     vets.find(
@@ -46,11 +45,7 @@ export default function VetTreatmentsQueuePage() {
     ) || vets[0];
 
   const queueList = appointments
-    .filter((a) => {
-      if (selectedVetId === 'all') return a.date === filterDate && a.status !== 'cancelled';
-      const vObj = vets.find((v) => v.id === selectedVetId);
-      return (a.vetId === selectedVetId || (vObj && a.vetId === vObj.name)) && a.date === filterDate && a.status !== 'cancelled';
-    })
+    .filter((a) => (a.vetId === activeVet.id || a.vetId === activeVet.name) && a.date === filterDate && a.status !== 'cancelled')
     .filter((a) => {
       const pet = pets.find((p) => p.id === a.petId);
       const owner = users.find((u) => u.id === a.ownerId);
@@ -76,48 +71,6 @@ export default function VetTreatmentsQueuePage() {
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             เลือกเคสสัตว์เลี้ยงเพื่อเข้าสู่หน้าจอบันทึกการตรวจรักษาและการสั่งจ่ายยา
           </p>
-        </div>
-      </div>
-
-      {/* Doctor Selection Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
-        <div className="flex items-center gap-2">
-          <Stethoscope className="w-4 h-4 text-sky-400" />
-          <span className="text-xs sm:text-sm font-bold text-white">เลือกดูห้องตรวจของแพทย์:</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSelectedVetId('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-              selectedVetId === 'all'
-                ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            คิวตรวจรวมทุกแพทย์ ({appointments.filter((a) => a.date === filterDate && a.status !== 'cancelled').length})
-          </button>
-          {vets.map((v) => {
-            const count = appointments.filter(
-              (a) => (a.vetId === v.id || a.vetId === v.name) && a.date === filterDate && a.status !== 'cancelled'
-            ).length;
-            const isSelected = selectedVetId === v.id;
-            return (
-              <button
-                type="button"
-                key={v.id}
-                onClick={() => setSelectedVetId(v.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  isSelected
-                    ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-              >
-                <img src={v.avatar} alt={v.name} className="w-4 h-4 rounded-full object-cover" />
-                <span>{v.name.split(' ')[1] || v.name} ({count})</span>
-              </button>
-            );
-          })}
         </div>
       </div>
 

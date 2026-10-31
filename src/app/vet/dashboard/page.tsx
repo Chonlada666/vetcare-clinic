@@ -37,24 +37,18 @@ export default function VetDashboardPage() {
 
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
-  // Find which doctor matches currentUser, if any
-  const loggedInVet = vets.find(
-    (v) =>
-      (currentUser?.email && v.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
-      (currentUser?.name && (v.name.includes(currentUser.name) || currentUser.name.includes(v.name.split(' ')[1] || '')))
+  const activeVet =
+    vets.find(
+      (v) =>
+        (currentUser?.email && v.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (currentUser?.name && (v.name.includes(currentUser.name) || currentUser.name.includes(v.name.split(' ')[1] || '')))
+    ) || vets[0];
+
+  const myAppointments = appointments.filter(
+    (a) => a.vetId === activeVet?.id || a.vetId === activeVet?.name
   );
 
-  // Allow selecting specific doctor or 'all'
-  const [selectedVetId, setSelectedVetId] = useState<string>('all');
-
-  const activeVet = vets.find((v) => v.id === selectedVetId) || loggedInVet || vets[0];
-
-  const filteredAppointments = appointments.filter((a) => {
-    if (selectedVetId === 'all') return true;
-    return a.vetId === selectedVetId || (activeVet && a.vetId === activeVet.name);
-  });
-
-  const selectedDateAppointments = filteredAppointments.filter((a) => a.date === selectedDate);
+  const selectedDateAppointments = myAppointments.filter((a) => a.date === selectedDate);
   const waitingPatients = selectedDateAppointments.filter(
     (a) => a.status === 'pending' || a.status === 'in_treatment' || a.status === 'confirmed'
   );
@@ -66,8 +60,8 @@ export default function VetDashboardPage() {
       <section className="py-6 sm:py-8 text-center space-y-8 border-b border-slate-800/80">
         <div className="max-w-2xl mx-auto space-y-4">
           <img
-            src={selectedVetId === 'all' ? (loggedInVet?.avatar || vets[0].avatar) : activeVet.avatar}
-            alt={selectedVetId === 'all' ? 'รวมทีมสัตวแพทย์' : activeVet.name}
+            src={activeVet.avatar}
+            alt={activeVet.name}
             className="w-20 h-20 rounded-full object-cover border border-slate-700 mx-auto"
           />
           <div className="space-y-1">
@@ -75,12 +69,10 @@ export default function VetDashboardPage() {
               VETERINARIAN CLINICAL PORTAL
             </div>
             <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide">
-              {selectedVetId === 'all' ? 'แดชบอร์ดคิวตรวจ (รวมทีมสัตวแพทย์ทุกท่าน)' : activeVet.name}
+              {activeVet.name}
             </h1>
             <p className="text-slate-400 text-xs sm:text-sm">
-              {selectedVetId === 'all'
-                ? 'ระบบจัดการคิวตรวจผู้ป่วยและเวชระเบียนสัตว์แพทย์ VetCare Clinic'
-                : `${activeVet.specialty} • ใบอนุญาตประกอบวิชาชีพ ${activeVet.licenseNo}`}
+              {activeVet.specialty} &bull; ใบอนุญาตประกอบวิชาชีพ {activeVet.licenseNo}
             </p>
           </div>
 
@@ -131,7 +123,7 @@ export default function VetDashboardPage() {
               นัดหมายทั้งหมด
             </span>
             <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-              {filteredAppointments.length}
+              {myAppointments.length}
             </span>
             <span className="text-xs sm:text-sm font-bold text-slate-300">
               เคส
@@ -139,48 +131,6 @@ export default function VetDashboardPage() {
           </div>
         </div>
       </section>
-
-      {/* Doctor Filter Bar - Select Which Doctor's Queue to View */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
-        <div className="flex items-center gap-2">
-          <Stethoscope className="w-4 h-4 text-sky-400" />
-          <span className="text-xs sm:text-sm font-bold text-white">เลือกดูคิวตรวจของแพทย์:</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSelectedVetId('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-              selectedVetId === 'all'
-                ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            คิวตรวจรวมทุกแพทย์ ({appointments.filter((a) => a.date === selectedDate).length})
-          </button>
-          {vets.map((v) => {
-            const count = appointments.filter(
-              (a) => (a.vetId === v.id || a.vetId === v.name) && a.date === selectedDate
-            ).length;
-            const isSelected = selectedVetId === v.id;
-            return (
-              <button
-                type="button"
-                key={v.id}
-                onClick={() => setSelectedVetId(v.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  isSelected
-                    ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-              >
-                <img src={v.avatar} alt={v.name} className="w-4 h-4 rounded-full object-cover" />
-                <span>{v.name.split(' ')[1] || v.name} ({count})</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Date Filter Bar - Dynamic Date Picker with Quick Date Toggles */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
