@@ -106,7 +106,7 @@ export default function VetSchedulePage() {
             </div>
             <h2 className="text-xl sm:text-2xl font-light mt-0.5 text-white">{myVet.name}</h2>
             <div className="text-xs text-slate-300 mt-0.5">
-              {myVet.specialty} &bull; วันออกตรวจ: {myVet.availableDays.join(', ')} ({myVet.workingHours.start} - {myVet.workingHours.end} น.)
+              ใบอนุญาตเลขที่ {myVet.licenseNo} &bull; วันและเวลาออกตรวจ: {myVet.availableDays.join(', ')}
             </div>
           </div>
         </div>

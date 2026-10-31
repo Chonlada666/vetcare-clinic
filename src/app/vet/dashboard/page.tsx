@@ -72,7 +72,7 @@ export default function VetDashboardPage() {
               {activeVet.name}
             </h1>
             <p className="text-slate-400 text-xs sm:text-sm">
-              {activeVet.specialty} &bull; ใบอนุญาตประกอบวิชาชีพ {activeVet.licenseNo}
+              ใบอนุญาตประกอบวิชาชีพ {activeVet.licenseNo}
             </p>
           </div>
 

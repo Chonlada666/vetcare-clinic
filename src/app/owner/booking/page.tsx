@@ -36,53 +36,49 @@ function getTodayDateString() {
 // Helper to automatically assign on-duty vet according to day of week
 const THAI_DAYS = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
-function getAssignedVet(dateStr: string, vetsList: Vet[], serviceId?: string): Vet | undefined {
+function getAssignedVet(dateStr: string, vetsList: Vet[], timeSlot?: string): Vet | undefined {
   if (!vetsList || vetsList.length === 0) return undefined;
-
-  // 1. Match preferred vet by service specialty
-  let targetVet: Vet | undefined = undefined;
-  if (serviceId) {
-    if (['srv_3', 'srv_4', 'srv_8'].includes(serviceId)) {
-      // Vaccines & Dentistry -> หมอนก (vet_3)
-      targetVet = vetsList.find((v) => v.id === 'vet_3' || v.specialty?.includes('วัคซีน') || v.specialty?.includes('ทันตกรรม'));
-    } else if (['srv_6', 'srv_7', 'srv_9'].includes(serviceId)) {
-      // Surgery & Orthopedics -> หมอกิต (vet_1)
-      targetVet = vetsList.find((v) => v.id === 'vet_1' || v.specialty?.includes('ศัลยกรรม') || v.specialty?.includes('กระดูก'));
-    } else if (['srv_1', 'srv_2', 'srv_5'].includes(serviceId)) {
-      // Medicine & Skin -> หมอป่าน (vet_2)
-      targetVet = vetsList.find((v) => v.id === 'vet_2' || v.specialty?.includes('อายุรกรรม') || v.specialty?.includes('ผิวหนัง'));
-    }
-  }
-
-  if (!dateStr) return targetVet || vetsList[0];
+  if (!dateStr) return vetsList[0];
 
   try {
     const d = new Date(dateStr + 'T00:00:00');
-    const dayName = THAI_DAYS[d.getDay()];
+    const dayOfWeek = d.getDay(); // 0: อาทิตย์, 1: จันทร์, 2: อังคาร, 3: พุธ, 4: พฤหัสบดี, 5: ศุกร์, 6: เสาร์
 
-    // If preferred specialist is on duty on this day, use them!
-    if (
-      targetVet &&
-      targetVet.availableDays &&
-      targetVet.availableDays.some((day) => day.includes(dayName) || dayName.includes(day) || day.toLowerCase().includes('ทุกวัน'))
-    ) {
-      return targetVet;
+    // Check timeSlot hour: Morning (< 13:00) vs Afternoon (>= 13:00)
+    const startHour = timeSlot ? parseInt(timeSlot.split(':')[0], 10) : 9;
+    const isMorning = startHour < 13;
+
+    let targetVetId = 'vet_2'; // default หมอป่าน
+
+    switch (dayOfWeek) {
+      case 1: // จันทร์
+        targetVetId = isMorning ? 'vet_2' : 'vet_1'; // เช้าหมอป่าน, บ่ายหมอกิต
+        break;
+      case 2: // อังคาร
+        targetVetId = isMorning ? 'vet_2' : 'vet_1'; // เช้าหมอป่าน, บ่ายหมอกิต
+        break;
+      case 3: // พุธ
+        targetVetId = 'vet_3'; // หมอนก (เต็มวัน)
+        break;
+      case 4: // พฤหัสบดี
+        targetVetId = 'vet_3'; // หมอนก (เต็มวัน)
+        break;
+      case 5: // ศุกร์
+        targetVetId = isMorning ? 'vet_1' : 'vet_2'; // เช้าหมอกิต, บ่ายหมอป่าน
+        break;
+      case 6: // เสาร์
+        targetVetId = isMorning ? 'vet_2' : 'vet_3'; // เช้าหมอป่าน, บ่ายหมอนก
+        break;
+      case 0: // อาทิตย์
+        targetVetId = isMorning ? 'vet_1' : 'vet_2'; // เช้าหมอกิต, บ่ายหมอป่าน
+        break;
+      default:
+        targetVetId = 'vet_2';
     }
 
-    // Otherwise find on-duty vets for that day
-    const onDutyVets = vetsList.filter(
-      (v) =>
-        v.availableDays &&
-        v.availableDays.some(
-          (day) => day.includes(dayName) || dayName.includes(day) || day.toLowerCase().includes('ทุกวัน')
-        )
-    );
-
-    if (onDutyVets.length === 0) return targetVet || vetsList[0];
-    if (targetVet && onDutyVets.some((v) => v.id === targetVet!.id)) return targetVet;
-    return onDutyVets[0];
+    return vetsList.find((v) => v.id === targetVetId) || vetsList[0];
   } catch {
-    return targetVet || vetsList[0];
+    return vetsList[0];
   }
 }
 
@@ -238,7 +234,7 @@ function BookingContent() {
   ];
 
   // Dynamic assigned vet based on duty schedule
-  const effectiveVet = getAssignedVet(selectedDate, vets, selectedServiceId) || vets[0];
+  const effectiveVet = getAssignedVet(selectedDate, vets, selectedTimeSlot) || vets[0];
 
   // Dynamic slot availability calculation
   const getSlotStatus = (time: string) => {
@@ -593,7 +589,7 @@ function BookingContent() {
                     แพทย์เวรประจำวันที่ระบบจัดสรรให้อัตโนมัติ
                   </div>
                   <div className="font-extrabold text-white text-sm">
-                    {effectiveVet.name} <span className="text-xs font-normal text-slate-400">({effectiveVet.specialty})</span>
+                    {effectiveVet.name}
                   </div>
                 </div>
                 <div className="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/50 shrink-0">
@@ -673,7 +669,7 @@ function BookingContent() {
                 <div className="space-y-1">
                   <span className="text-slate-400 block text-[11px]">สัตวแพทย์ผู้ตรวจ:</span>
                   <div className="font-extrabold text-white text-sm">{effectiveVet?.name || '-'}</div>
-                  <div className="text-sky-400 font-semibold">{effectiveVet?.specialty}</div>
+                  <div className="text-sky-400 font-semibold">สัตวแพทย์เวรประจำวัน</div>
                 </div>
 
                 <div className="space-y-1">

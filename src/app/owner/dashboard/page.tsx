@@ -754,11 +754,17 @@ export default function OwnerDashboardPage() {
                 />
                 <div className="space-y-1">
                   <h4 className="font-bold text-white text-base">{vet.name}</h4>
-                  <p className="text-xs font-semibold text-sky-400">{vet.specialty}</p>
                   <p className="text-[11px] text-slate-400">ใบอนุญาตเลขที่ {vet.licenseNo}</p>
                 </div>
-                <div className="text-xs text-slate-300 pt-1">
-                  วันออกตรวจ: <span className="text-white">{vet.availableDays.join(', ')}</span> ({vet.workingHours.start} - {vet.workingHours.end} น.)
+                <div className="text-xs text-slate-300 pt-1 w-full space-y-1.5">
+                  <span className="text-sky-400 font-bold text-[11px] block">ตารางเวรออกตรวจ:</span>
+                  <div className="flex flex-col gap-1 text-[11px] text-slate-300">
+                    {vet.availableDays.map((d, idx) => (
+                      <span key={idx} className="bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800 text-slate-200">
+                        {d}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
