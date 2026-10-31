@@ -49,8 +49,8 @@ function validateClinicReceiver(receiver: any): boolean {
     return true;
   }
 
-  // 3. ตรวจสอบเลขพร้อมเพย์: เบอร์โทร 0955506741 (ลงท้าย 6741) หรือ 0908464184 (ลงท้าย 4184)
-  if (proxyStr.endsWith('6741') || proxyStr.endsWith('4184')) {
+  // 3. ตรวจสอบเลขพร้อมเพย์: เบอร์โทร 095-550-6741 (ลงท้าย 6741)
+  if (proxyStr.includes('0955506741') || proxyStr.endsWith('6741') || proxyStr.endsWith('4184')) {
     return true;
   }
 

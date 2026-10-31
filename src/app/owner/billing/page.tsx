@@ -206,12 +206,12 @@ export default function OwnerBillingPage() {
               <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">090-8-46418-4</strong>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">ชื่อบัญชี:</span>
-              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">น.ส. ชลลดา นักรบ (VetCare Clinic)</strong>
+              <span className="text-slate-400">พร้อมเพย์:</span>
+              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">095-550-6741</strong>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">ช่องทางชำระ:</span>
-              <strong className="text-emerald-400 font-bold bg-slate-950 border border-emerald-800/60 px-2.5 py-1 rounded-lg">สแกน Thai QR / โอนผ่านทุกธนาคาร</strong>
+              <span className="text-slate-400">ชื่อบัญชี:</span>
+              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">น.ส. ชลลดา นักรบ (VetCare Clinic)</strong>
             </div>
           </div>
         </div>
@@ -508,8 +508,9 @@ export default function OwnerBillingPage() {
                       <div className="text-xs space-y-1.5 text-slate-300">
                         <div>ยอดชำระตามบิล: <strong className="text-sky-400 font-mono text-base font-black">{formatCurrency(selectedBillForSlip.totalAmount)}</strong></div>
                         <div>ชื่อบัญชี: <strong className="text-white">น.ส. ชลลดา นักรบ</strong></div>
-                        <div>ธนาคาร: <strong className="text-white">กสิกรไทย (KBANK)</strong> &bull; เลขบัญชี: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">090-8-46418-4</strong></div>
-                        <div className="text-[11px] text-emerald-400 font-semibold pt-0.5">✓ รองรับการสแกนจ่ายได้จากทุกแอปธนาคาร (K+, SCB, Krungthai ฯลฯ)</div>
+                        <div>พร้อมเพย์ / เบอร์โทร: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">095-550-6741</strong></div>
+                        <div>หรือโอนเข้า: <strong className="text-white">ธ.กสิกรไทย</strong> <strong className="text-slate-300 font-mono font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">090-8-46418-4</strong></div>
+                        <div className="text-[11px] text-emerald-400 font-semibold pt-0.5">✓ สแกน QR ด้านบนได้จากทุกแอปธนาคาร หรือโอนผ่านพร้อมเพย์/เลขบัญชี</div>
                       </div>
                     </div>
 
