@@ -74,12 +74,12 @@ interface ClinicContextType {
   quickSwitchUser: (role: UserRole, specificVetId?: string) => void;
   addUser: (user: Omit<User, 'id'>) => User;
   updateUser: (id: string, data: Partial<User>) => void;
-  deleteUser: (id: string) => void;
+  deleteUser: (id: string) => Promise<void>;
 
   // Pets
   addPet: (pet: Omit<Pet, 'id'>) => Pet;
   updatePet: (id: string, data: Partial<Pet>) => void;
-  deletePet: (id: string) => void;
+  deletePet: (id: string) => Promise<void>;
 
   // Vets
   addVet: (vet: Omit<Vet, 'id'>) => Vet;
@@ -508,16 +508,25 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
           if (res.ok) {
             const json = await res.json();
             if (json.success && Array.isArray(json.users)) {
+              let deletedIds: string[] = [];
+              try {
+                const stored = localStorage.getItem('vetcare_deleted_user_ids');
+                if (stored) deletedIds = JSON.parse(stored);
+              } catch {}
+              const deletedSet = new Set(deletedIds);
+
               setUsers((prev) => {
                 const map = new Map<string, User>();
                 json.users.forEach((u: User) => {
-                  map.set(u.id, u);
-                  if (u.email) map.set(u.email.toLowerCase(), u);
+                  if (!deletedSet.has(u.id)) {
+                    map.set(u.id, u);
+                    if (u.email) map.set(u.email.toLowerCase(), u);
+                  }
                 });
                 let hasUnsynced = false;
                 prev.forEach((localU) => {
                   const key = localU.email ? localU.email.toLowerCase() : localU.id;
-                  if (!map.has(key) && !map.has(localU.id)) {
+                  if (!deletedSet.has(localU.id) && !map.has(key) && !map.has(localU.id)) {
                     map.set(localU.id, localU);
                     hasUnsynced = true;
                     fetch('/api/users', {
@@ -527,15 +536,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
                     }).catch(() => {});
                   }
                 });
-                const seenIds = new Set<string>();
-                const list: User[] = [];
-                map.forEach((u) => {
-                  if (!seenIds.has(u.id)) {
-                    seenIds.add(u.id);
-                    list.push(u);
-                  }
-                });
-                return list;
+                return Array.from(new Set(map.values()));
               });
             }
           }
@@ -549,12 +550,23 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
           if (res.ok) {
             const json = await res.json();
             if (json.success && Array.isArray(json.pets)) {
+              let deletedIds: string[] = [];
+              try {
+                const stored = localStorage.getItem('vetcare_deleted_pet_ids');
+                if (stored) deletedIds = JSON.parse(stored);
+              } catch {}
+              const deletedSet = new Set(deletedIds);
+
               setPets((prev) => {
                 const map = new Map<string, Pet>();
-                json.pets.forEach((p: Pet) => map.set(p.id, p));
+                json.pets.forEach((p: Pet) => {
+                  if (!deletedSet.has(p.id)) {
+                    map.set(p.id, p);
+                  }
+                });
                 let hasUnsynced = false;
                 prev.forEach((localP) => {
-                  if (!map.has(localP.id)) {
+                  if (!deletedSet.has(localP.id) && !map.has(localP.id)) {
                     map.set(localP.id, localP);
                     hasUnsynced = true;
                     fetch('/api/pets', {
@@ -815,7 +827,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const deleteUser = (id: string) => {
+  const deleteUser = async (id: string) => {
     setUsers((prev) => {
       const updated = prev.filter((u) => u.id !== id);
       try {
@@ -826,6 +838,26 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {}
       return updated;
     });
+
+    // Save tombstone ID in localStorage so client sync never resurrects it
+    try {
+      const deletedKey = 'vetcare_deleted_user_ids';
+      const stored = localStorage.getItem(deletedKey);
+      const list: string[] = stored ? JSON.parse(stored) : [];
+      if (!list.includes(id)) {
+        list.push(id);
+        localStorage.setItem(deletedKey, JSON.stringify(list));
+      }
+    } catch {}
+
+    // Call server DELETE API
+    try {
+      await fetch(`/api/users?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      console.warn('Server user delete error:', err);
+    }
 
     if (isFirebaseConfigured() && db) {
       try {
@@ -901,7 +933,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const deletePet = (id: string) => {
+  const deletePet = async (id: string) => {
     setPets((prev) => {
       const updated = prev.filter((p) => p.id !== id);
       try {
@@ -914,6 +946,25 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
       return updated;
     });
+
+    try {
+      const deletedKey = 'vetcare_deleted_pet_ids';
+      const stored = localStorage.getItem(deletedKey);
+      const list: string[] = stored ? JSON.parse(stored) : [];
+      if (!list.includes(id)) {
+        list.push(id);
+        localStorage.setItem(deletedKey, JSON.stringify(list));
+      }
+    } catch {}
+
+    try {
+      await fetch(`/api/pets?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      console.warn('Server pet delete error:', err);
+    }
+
     if (isFirebaseConfigured() && db) {
       try {
         deleteDoc(doc(db, 'pets', id)).catch((err) => console.warn('Firestore sync error:', err));

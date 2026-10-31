@@ -138,3 +138,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    const email = searchParams.get('email');
+
+    if (!id && !email) {
+      return NextResponse.json({ success: false, message: 'Missing id or email' }, { status: 400 });
+    }
+
+    const currentList = loadUsers();
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const updatedList = currentList.filter(
+      (u) => u.id !== id && (!cleanEmail || !u.email || u.email.toLowerCase() !== cleanEmail)
+    );
+
+    saveUsers(updatedList);
+    return NextResponse.json({ success: true, count: updatedList.length, users: updatedList });
+  } catch (err: any) {
+    console.error('Failed to delete user API:', err);
+    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
+  }
+}

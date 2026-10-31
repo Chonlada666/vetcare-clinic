@@ -110,13 +110,13 @@ export default function AdminUsersAndVetsPage() {
     setIsUserModalOpen(false);
   };
 
-  const handleUserDelete = (id: string, name: string) => {
+  const handleUserDelete = async (id: string, name: string) => {
     if (id === currentUser?.id) {
       alert('ไม่สามารถลบบัญชีผู้ใช้ที่กำลังเข้าสู่ระบบอยู่ได้');
       return;
     }
     if (confirm(`คุณต้องการลบผู้ใช้งาน "${name}" ใช่หรือไม่?`)) {
-      deleteUser(id);
+      await deleteUser(id);
     }
   };
 

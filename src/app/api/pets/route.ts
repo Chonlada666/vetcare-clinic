@@ -119,3 +119,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: 'Missing id' }, { status: 400 });
+    }
+
+    const currentList = loadPets();
+    const updatedList = currentList.filter((p) => p.id !== id);
+
+    savePets(updatedList);
+    return NextResponse.json({ success: true, count: updatedList.length, pets: updatedList });
+  } catch (err: any) {
+    console.error('Failed to delete pet API:', err);
+    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
+  }
+}
