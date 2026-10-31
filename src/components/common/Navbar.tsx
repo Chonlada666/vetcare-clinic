@@ -35,6 +35,8 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+
   // Fallback active user if currentUser is null or uninitialized on role-specific routes
   const roleFromPath = pathname?.startsWith('/vet')
     ? 'vet'
@@ -50,10 +52,11 @@ export function Navbar() {
       null
     : null;
 
-  const activeUser =
-    currentUser && (!roleFromPath || currentUser.role === roleFromPath)
-      ? currentUser
-      : fallbackUser || currentUser;
+  const activeUser = isAuthPage
+    ? null
+    : currentUser && (!roleFromPath || currentUser.role === roleFromPath)
+    ? currentUser
+    : fallbackUser || currentUser;
 
   // Profile Edit Modal State
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);

@@ -18,6 +18,7 @@ import {
   AlertCircle,
   UserPlus,
   LogIn,
+  LogOut,
 } from 'lucide-react';
 
 function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
@@ -44,7 +45,7 @@ function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
 }
 
 function LoginForm() {
-  const { users, login, addUser } = useClinic();
+  const { users, currentUser, isLoaded, login, logout, addUser } = useClinic();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect');
@@ -84,13 +85,53 @@ function LoginForm() {
 
   const navigateAfterAuth = (userRole: string) => {
     if (redirectUrl) {
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
       return;
     }
-    if (userRole === 'owner') router.push('/owner/dashboard');
-    else if (userRole === 'vet') router.push('/vet/dashboard');
-    else if (userRole === 'admin') router.push('/admin/dashboard');
+    if (userRole === 'owner') window.location.href = '/owner/dashboard';
+    else if (userRole === 'vet') window.location.href = '/vet/dashboard';
+    else if (userRole === 'admin') window.location.href = '/admin/dashboard';
   };
+
+  // หากผู้ใช้เข้าสู่ระบบอยู่แล้ว แสดงหน้าแจ้งเตือนชัดเจน ไม่ให้หน้าล็อกอินซ้อนกับผู้ใช้เดิม
+  if (isLoaded && currentUser) {
+    return (
+      <div className="max-w-md w-full mx-auto my-12 p-6 sm:p-8 bg-slate-900 border border-slate-800 rounded-3xl text-center space-y-6 shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center mx-auto text-sky-400">
+          <Shield className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold">
+            ✓ บัญชีออนไลน์อยู่แล้ว
+          </div>
+          <h2 className="text-xl font-black text-white">คุณกำลังเข้าสู่ระบบอยู่แล้ว</h2>
+          <p className="text-xs text-slate-300">
+            ขณะนี้คุณเข้าสู่ระบบในชื่อ <strong className="text-sky-400 font-bold">{currentUser.name}</strong> ({currentUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : currentUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'})
+          </p>
+        </div>
+
+        <div className="space-y-3 pt-2">
+          <button
+            type="button"
+            onClick={() => navigateAfterAuth(currentUser.role)}
+            className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20"
+          >
+            <span>ไปยังหน้าหลัก / แดชบอร์ด</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="w-full py-2.5 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-300 text-slate-300 font-bold rounded-xl text-xs border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>ออกจากระบบ เพื่อเข้าใช้งานด้วยบัญชีอื่น</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
