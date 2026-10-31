@@ -1,59 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { INITIAL_APPOINTMENTS } from '@/lib/mockData';
 import { Appointment } from '@/types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const FILE_PATH = path.join(DATA_DIR, 'appointments.json');
+declare global {
+  var __vetcare_appointments: Appointment[] | undefined;
+}
 
-function ensureDataFile(): Appointment[] {
+function getDataFilePath(): string {
+  const projectDataDir = path.join(process.cwd(), 'data');
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(projectDataDir)) {
+      fs.mkdirSync(projectDataDir, { recursive: true });
     }
-    if (!fs.existsSync(FILE_PATH)) {
-      fs.writeFileSync(FILE_PATH, JSON.stringify(INITIAL_APPOINTMENTS, null, 2), 'utf8');
-      return INITIAL_APPOINTMENTS;
+    const testFile = path.join(projectDataDir, '.test_write');
+    fs.writeFileSync(testFile, 'ok');
+    fs.unlinkSync(testFile);
+    return path.join(projectDataDir, 'appointments.json');
+  } catch {
+    const tmpDir = path.join(os.tmpdir(), 'vetcare_data');
+    if (!fs.existsSync(tmpDir)) {
+      try {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      } catch {}
     }
-    const raw = fs.readFileSync(FILE_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      // Merge in any initial appointments that might be missing
-      const existingIds = new Set(parsed.map((a: Appointment) => a.id));
-      let modified = false;
-      INITIAL_APPOINTMENTS.forEach((initA) => {
-        if (!existingIds.has(initA.id)) {
-          parsed.push(initA);
-          modified = true;
-        }
-      });
-      if (modified) {
-        fs.writeFileSync(FILE_PATH, JSON.stringify(parsed, null, 2), 'utf8');
-      }
-      return parsed;
-    }
-    fs.writeFileSync(FILE_PATH, JSON.stringify(INITIAL_APPOINTMENTS, null, 2), 'utf8');
-    return INITIAL_APPOINTMENTS;
-  } catch (err) {
-    console.error('Error reading appointments data file:', err);
-    return INITIAL_APPOINTMENTS;
+    return path.join(tmpDir, 'appointments.json');
   }
 }
 
-function saveAppointments(appointments: Appointment[]) {
+function loadAppointments(): Appointment[] {
+  if (globalThis.__vetcare_appointments && globalThis.__vetcare_appointments.length > 0) {
+    return globalThis.__vetcare_appointments;
+  }
+
+  const filePath = getDataFilePath();
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const map = new Map<string, Appointment>();
+        INITIAL_APPOINTMENTS.forEach((a) => map.set(a.id, a));
+        parsed.forEach((a: Appointment) => {
+          if (a && a.id) map.set(a.id, a);
+        });
+        const combined = Array.from(map.values());
+        globalThis.__vetcare_appointments = combined;
+        return combined;
+      }
     }
-    fs.writeFileSync(FILE_PATH, JSON.stringify(appointments, null, 2), 'utf8');
   } catch (err) {
-    console.error('Error writing appointments data file:', err);
+    console.error('Error reading appointments file:', err);
+  }
+
+  globalThis.__vetcare_appointments = [...INITIAL_APPOINTMENTS];
+  saveAppointments(globalThis.__vetcare_appointments);
+  return globalThis.__vetcare_appointments;
+}
+
+function saveAppointments(appointments: Appointment[]) {
+  globalThis.__vetcare_appointments = appointments;
+  try {
+    const filePath = getDataFilePath();
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(filePath, JSON.stringify(appointments, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error writing appointments file:', err);
   }
 }
 
 export async function GET() {
-  const appointments = ensureDataFile();
+  const appointments = loadAppointments();
   return NextResponse.json({
     success: true,
     count: appointments.length,
@@ -64,10 +86,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const currentList = ensureDataFile();
+    const currentList = loadAppointments();
 
     if (Array.isArray(body)) {
-      // Batch sync
       const map = new Map<string, Appointment>();
       currentList.forEach((a) => map.set(a.id, a));
       body.forEach((a: Appointment) => {
@@ -81,7 +102,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (body && body.id) {
-      // Single appointment insert or update
       const index = currentList.findIndex((a) => a.id === body.id);
       let updatedList: Appointment[];
       if (index >= 0) {

@@ -254,9 +254,9 @@ function BookingContent() {
     }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!currentUser) return;
-    createAppointment({
+    const newApt = createAppointment({
       petId: selectedPetId,
       ownerId: currentUser.id,
       vetId: effectiveVet?.id || 'vet_1',
@@ -265,6 +265,16 @@ function BookingContent() {
       timeSlot: selectedTimeSlot,
       initialSymptoms,
     });
+    // Ensure the appointment is immediately posted to the VPS server before navigation
+    try {
+      await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newApt),
+      });
+    } catch (e) {
+      console.warn('Direct server sync note:', e);
+    }
     router.push('/owner/appointments');
   };
 

@@ -542,24 +542,60 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
         } catch (err) {}
       };
 
-      syncAppointmentsWithServer();
-      syncUsersWithServer();
-      const syncInterval = setInterval(() => {
-        syncAppointmentsWithServer();
-        syncUsersWithServer();
-      }, 8000);
-      const handleFocus = () => {
-        syncAppointmentsWithServer();
-        syncUsersWithServer();
+      // Real-Time Server Sync for Pets (Cross-Device Pet Management)
+      const syncPetsWithServer = async () => {
+        try {
+          const res = await fetch('/api/pets', { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.pets)) {
+              setPets((prev) => {
+                const map = new Map<string, Pet>();
+                json.pets.forEach((p: Pet) => map.set(p.id, p));
+                let hasUnsynced = false;
+                prev.forEach((localP) => {
+                  if (!map.has(localP.id)) {
+                    map.set(localP.id, localP);
+                    hasUnsynced = true;
+                    fetch('/api/pets', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(localP),
+                    }).catch(() => {});
+                  }
+                });
+                return Array.from(map.values());
+              });
+            }
+          }
+        } catch (err) {}
       };
+
+      const syncAll = () => {
+        syncAppointmentsWithServer();
+        syncUsersWithServer();
+        syncPetsWithServer();
+      };
+
+      syncAll();
+      const syncInterval = setInterval(syncAll, 3500);
+      const handleFocus = () => syncAll();
+      const handleVisibilityChange = () => {
+        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          syncAll();
+        }
+      };
+
       if (typeof window !== 'undefined') {
         window.addEventListener('focus', handleFocus);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
       }
 
       return () => {
         clearInterval(syncInterval);
         if (typeof window !== 'undefined') {
           window.removeEventListener('focus', handleFocus);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
         }
       };
     };
@@ -815,6 +851,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
       return updated;
     });
+    // Real-Time Cross-Device Server Sync (VPS Shared Storage)
+    fetch('/api/pets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPet),
+    }).catch((err) => console.warn('Server sync error in addPet:', err));
+
     if (isFirebaseConfigured() && db) {
       try {
         setDoc(doc(db, 'pets', newPet.id), sanitizeForFirestore(newPet)).catch((err) =>
@@ -840,6 +883,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
       return updated;
     });
+
+    // Real-Time Cross-Device Server Sync
+    fetch('/api/pets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...data }),
+    }).catch(() => {});
     if (isFirebaseConfigured() && db) {
       try {
         updateDoc(doc(db, 'pets', id), sanitizeForFirestore(data)).catch((err) =>

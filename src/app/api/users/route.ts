@@ -1,69 +1,94 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { INITIAL_USERS } from '@/lib/mockData';
 import { User } from '@/types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const FILE_PATH = path.join(DATA_DIR, 'users.json');
+declare global {
+  var __vetcare_users: User[] | undefined;
+}
 
-function ensureUsersFile(): User[] {
+function getDataFilePath(): string {
+  const projectDataDir = path.join(process.cwd(), 'data');
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(projectDataDir)) {
+      fs.mkdirSync(projectDataDir, { recursive: true });
     }
-    if (!fs.existsSync(FILE_PATH)) {
-      fs.writeFileSync(FILE_PATH, JSON.stringify(INITIAL_USERS, null, 2), 'utf8');
-      return INITIAL_USERS;
+    const testFile = path.join(projectDataDir, '.test_write_user');
+    fs.writeFileSync(testFile, 'ok');
+    fs.unlinkSync(testFile);
+    return path.join(projectDataDir, 'users.json');
+  } catch {
+    const tmpDir = path.join(os.tmpdir(), 'vetcare_data');
+    if (!fs.existsSync(tmpDir)) {
+      try {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      } catch {}
     }
-    const raw = fs.readFileSync(FILE_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      const map = new Map<string, User>();
-      // Seed with initial users
-      INITIAL_USERS.forEach((u) => {
-        map.set(u.id, u);
-        if (u.email) map.set(u.email.toLowerCase(), u);
-      });
-      // Merge with persisted users (persisted overrides seed if updated)
-      parsed.forEach((u: User) => {
-        if (u && u.id) {
-          map.set(u.id, u);
-          if (u.email) map.set(u.email.toLowerCase(), u);
-        }
-      });
-      // Deduplicate by ID
-      const deduplicated: User[] = [];
-      const seenIds = new Set<string>();
-      map.forEach((user) => {
-        if (!seenIds.has(user.id)) {
-          seenIds.add(user.id);
-          deduplicated.push(user);
-        }
-      });
-      return deduplicated;
-    }
-    fs.writeFileSync(FILE_PATH, JSON.stringify(INITIAL_USERS, null, 2), 'utf8');
-    return INITIAL_USERS;
-  } catch (err) {
-    console.error('Error reading users data file:', err);
-    return INITIAL_USERS;
+    return path.join(tmpDir, 'users.json');
   }
 }
 
-function saveUsers(usersList: User[]) {
+function loadUsers(): User[] {
+  if (globalThis.__vetcare_users && globalThis.__vetcare_users.length > 0) {
+    return globalThis.__vetcare_users;
+  }
+
+  const filePath = getDataFilePath();
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const map = new Map<string, User>();
+        INITIAL_USERS.forEach((u) => {
+          map.set(u.id, u);
+          if (u.email) map.set(u.email.toLowerCase(), u);
+        });
+        parsed.forEach((u: User) => {
+          if (u && u.id) {
+            map.set(u.id, u);
+            if (u.email) map.set(u.email.toLowerCase(), u);
+          }
+        });
+        const deduplicated: User[] = [];
+        const seenIds = new Set<string>();
+        map.forEach((user) => {
+          if (!seenIds.has(user.id)) {
+            seenIds.add(user.id);
+            deduplicated.push(user);
+          }
+        });
+        globalThis.__vetcare_users = deduplicated;
+        return deduplicated;
+      }
     }
-    fs.writeFileSync(FILE_PATH, JSON.stringify(usersList, null, 2), 'utf8');
   } catch (err) {
-    console.error('Error writing users data file:', err);
+    console.error('Error reading users file:', err);
+  }
+
+  globalThis.__vetcare_users = [...INITIAL_USERS];
+  saveUsers(globalThis.__vetcare_users);
+  return globalThis.__vetcare_users;
+}
+
+function saveUsers(usersList: User[]) {
+  globalThis.__vetcare_users = usersList;
+  try {
+    const filePath = getDataFilePath();
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(filePath, JSON.stringify(usersList, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error writing users file:', err);
   }
 }
 
 export async function GET() {
-  const users = ensureUsersFile();
+  const users = loadUsers();
   return NextResponse.json({
     success: true,
     count: users.length,
@@ -74,10 +99,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const currentList = ensureUsersFile();
+    const currentList = loadUsers();
 
     if (Array.isArray(body)) {
-      // Batch sync
       const map = new Map<string, User>();
       currentList.forEach((u) => map.set(u.id, u));
       body.forEach((u: User) => {
@@ -91,7 +115,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (body && (body.id || body.email)) {
-      // Single user insert or update
       const cleanEmail = (body.email || '').trim().toLowerCase();
       const index = currentList.findIndex(
         (u) =>

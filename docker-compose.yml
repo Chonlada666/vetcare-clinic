@@ -11,5 +11,7 @@ services:
     environment:
       SLIPOK_API_KEY: SLIPOKV0M0RA8
       SLIPOK_BRANCH_ID: "77947"
+    volumes:
+      - ./data:/app/data
     ports:
       - "${APP_PORT:-3300}:3000"
