@@ -206,25 +206,25 @@ export default function OwnerBillingPage() {
               <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">090-8-46418-4</strong>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">พร้อมเพย์:</span>
-              <strong className="text-sky-300 font-mono text-sm bg-slate-950 border border-sky-500 px-3 py-1 rounded-xl">090-846-4184</strong>
+              <span className="text-slate-400">ชื่อบัญชี:</span>
+              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">น.ส. ชลลดา นักรบ (VetCare Clinic)</strong>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">ชื่อบัญชี:</span>
-              <strong className="text-white font-bold bg-slate-950 border border-slate-700 px-2.5 py-1 rounded-lg">ชลลดา นักรบ (VetCare Animal Clinic)</strong>
+              <span className="text-slate-400">ช่องทางชำระ:</span>
+              <strong className="text-emerald-400 font-bold bg-slate-950 border border-emerald-800/60 px-2.5 py-1 rounded-lg">สแกน Thai QR / โอนผ่านทุกธนาคาร</strong>
             </div>
           </div>
         </div>
 
-        <div className="p-3.5 bg-slate-950 rounded-2xl shrink-0 text-center border-2 border-sky-500 flex flex-col items-center">
-          <div className="w-28 h-28 bg-white p-1.5 rounded-xl flex items-center justify-center">
+        <div className="p-3 bg-slate-950 rounded-2xl shrink-0 text-center border-2 border-sky-500 flex flex-col items-center">
+          <div className="w-28 sm:w-32 bg-white p-1.5 rounded-xl flex items-center justify-center overflow-hidden shadow-lg">
             <img
-              src="https://promptpay.io/0908464184.png"
-              alt="PromptPay QR Code 0908464184"
-              className="w-full h-full object-contain rounded-lg"
+              src="/images/promptpay-qr.png"
+              alt="Thai QR Payment น.ส. ชลลดา นักรบ"
+              className="w-full h-auto object-contain rounded-lg"
             />
           </div>
-          <span className="text-[10px] font-black text-sky-400 block mt-2 tracking-wide">QR พร้อมเพย์ 090-846-4184</span>
+          <span className="text-[10px] font-black text-sky-400 block mt-2 tracking-wide">สแกน Thai QR เพื่อชำระเงิน</span>
         </div>
       </div>
 
@@ -489,30 +489,27 @@ export default function OwnerBillingPage() {
                 {/* Tab 1: PromptPay / QR Bank Transfer */}
                 {paymentMethodTab === 'promptpay' && (
                   <form onSubmit={handleVerifyWithSlipOK} className="space-y-4 pt-1">
-                    {/* PromptPay QR Code Card */}
+                    {/* PromptPay / Thai QR Code Card */}
                     <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center text-center space-y-3 shadow-inner">
                       <div className="inline-flex items-center gap-1.5 bg-sky-500/15 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full text-[11px] font-bold">
                         <QrCode className="w-3.5 h-3.5" />
                         <span>สแกน QR เพื่อชำระเงินผ่าน Mobile Banking</span>
                       </div>
 
-                      {/* Official PromptPay QR Code with amount */}
-                      <div className="bg-white p-3 rounded-2xl shadow-xl border-2 border-sky-400/40 inline-block">
+                      {/* Official Thai QR Payment Slip from K-Bank */}
+                      <div className="bg-white p-2 rounded-2xl shadow-2xl border-2 border-sky-400/40 inline-block overflow-hidden max-w-[260px] sm:max-w-[280px]">
                         <img
-                          src={`https://promptpay.io/0908464184/${selectedBillForSlip.totalAmount}.png`}
-                          alt={`PromptPay QR ฿${selectedBillForSlip.totalAmount}`}
-                          className="w-44 h-44 object-contain rounded-lg mx-auto"
+                          src="/images/promptpay-qr.png"
+                          alt="Thai QR Payment น.ส. ชลลดา นักรบ"
+                          className="w-full h-auto object-contain rounded-xl mx-auto"
                         />
-                        <div className="text-[10px] font-black text-slate-800 mt-1 uppercase tracking-wider">
-                          Thai QR Payment &bull; PromptPay
-                        </div>
                       </div>
 
-                      <div className="text-xs space-y-1 text-slate-300">
-                        <div>ยอดชำระ: <strong className="text-sky-400 font-mono text-base font-black">{formatCurrency(selectedBillForSlip.totalAmount)}</strong></div>
-                        <div>ชื่อบัญชี: <strong className="text-white">ชลลดา นักรบ (VetCare Clinic)</strong></div>
-                        <div>พร้อมเพย์ / เบอร์โทร: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">090-846-4184</strong></div>
-                        <div>หรือโอนเข้า: <strong className="text-slate-200 font-mono">ธ.กสิกรไทย 090-8-46418-4</strong></div>
+                      <div className="text-xs space-y-1.5 text-slate-300">
+                        <div>ยอดชำระตามบิล: <strong className="text-sky-400 font-mono text-base font-black">{formatCurrency(selectedBillForSlip.totalAmount)}</strong></div>
+                        <div>ชื่อบัญชี: <strong className="text-white">น.ส. ชลลดา นักรบ</strong></div>
+                        <div>ธนาคาร: <strong className="text-white">กสิกรไทย (KBANK)</strong> &bull; เลขบัญชี: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">090-8-46418-4</strong></div>
+                        <div className="text-[11px] text-emerald-400 font-semibold pt-0.5">✓ รองรับการสแกนจ่ายได้จากทุกแอปธนาคาร (K+, SCB, Krungthai ฯลฯ)</div>
                       </div>
                     </div>
 

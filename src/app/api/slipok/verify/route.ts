@@ -44,8 +44,8 @@ function validateClinicReceiver(receiver: any): boolean {
     return true;
   }
 
-  // 2. ตรวจสอบเลขบัญชีปลายทาง: กสิกรไทย 0908464184
-  if (accStr.includes('0908464184') || accStr.endsWith('4184') || accStr.endsWith('418')) {
+  // 2. ตรวจสอบเลขบัญชีปลายทาง: กสิกรไทย 090-8-46418-4 (หรือลงท้าย 6418 / 4184 / 418)
+  if (accStr.includes('0908464184') || accStr.includes('46418') || accStr.includes('6418') || accStr.endsWith('4184') || accStr.endsWith('418')) {
     return true;
   }
 
