@@ -140,14 +140,6 @@ export default function AdminPaymentsPage() {
             ตรวจสอบความถูกต้องของสลิปโอนเงิน อนุมัติยอด และออกใบเสร็จรับเงินให้แก่เจ้าของสัตว์เลี้ยง
           </p>
         </div>
-
-        <button
-          onClick={() => setIsConfigModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2.5 rounded-md transition text-xs cursor-pointer"
-        >
-          <KeyRound className="w-4 h-4" />
-          <span>ตั้งค่าเชื่อมต่อ SlipOK ของจริง</span>
-        </button>
       </div>
 
       {/* SlipOK API Integration Status Card */}
@@ -171,7 +163,7 @@ export default function AdminPaymentsPage() {
           <p className="text-xs text-slate-300">
             {slipOkStatus?.isConfigured
               ? `ระบบเชื่อมต่อกับ Branch ID: ${slipOkStatus.branchId} (API Key: ${slipOkStatus.maskedApiKey || '***'}) ตรวจสอบสลิปผ่านธนาคารอัตโนมัติ 100%`
-              : 'สามารถคลิกปุ่ม "ตั้งค่าเชื่อมต่อ SlipOK ของจริง" เพื่อใส่ API Key และ Branch ID ได้ทันที'}
+              : 'สามารถคลิกปุ่ม "เชื่อมต่อ SlipOK เดี๋ยวนี้" เพื่อใส่ API Key และ Branch ID ได้ทันที'}
           </p>
         </div>
 
