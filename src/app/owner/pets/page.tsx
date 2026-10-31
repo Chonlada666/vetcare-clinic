@@ -24,7 +24,7 @@ import {
 
 export default function OwnerPetsPage() {
   const router = useRouter();
-  const { currentUser, pets, addPet, updatePet, deletePet } = useClinic();
+  const { currentUser, users, pets, addPet, updatePet, deletePet } = useClinic();
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
@@ -42,14 +42,18 @@ export default function OwnerPetsPage() {
   const [photoUrl, setPhotoUrl] = useState('');
   const [notes, setNotes] = useState('');
 
-  const myPets = pets.filter(
-    (p) =>
-      p.ownerId === currentUser?.id &&
-      (p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.species.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.exoticType && p.exoticType.toLowerCase().includes(searchQuery.toLowerCase())))
-  );
+  const myPets = pets.filter((p) => {
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.species.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.exoticType && p.exoticType.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    if (!matchesSearch) return false;
+    if (currentUser?.role === 'admin') return true;
+    if (!currentUser) return true;
+    return p.ownerId === currentUser.id;
+  });
 
   const openAddModal = () => {
     setEditingPet(null);
@@ -88,17 +92,44 @@ export default function OwnerPetsPage() {
     setIsModalOpen(true);
   };
 
-  // Handle local image file upload from device
+  // Handle local image file upload from device with auto-compression
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert('ขนาดไฟล์รูปภาพต้องไม่เกิน 10MB');
+      if (file.size > 15 * 1024 * 1024) {
+        alert('ขนาดไฟล์รูปภาพต้องไม่เกิน 15MB');
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoUrl(reader.result as string);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 500;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > MAX_SIZE) {
+              h *= MAX_SIZE / w;
+              w = MAX_SIZE;
+            }
+          } else {
+            if (h > MAX_SIZE) {
+              w *= MAX_SIZE / h;
+              h = MAX_SIZE;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, w, h);
+            setPhotoUrl(canvas.toDataURL('image/jpeg', 0.8));
+          } else {
+            setPhotoUrl(event.target?.result as string);
+          }
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -107,9 +138,15 @@ export default function OwnerPetsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successToast, setSuccessToast] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+
+    // Fallback owner identification
+    const effectiveOwnerId =
+      editingPet?.ownerId ||
+      currentUser?.id ||
+      (users && users.find((u) => u.role === 'owner')?.id) ||
+      'user_owner_1';
 
     if (species === 'อื่นๆ' && !otherSpecies.trim()) {
       alert('กรุณาระบุชนิดสัตว์เลี้ยงในช่องระบุ');
@@ -145,11 +182,14 @@ export default function OwnerPetsPage() {
       }
 
       if (editingPet) {
-        updatePet(editingPet.id, petPayload);
+        await updatePet(editingPet.id, {
+          ownerId: effectiveOwnerId,
+          ...petPayload,
+        });
         setSuccessToast(`บันทึกการแก้ไขข้อมูล "${name}" เรียบร้อยแล้ว`);
       } else {
-        addPet({
-          ownerId: currentUser.id,
+        await addPet({
+          ownerId: effectiveOwnerId,
           ...petPayload,
         });
         setSuccessToast(`ลงทะเบียนสัตว์เลี้ยง "${name}" สำเร็จเรียบร้อยแล้ว`);
@@ -165,6 +205,7 @@ export default function OwnerPetsPage() {
       setTimeout(() => setSuccessToast(''), 4000);
     } catch (err) {
       console.error('Failed to save pet:', err);
+      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
     } finally {
       setIsSubmitting(false);
     }
