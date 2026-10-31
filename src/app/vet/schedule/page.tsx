@@ -35,7 +35,7 @@ const ALL_SLOTS = [
 ];
 
 export default function VetSchedulePage() {
-  const { vets, appointments, pets, users, currentUser } = useClinic();
+  const { vets, appointments, pets, users, services, currentUser } = useClinic();
 
   // Automatically find the logged-in doctor profile
   const myVet = vets.find(
@@ -200,6 +200,7 @@ export default function VetSchedulePage() {
             const isCompleted = apt?.status === 'completed';
             const pet = isBooked ? pets.find((p) => p.id === apt.petId) : null;
             const owner = isBooked ? users.find((u) => u.id === apt.ownerId) : null;
+            const service = isBooked ? services.find((s) => s.id === apt.serviceId) : null;
 
             return (
               <div
@@ -231,25 +232,33 @@ export default function VetSchedulePage() {
                   )}
                 </div>
 
-                {isBooked && pet ? (
+                {isBooked ? (
                   <div className="pt-2.5 space-y-2 text-xs">
                     <div className="flex items-center gap-2">
-                      <strong className="text-white text-sm">{pet.name}</strong>
+                      <strong className="text-white text-sm">
+                        {pet?.name || 'สัตว์เลี้ยง (เคสนัดหมาย)'}
+                      </strong>
                       <span className="text-[11px] text-slate-400">
-                        ({pet.species === 'อื่นๆ' && pet.exoticType ? pet.exoticType : pet.species} &bull; {pet.breed || '-'})
+                        ({pet ? `${pet.species === 'อื่นๆ' && pet.exoticType ? pet.exoticType : pet.species} • ${pet.breed || '-'}` : 'ข้อมูลในระบบ'})
                       </span>
                     </div>
 
                     <div className="text-slate-400 text-[11px]">
-                      เจ้าของ: <strong className="text-white">{owner?.name}</strong> (โทร: {owner?.phone})
+                      เจ้าของ: <strong className="text-white">{owner?.name || 'ลูกค้าผู้จอง'}</strong> {owner?.phone ? `(โทร: ${owner.phone})` : ''}
                     </div>
+
+                    {service && (
+                      <div className="text-[11px] text-sky-400 font-medium">
+                        บริการ: <span className="text-slate-200">{service.name}</span>
+                      </div>
+                    )}
 
                     <div className={`text-[11px] p-2.5 rounded-xl shadow-xs border ${
                       isCompleted
                         ? 'bg-slate-900 text-slate-300 border-emerald-800/40'
                         : 'bg-slate-900 text-slate-300 border-sky-800/40'
                     }`}>
-                      <strong className="text-white">อาการที่แจ้ง:</strong> {apt.initialSymptoms}
+                      <strong className="text-white">อาการที่แจ้ง:</strong> {apt.initialSymptoms || '-'}
                     </div>
 
                     {!isCompleted && (
