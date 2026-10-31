@@ -117,7 +117,7 @@ interface ClinicContextType {
 
   // Payments & Invoicing
   uploadPaymentSlip: (billId: string, slipUrl: string) => void;
-  verifyPayment: (billId: string, approved: boolean, reason?: string) => void;
+  verifyPayment: (billId: string, approved: boolean, reason?: string, slipUrl?: string) => void;
   payWithCash: (billId: string) => void;
 
   // Services & Medicines
@@ -384,19 +384,51 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
           );
           unsubs.push(unsubTreatments);
 
-          // Subscribe to bills in Real-Time (with merge)
+          // Subscribe to bills in Real-Time (with smart merge that never downgrades 'paid')
           const unsubBills = onSnapshot(
             collection(db, 'bills'),
             (snap) => {
               if (!snap.empty) {
                 const list = snap.docs.map((d) => ({ ...d.data(), id: d.id } as PaymentBill));
                 setBills((prev) => {
-                  const combined = [...list];
-                  prev.forEach((localB) => {
-                    if (!combined.some((b) => b.id === localB.id)) {
-                      combined.push(localB);
+                  const localMap = new Map<string, PaymentBill>(prev.map((b) => [b.id, b]));
+                  const statusPriority: Record<string, number> = {
+                    paid: 3,
+                    verifying: 2,
+                    rejected: 2,
+                    pending_upload: 1,
+                  };
+                  const combined: PaymentBill[] = [];
+
+                  list.forEach((remoteB) => {
+                    const localB = localMap.get(remoteB.id);
+                    if (!localB) {
+                      combined.push(remoteB);
+                    } else {
+                      const localPri = statusPriority[localB.status] || 0;
+                      const remotePri = statusPriority[remoteB.status] || 0;
+
+                      if (localPri > remotePri) {
+                        combined.push({
+                          ...remoteB,
+                          ...localB,
+                          status: localB.status,
+                          receiptNumber: localB.receiptNumber || remoteB.receiptNumber,
+                          paidAt: localB.paidAt || remoteB.paidAt,
+                        });
+                      } else {
+                        combined.push({
+                          ...localB,
+                          ...remoteB,
+                          receiptNumber: remoteB.receiptNumber || localB.receiptNumber,
+                          paidAt: remoteB.paidAt || localB.paidAt,
+                        });
+                      }
                     }
+                    localMap.delete(remoteB.id);
                   });
+
+                  localMap.forEach((remainingB) => combined.push(remainingB));
                   return combined;
                 });
               }
@@ -639,10 +671,77 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
         } catch (err) {}
       };
 
+      // Real-Time Server Sync for Bills (Cross-Device Payment Status)
+      const syncBillsWithServer = async () => {
+        try {
+          const res = await fetch('/api/bills', { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.bills)) {
+              setBills((prev) => {
+                const localMap = new Map<string, PaymentBill>(prev.map((b) => [b.id, b]));
+                const statusPriority: Record<string, number> = {
+                  paid: 3,
+                  verifying: 2,
+                  rejected: 2,
+                  pending_upload: 1,
+                };
+                const combined: PaymentBill[] = [];
+
+                json.bills.forEach((remoteB: PaymentBill) => {
+                  const localB = localMap.get(remoteB.id);
+                  if (!localB) {
+                    combined.push(remoteB);
+                  } else {
+                    const localPri = statusPriority[localB.status] || 0;
+                    const remotePri = statusPriority[remoteB.status] || 0;
+
+                    if (localPri > remotePri) {
+                      combined.push({
+                        ...remoteB,
+                        ...localB,
+                        status: localB.status,
+                        receiptNumber: localB.receiptNumber || remoteB.receiptNumber,
+                        paidAt: localB.paidAt || remoteB.paidAt,
+                      });
+                      fetch('/api/bills', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(localB),
+                      }).catch(() => {});
+                    } else {
+                      combined.push({
+                        ...localB,
+                        ...remoteB,
+                        receiptNumber: remoteB.receiptNumber || localB.receiptNumber,
+                        paidAt: remoteB.paidAt || localB.paidAt,
+                      });
+                    }
+                  }
+                  localMap.delete(remoteB.id);
+                });
+
+                localMap.forEach((remainingB) => {
+                  combined.push(remainingB);
+                  fetch('/api/bills', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(remainingB),
+                  }).catch(() => {});
+                });
+
+                return combined;
+              });
+            }
+          }
+        } catch {}
+      };
+
       const syncAll = () => {
         syncAppointmentsWithServer();
         syncUsersWithServer();
         syncPetsWithServer();
+        syncBillsWithServer();
       };
 
       syncAll();
@@ -1293,90 +1392,155 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   // Payments & Invoicing
   const uploadPaymentSlip = (billId: string, slipUrl: string) => {
     const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 16);
-    setBills((prev) =>
-      prev.map((bill) =>
-        bill.id === billId
-          ? {
-              ...bill,
-              status: 'verifying',
-              slipUrl,
-              slipUploadedAt: timestamp,
-            }
-          : bill
-      )
-    );
-    if (isFirebaseConfigured() && db) {
-      try {
-        updateDoc(
-          doc(db, 'bills', billId),
-          sanitizeForFirestore({
+    let updatedBill: PaymentBill | null = null;
+
+    setBills((prev) => {
+      const updated = prev.map((bill) => {
+        if (bill.id === billId) {
+          updatedBill = {
+            ...bill,
             status: 'verifying',
             slipUrl,
             slipUploadedAt: timestamp,
-          })
+          };
+          return updatedBill;
+        }
+        return bill;
+      });
+
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.bills = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.warn('LocalStorage save note in uploadPaymentSlip:', e);
+      }
+      return updated;
+    });
+
+    // Cloud Firestore Sync (Safe setDoc with merge)
+    if (isFirebaseConfigured() && db) {
+      try {
+        setDoc(
+          doc(db, 'bills', billId),
+          sanitizeForFirestore({
+            id: billId,
+            status: 'verifying',
+            slipUrl,
+            slipUploadedAt: timestamp,
+          }),
+          { merge: true }
         ).catch((err) => console.warn('Firestore sync error:', err));
       } catch (err) {
         console.warn('Firestore slip upload error:', err);
       }
     }
+
+    // Cross-Device Server Sync
+    fetch('/api/bills', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: billId,
+        status: 'verifying',
+        slipUploadedAt: timestamp,
+      }),
+    }).catch(() => {});
   };
 
-  const verifyPayment = (billId: string, approved: boolean, reason?: string) => {
+  const verifyPayment = (billId: string, approved: boolean, reason?: string, slipUrl?: string) => {
     const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 16);
     const receiptNum = `RCP-${new Date().getFullYear()}${(new Date().getMonth() + 1)
       .toString()
       .padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    setBills((prev) =>
-      prev.map((bill) => {
+    let updatedBill: PaymentBill | null = null;
+
+    setBills((prev) => {
+      const updated = prev.map((bill) => {
         if (bill.id !== billId) return bill;
         if (approved) {
-          return {
+          updatedBill = {
             ...bill,
             status: 'paid',
             paymentMethod: bill.paymentMethod || 'promptpay',
             verifiedAt: timestamp,
-            receiptNumber: receiptNum,
-            paidAt: timestamp,
+            receiptNumber: bill.receiptNumber || receiptNum,
+            paidAt: bill.paidAt || timestamp,
             rejectionReason: undefined,
+            ...(slipUrl ? { slipUrl } : {}),
           };
+          return updatedBill;
         } else {
-          return {
+          updatedBill = {
             ...bill,
             status: 'rejected',
             rejectionReason: reason || 'สลิปไม่ถูกต้อง หรือยอดเงินไม่ตรง',
           };
+          return updatedBill;
         }
-      })
-    );
+      });
 
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.bills = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.warn('LocalStorage save note in verifyPayment:', e);
+      }
+      return updated;
+    });
+
+    // Cloud Firestore Sync (Safe setDoc with merge)
     if (isFirebaseConfigured() && db) {
       try {
         if (approved) {
-          updateDoc(
+          setDoc(
             doc(db, 'bills', billId),
             sanitizeForFirestore({
+              id: billId,
               status: 'paid',
               paymentMethod: 'promptpay',
               verifiedAt: timestamp,
               receiptNumber: receiptNum,
               paidAt: timestamp,
               rejectionReason: null,
-            })
+              ...(slipUrl ? { slipUrl } : {}),
+            }),
+            { merge: true }
           ).catch((err) => console.warn('Firestore sync error:', err));
         } else {
-          updateDoc(
+          setDoc(
             doc(db, 'bills', billId),
             sanitizeForFirestore({
+              id: billId,
               status: 'rejected',
               rejectionReason: reason || 'สลิปไม่ถูกต้อง หรือยอดเงินไม่ตรง',
-            })
+            }),
+            { merge: true }
           ).catch((err) => console.warn('Firestore sync error:', err));
         }
       } catch (err) {
         console.warn('Firestore verify payment error:', err);
       }
     }
+
+    // Cross-Device Server Sync (VPS Shared Storage)
+    fetch('/api/bills', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: billId,
+        status: approved ? 'paid' : 'rejected',
+        receiptNumber: approved ? receiptNum : undefined,
+        paidAt: approved ? timestamp : undefined,
+        verifiedAt: approved ? timestamp : undefined,
+        paymentMethod: approved ? 'promptpay' : undefined,
+        rejectionReason: approved ? undefined : reason,
+      }),
+    }).catch(() => {});
   };
 
   const payWithCash = (billId: string) => {
@@ -1385,39 +1549,69 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       .toString()
       .padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    setBills((prev) =>
-      prev.map((bill) =>
-        bill.id === billId
-          ? {
-              ...bill,
-              status: 'paid',
-              paymentMethod: 'cash',
-              verifiedAt: timestamp,
-              receiptNumber: receiptNum,
-              paidAt: timestamp,
-              rejectionReason: undefined,
-            }
-          : bill
-      )
-    );
+    let updatedBill: PaymentBill | null = null;
+
+    setBills((prev) => {
+      const updated = prev.map((bill) => {
+        if (bill.id === billId) {
+          updatedBill = {
+            ...bill,
+            status: 'paid',
+            paymentMethod: 'cash',
+            verifiedAt: timestamp,
+            receiptNumber: bill.receiptNumber || receiptNum,
+            paidAt: bill.paidAt || timestamp,
+            rejectionReason: undefined,
+          };
+          return updatedBill;
+        }
+        return bill;
+      });
+
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const parsed = stored ? JSON.parse(stored) : {};
+        parsed.bills = updated;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e) {
+        console.warn('LocalStorage save note in payWithCash:', e);
+      }
+      return updated;
+    });
 
     if (isFirebaseConfigured() && db) {
       try {
-        updateDoc(
+        setDoc(
           doc(db, 'bills', billId),
           sanitizeForFirestore({
+            id: billId,
             status: 'paid',
             paymentMethod: 'cash',
             verifiedAt: timestamp,
             receiptNumber: receiptNum,
             paidAt: timestamp,
             rejectionReason: null,
-          })
+          }),
+          { merge: true }
         ).catch((err) => console.warn('Firestore sync error:', err));
       } catch (err) {
-        console.warn('Firestore pay with cash error:', err);
+        console.warn('Firestore cash payment error:', err);
       }
     }
+
+    // Cross-Device Server Sync
+    fetch('/api/bills', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: billId,
+        status: 'paid',
+        paymentMethod: 'cash',
+        verifiedAt: timestamp,
+        receiptNumber: receiptNum,
+        paidAt: timestamp,
+      }),
+    }).catch(() => {});
   };
 
   // Services CRUD

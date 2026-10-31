@@ -1,0 +1,44 @@
+[
+  {
+    "id": "bill_mvw427p4_asqz",
+    "appointmentId": "apt_mvw427p4",
+    "treatmentRecordId": "tr_mvw427p4",
+    "petId": "pet_1",
+    "ownerId": "user_owner_1",
+    "totalAmount": 20,
+    "status": "paid",
+    "paymentMethod": "promptpay",
+    "receiptNumber": "RCP-202610-4184",
+    "paidAt": "2026-10-31 15:30",
+    "verifiedAt": "2026-10-31 15:30",
+    "createdAt": "2026-10-31 08:00"
+  },
+  {
+    "id": "bill_101",
+    "appointmentId": "apt_101",
+    "treatmentRecordId": "tr_101",
+    "petId": "pet_1",
+    "ownerId": "user_owner_1",
+    "totalAmount": 480,
+    "status": "paid",
+    "paymentMethod": "promptpay",
+    "receiptNumber": "RCP-202608-1011",
+    "paidAt": "2026-08-24 11:00",
+    "verifiedAt": "2026-08-24 11:00",
+    "createdAt": "2026-08-24 10:30"
+  },
+  {
+    "id": "bill_102",
+    "appointmentId": "apt_102",
+    "treatmentRecordId": "tr_102",
+    "petId": "pet_2",
+    "ownerId": "user_owner_1",
+    "totalAmount": 520,
+    "status": "paid",
+    "paymentMethod": "promptpay",
+    "receiptNumber": "RCP-202608-5521",
+    "paidAt": "2026-08-25 14:35",
+    "verifiedAt": "2026-08-25 14:35",
+    "createdAt": "2026-08-25 14:30"
+  }
+]

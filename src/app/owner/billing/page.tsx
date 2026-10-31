@@ -88,7 +88,7 @@ export default function OwnerBillingPage() {
     setErrorMessage('');
   };
 
-  // Handle Slip File Selection from device
+  // Handle Slip File Selection from device (with automatic canvas compression)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -97,9 +97,37 @@ export default function OwnerBillingPage() {
         return;
       }
       setSlipFile(file);
+
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setSlipUrl(reader.result as string);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 800;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > MAX_SIZE) {
+              h *= MAX_SIZE / w;
+              w = MAX_SIZE;
+            }
+          } else {
+            if (h > MAX_SIZE) {
+              w *= MAX_SIZE / h;
+              h = MAX_SIZE;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, w, h);
+            setSlipUrl(canvas.toDataURL('image/jpeg', 0.8));
+          } else {
+            setSlipUrl(event.target?.result as string);
+          }
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -133,8 +161,17 @@ export default function OwnerBillingPage() {
 
       if (res.ok && json.success) {
         setSlipOkResult(json.data);
-        uploadPaymentSlip(selectedBillForSlip.id, slipUrl);
-        verifyPayment(selectedBillForSlip.id, true);
+        verifyPayment(selectedBillForSlip.id, true, undefined, slipUrl);
+        setSelectedBillForSlip((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: 'paid',
+                slipUrl,
+                paidAt: new Date().toISOString(),
+              }
+            : null
+        );
       } else {
         setErrorMessage(json.message || 'การตรวจสอบสลิปไม่ผ่าน กรุณาตรวจสอบยอดเงินหรือภาพสลิป');
       }
@@ -159,8 +196,17 @@ export default function OwnerBillingPage() {
     setSlipUrl(mockSlip);
     setSlipOkResult(mockResult);
     setErrorMessage('');
-    uploadPaymentSlip(selectedBillForSlip.id, mockSlip);
-    verifyPayment(selectedBillForSlip.id, true);
+    verifyPayment(selectedBillForSlip.id, true, undefined, mockSlip);
+    setSelectedBillForSlip((prev) =>
+      prev
+        ? {
+            ...prev,
+            status: 'paid',
+            slipUrl: mockSlip,
+            paidAt: new Date().toISOString(),
+          }
+        : null
+    );
   };
 
   // Cash payment confirmation
