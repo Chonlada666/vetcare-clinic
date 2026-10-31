@@ -300,8 +300,8 @@ export default function OwnerDashboardPage() {
                   : 'opacity-0 translate-x-full z-0 pointer-events-none'
               }`}
             >
-              {/* Full-Width Wide Background with Lazy Loading & Asynchronous Decoding */}
-              <div className="absolute inset-0 z-0 bg-slate-950">
+              {/* Full-Width Background Gradient with Ambient Glow */}
+              <div className="absolute inset-0 z-0 bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950/70">
                 {slideItem.bgImage && (
                   <img
                     src={slideItem.bgImage}
@@ -311,56 +311,100 @@ export default function OwnerDashboardPage() {
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover object-center opacity-30 mix-blend-luminosity"
                   />
                 )}
-                {/* Subtle right-side gradient so wide image is clear and right-side text is legible */}
-                <div className="absolute inset-0 bg-gradient-to-l from-slate-950/90 via-slate-950/40 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
+                {/* Subtle dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-sky-500/10 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
               </div>
 
-              {/* Right-Only Content Layout: Each sentence on its own single line */}
-              <div className="relative z-10 w-full max-w-7xl mx-auto px-12 sm:px-20 lg:px-24 py-8 flex items-center justify-end">
-                <div className="w-full max-w-4xl text-right space-y-2.5 z-10">
-                  <div className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-sky-300 uppercase drop-shadow sm:whitespace-nowrap">
-                    {slideItem.leftLogo.sub}
+              {/* Balanced 2-Column Content Layout: Left Content + Right Feature Card */}
+              <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 py-8 flex items-center justify-between gap-8">
+                {/* Left Side: Headline & Offers (Left Aligned) */}
+                <div className="w-full lg:max-w-2xl text-left space-y-3 z-10">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-400 text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em]">
+                    <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                    <span>{slideItem.leftLogo.sub}</span>
                   </div>
 
-                  <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-snug drop-shadow-lg sm:whitespace-nowrap">
+                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
                     {slideItem.leftLogo.title}{' '}
-                    <span className="text-sky-300">{slideItem.leftLogo.titleHighlight}</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-400">
+                      {slideItem.leftLogo.titleHighlight}
+                    </span>
                   </h2>
 
-                  <div className="text-base sm:text-xl lg:text-2xl font-semibold text-white drop-shadow sm:whitespace-nowrap">
-                    {slideItem.highlightPrice}{' '}
-                    <span className="text-xs sm:text-base font-normal text-slate-200">
+                  <div className="flex flex-wrap items-baseline gap-2 pt-1">
+                    <span className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-400">
+                      {slideItem.highlightPrice}
+                    </span>
+                    <span className="text-xs sm:text-sm text-slate-300 font-medium">
                       ({slideItem.priceSub})
                     </span>
                   </div>
 
-                  <div className="space-y-1 text-xs sm:text-sm text-slate-100 drop-shadow">
-                    <p className="sm:whitespace-nowrap">
-                      {slideItem.systemText} <span className="font-semibold text-sky-300">{slideItem.systemBadge}</span>
+                  <div className="space-y-1.5 text-xs sm:text-sm text-slate-200">
+                    <p className="flex items-center gap-2">
+                      <span className="text-slate-300">{slideItem.systemText}</span>
+                      <strong className="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/40 font-mono text-xs">
+                        {slideItem.systemBadge}
+                      </strong>
                     </p>
-                    <p className="sm:whitespace-nowrap">
+                    <p className="text-slate-300 font-light text-xs sm:text-sm">
                       {slideItem.ribbonText}
                     </p>
                   </div>
 
-                  <div className="space-y-0.5 text-[11px] text-slate-300/90 font-light">
-                    <p className="sm:whitespace-nowrap">{slideItem.disclaimer1}</p>
-                    <p className="sm:whitespace-nowrap">{slideItem.disclaimer2}</p>
+                  <div className="space-y-0.5 text-[11px] text-slate-400 font-light pt-1">
+                    <p>{slideItem.disclaimer1}</p>
+                    <p>{slideItem.disclaimer2}</p>
                   </div>
 
-                  <div className="pt-2 flex justify-end">
+                  <div className="pt-3 flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => router.push(`/owner/booking?serviceId=${slideItem.serviceId}`)}
-                      className="inline-flex items-center gap-2 bg-white/95 hover:bg-white text-slate-950 font-bold text-xs sm:text-sm px-6 py-2.5 rounded-md shadow-lg transition cursor-pointer"
+                      className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs sm:text-sm px-6 py-3 rounded-xl shadow-lg shadow-sky-500/20 transition cursor-pointer"
                     >
                       <span>จองคิวตรวจโปรแกรมนี้</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push('/owner/services')}
+                      className="inline-flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-slate-700 transition cursor-pointer"
+                    >
+                      <span>ดูอัตราค่าบริการทั้งหมด</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Side: Feature Highlight Card (Fills right space so it is never blank) */}
+                <div className="hidden lg:flex flex-col items-center justify-center shrink-0 w-80 p-6 rounded-3xl bg-slate-900/80 border border-slate-700/60 backdrop-blur-xl shadow-2xl text-center space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-xl shadow-sky-500/30">
+                    <HeartPulse className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold tracking-[0.2em] text-sky-400 uppercase">
+                      VETCARE CLINICAL CARE
+                    </span>
+                    <h3 className="text-base font-extrabold text-white">มาตรฐานสถานพยาบาลสัตว์</h3>
+                  </div>
+                  <div className="w-full space-y-2 text-left text-xs text-slate-300 pt-1">
+                    <div className="flex items-center gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>เวชระเบียน EMR ดิจิทัล 100%</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                      <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
+                      <span>ตรวจโดยสัตวแพทย์มีใบอนุญาต</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                      <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>นัดหมายล่วงหน้า ไม่ต้องรอคิว</span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -124,7 +124,12 @@ export function Navbar() {
 
   const getNavLinks = (): NavLink[] => {
     if (!activeUser) {
-      return [];
+      if (isAuthPage) return [];
+      return [
+        { href: '/owner/dashboard', label: 'หน้าหลัก' },
+        { href: '/owner/services', label: 'อัตราค่าบริการ' },
+        { href: '/owner/booking', label: 'จองคิวนัดหมาย' },
+      ];
     }
 
     if (activeUser.role === 'owner') {
@@ -214,7 +219,7 @@ export function Navbar() {
               </a>
 
               {/* Desktop Navigation */}
-              {activeUser && links.length > 0 && (
+              {links.length > 0 && (
                 <nav className="hidden md:flex items-center space-x-2 lg:space-x-5 min-w-0 overflow-x-auto py-1">
                   {links.map((link) => {
                     const isActive = pathname === link.href;
@@ -317,7 +322,7 @@ export function Navbar() {
               )}
 
               {/* Mobile menu button */}
-              {activeUser && (
+              {links.length > 0 && !isAuthPage && (
                 <div className="flex md:hidden items-center shrink-0">
                   <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -332,44 +337,59 @@ export function Navbar() {
         </div>
 
         {/* Mobile menu */}
-        {mobileMenuOpen && activeUser && (
+        {mobileMenuOpen && links.length > 0 && (
           <div className="md:hidden border-t border-slate-800 bg-slate-900 px-4 pt-2 pb-4 space-y-1 shadow-2xl">
-            <div className="flex items-center justify-between gap-3 p-3 bg-slate-800 rounded-xl mb-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-                  {activeUser.avatar ? (
-                    <img
-                      src={activeUser.avatar}
-                      alt={activeUser.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : activeUser.role === 'owner' ? (
-                    <User className="w-5 h-5" />
-                  ) : activeUser.role === 'vet' ? (
-                    <Stethoscope className="w-5 h-5" />
-                  ) : (
-                    <Shield className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <div className="font-semibold text-sm text-white truncate">{activeUser.name}</div>
-                  <div className="text-xs text-sky-400 capitalize whitespace-nowrap">
-                    {activeUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : activeUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
+            {activeUser ? (
+              <div className="flex items-center justify-between gap-3 p-3 bg-slate-800 rounded-xl mb-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+                    {activeUser.avatar ? (
+                      <img
+                        src={activeUser.avatar}
+                        alt={activeUser.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : activeUser.role === 'owner' ? (
+                      <User className="w-5 h-5" />
+                    ) : activeUser.role === 'vet' ? (
+                      <Stethoscope className="w-5 h-5" />
+                    ) : (
+                      <Shield className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-sm text-white truncate">{activeUser.name}</div>
+                    <div className="text-xs text-sky-400 capitalize whitespace-nowrap">
+                      {activeUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : activeUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openProfileModal();
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs flex items-center gap-1 shrink-0 cursor-pointer"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>แก้ไขโปรไฟล์</span>
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openProfileModal();
-                }}
-                className="px-3 py-1.5 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs flex items-center gap-1 shrink-0 cursor-pointer"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-                <span>แก้ไขโปรไฟล์</span>
-              </button>
-            </div>
+            ) : (
+              <div className="p-3 bg-slate-800 rounded-xl mb-3 flex items-center justify-between">
+                <div className="text-xs text-slate-300">
+                  เข้าสู่ระบบเพื่อจัดการสัตว์เลี้ยงและนัดหมาย
+                </div>
+                <a
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-1.5 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs shrink-0"
+                >
+                  เข้าสู่ระบบ
+                </a>
+              </div>
+            )}
 
             {links.map((link) => (
               <a
