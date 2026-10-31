@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useClinic } from '@/lib/store';
+import { INITIAL_USERS } from '@/lib/mockData';
 import {
   User,
   LogOut,
@@ -28,11 +29,31 @@ interface NavLink {
 }
 
 export function Navbar() {
-  const { currentUser, updateUser, logout, bills } = useClinic();
+  const { currentUser, updateUser, logout, bills, users } = useClinic();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const pathname = usePathname();
   const router = useRouter();
+
+  // Fallback active user if currentUser is null or uninitialized on role-specific routes
+  const roleFromPath = pathname?.startsWith('/vet')
+    ? 'vet'
+    : pathname?.startsWith('/admin')
+    ? 'admin'
+    : pathname?.startsWith('/owner')
+    ? 'owner'
+    : null;
+
+  const fallbackUser = roleFromPath
+    ? (users && users.find((u) => u.role === roleFromPath)) ||
+      INITIAL_USERS.find((u) => u.role === roleFromPath) ||
+      null
+    : null;
+
+  const activeUser =
+    currentUser && (!roleFromPath || currentUser.role === roleFromPath)
+      ? currentUser
+      : fallbackUser || currentUser;
 
   // Profile Edit Modal State
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -58,12 +79,12 @@ export function Navbar() {
   };
 
   const openProfileModal = () => {
-    if (!currentUser) return;
-    setProfileName(currentUser.name || '');
-    setProfileEmail(currentUser.email || '');
-    setProfilePhone(currentUser.phone || '');
-    setProfileAddress(currentUser.address || '');
-    setProfileAvatar(currentUser.avatar || '');
+    if (!activeUser) return;
+    setProfileName(activeUser.name || '');
+    setProfileEmail(activeUser.email || '');
+    setProfilePhone(activeUser.phone || '');
+    setProfileAddress(activeUser.address || '');
+    setProfileAvatar(activeUser.avatar || '');
     setProfileSavedToast('');
     setIsProfileModalOpen(true);
   };
@@ -85,13 +106,13 @@ export function Navbar() {
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+    if (!activeUser) return;
     if (!profileName.trim()) {
       alert('กรุณากรอกชื่อ - นามสกุล');
       return;
     }
 
-    updateUser(currentUser.id, {
+    updateUser(activeUser.id, {
       name: profileName.trim(),
       email: profileEmail.trim(),
       phone: profilePhone.trim(),
@@ -113,15 +134,15 @@ export function Navbar() {
 
   // Count pending bills for current owner
   const pendingBillsCount = bills.filter(
-    (b) => b.ownerId === currentUser?.id && (b.status === 'pending_upload' || b.status === 'rejected')
+    (b) => b.ownerId === activeUser?.id && (b.status === 'pending_upload' || b.status === 'rejected')
   ).length;
 
   const getNavLinks = (): NavLink[] => {
-    if (!currentUser) {
+    if (!activeUser) {
       return [];
     }
 
-    if (currentUser.role === 'owner') {
+    if (activeUser.role === 'owner') {
       return [
         { href: '/owner/dashboard', label: 'หน้าหลัก' },
         { href: '/owner/pets', label: 'สัตว์เลี้ยงของฉัน' },
@@ -132,7 +153,7 @@ export function Navbar() {
       ];
     }
 
-    if (currentUser.role === 'vet') {
+    if (activeUser.role === 'vet') {
       return [
         { href: '/vet/dashboard', label: 'แดชบอร์ดสัตวแพทย์' },
         { href: '/vet/schedule', label: 'ตารางนัดหมาย & คิวตรวจ' },
@@ -140,7 +161,7 @@ export function Navbar() {
       ];
     }
 
-    if (currentUser.role === 'admin') {
+    if (activeUser.role === 'admin') {
       const adminPendingCount = bills.filter((b) => b.status === 'verifying').length;
       return [
         { href: '/admin/dashboard', label: 'แดชบอร์ดบริหาร' },
@@ -166,7 +187,7 @@ export function Navbar() {
             <div className="flex items-center gap-6 sm:gap-8 lg:gap-10 min-w-0 flex-1">
               {/* Brand Logo - Formal Veterinary Clinic Crest */}
               <a
-                href={currentUser ? `/${currentUser.role}/dashboard` : '/login'}
+                href={activeUser ? `/${activeUser.role}/dashboard` : '/login'}
                 className="flex items-center gap-3 group shrink-0 whitespace-nowrap"
               >
                 <div className="w-10 h-10 flex items-center justify-center shrink-0">
@@ -208,7 +229,7 @@ export function Navbar() {
               </a>
 
               {/* Desktop Navigation */}
-              {currentUser && links.length > 0 && (
+              {activeUser && links.length > 0 && (
                 <nav className="hidden md:flex items-center space-x-2 lg:space-x-5 min-w-0 overflow-x-auto py-1">
                   {links.map((link) => {
                     const isActive = pathname === link.href;
@@ -251,7 +272,7 @@ export function Navbar() {
                 )}
               </button>
 
-              {currentUser && (
+              {activeUser && (
                 <div className="hidden md:flex items-center gap-4 shrink-0 whitespace-nowrap">
                   <div className="flex items-center gap-2.5 pl-3 border-l border-slate-800 shrink-0 whitespace-nowrap">
                     {/* Clickable User Profile Button to Open Edit Modal */}
@@ -262,15 +283,15 @@ export function Navbar() {
                       className="flex items-center gap-3 px-2.5 py-1.5 rounded-xl hover:bg-slate-800/80 transition cursor-pointer group"
                     >
                       <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white ring-2 ring-sky-500/30 shrink-0 shadow-xs">
-                        {currentUser.avatar ? (
+                        {activeUser.avatar ? (
                           <img
-                            src={currentUser.avatar}
-                            alt={currentUser.name}
+                            src={activeUser.avatar}
+                            alt={activeUser.name}
                             className="w-full h-full object-cover"
                           />
-                        ) : currentUser.role === 'owner' ? (
+                        ) : activeUser.role === 'owner' ? (
                           <User className="w-4 h-4" />
-                        ) : currentUser.role === 'vet' ? (
+                        ) : activeUser.role === 'vet' ? (
                           <Stethoscope className="w-4 h-4" />
                         ) : (
                           <Shield className="w-4 h-4" />
@@ -278,11 +299,11 @@ export function Navbar() {
                       </div>
                       <div className="text-left whitespace-nowrap">
                         <div className="text-xs font-bold text-white group-hover:text-sky-400 transition whitespace-nowrap max-w-[140px] truncate leading-tight flex items-center gap-1.5">
-                          <span>{currentUser.name}</span>
+                          <span>{activeUser.name}</span>
                           <Edit2 className="w-3 h-3 text-slate-400 group-hover:text-sky-400 shrink-0" />
                         </div>
                         <div className="text-[10px] text-sky-400 whitespace-nowrap leading-tight mt-0.5">
-                          {currentUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : currentUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
+                          {activeUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : activeUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
                         </div>
                       </div>
                     </button>
@@ -299,7 +320,7 @@ export function Navbar() {
               )}
 
               {/* Mobile menu button */}
-              {currentUser && (
+              {activeUser && (
                 <div className="flex md:hidden items-center shrink-0">
                   <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -314,29 +335,29 @@ export function Navbar() {
         </div>
 
         {/* Mobile menu */}
-        {mobileMenuOpen && currentUser && (
+        {mobileMenuOpen && activeUser && (
           <div className="md:hidden border-t border-slate-800 bg-slate-900 px-4 pt-2 pb-4 space-y-1 shadow-2xl">
             <div className="flex items-center justify-between gap-3 p-3 bg-slate-800 rounded-xl mb-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-                  {currentUser.avatar ? (
+                  {activeUser.avatar ? (
                     <img
-                      src={currentUser.avatar}
-                      alt={currentUser.name}
+                      src={activeUser.avatar}
+                      alt={activeUser.name}
                       className="w-full h-full object-cover"
                     />
-                  ) : currentUser.role === 'owner' ? (
+                  ) : activeUser.role === 'owner' ? (
                     <User className="w-5 h-5" />
-                  ) : currentUser.role === 'vet' ? (
+                  ) : activeUser.role === 'vet' ? (
                     <Stethoscope className="w-5 h-5" />
                   ) : (
                     <Shield className="w-5 h-5" />
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-semibold text-sm text-white truncate">{currentUser.name}</div>
+                  <div className="font-semibold text-sm text-white truncate">{activeUser.name}</div>
                   <div className="text-xs text-sky-400 capitalize whitespace-nowrap">
-                    {currentUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : currentUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
+                    {activeUser.role === 'owner' ? 'เจ้าของสัตว์เลี้ยง' : activeUser.role === 'vet' ? 'สัตวแพทย์' : 'ผู้ดูแลระบบ'}
                   </div>
                 </div>
               </div>
@@ -384,7 +405,7 @@ export function Navbar() {
       </header>
 
       {/* ================= Edit Profile Modal ================= */}
-      {isProfileModalOpen && currentUser && (
+      {isProfileModalOpen && activeUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <button
             type="button"
