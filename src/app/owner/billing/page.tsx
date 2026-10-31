@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useClinic } from '@/lib/store';
 import { PaymentBill, TreatmentRecord } from '@/types';
 import { formatCurrency, formatThaiDate } from '@/lib/utils';
+import {
+  generatePromptPayQrDataUrl,
+  CLINIC_PROMPTPAY_NUMBER,
+  CLINIC_BANK_ACCOUNT,
+  CLINIC_ACCOUNT_NAME,
+  CLINIC_BANK_NAME,
+} from '@/lib/promptpay';
 import {
   CreditCard,
   QrCode,
@@ -45,6 +52,26 @@ export default function OwnerBillingPage() {
   const [slipOkResult, setSlipOkResult] = useState<any>(null);
   const [isCashPaidSuccess, setIsCashPaidSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Generated EMVCo PromptPay QR Data URLs
+  const [dynamicQrUrl, setDynamicQrUrl] = useState<string>('');
+  const [staticQrUrl, setStaticQrUrl] = useState<string>('');
+
+  // Generate static PromptPay QR for banner
+  useEffect(() => {
+    generatePromptPayQrDataUrl(CLINIC_PROMPTPAY_NUMBER).then(setStaticQrUrl).catch(() => {});
+  }, []);
+
+  // Generate dynamic PromptPay QR with embedded amount whenever a bill is selected
+  useEffect(() => {
+    if (selectedBillForSlip && selectedBillForSlip.totalAmount > 0) {
+      generatePromptPayQrDataUrl(CLINIC_PROMPTPAY_NUMBER, selectedBillForSlip.totalAmount)
+        .then(setDynamicQrUrl)
+        .catch(() => {});
+    } else {
+      setDynamicQrUrl('');
+    }
+  }, [selectedBillForSlip]);
 
   const myBills = bills
     .filter((b) => b.ownerId === currentUser?.id)
@@ -219,7 +246,7 @@ export default function OwnerBillingPage() {
         <div className="p-3 bg-slate-950 rounded-2xl shrink-0 text-center border-2 border-sky-500 flex flex-col items-center">
           <div className="w-28 sm:w-32 bg-white p-1.5 rounded-xl flex items-center justify-center overflow-hidden shadow-lg">
             <img
-              src="/images/promptpay-qr.png"
+              src={staticQrUrl || '/images/promptpay-qr.png'}
               alt="Thai QR Payment น.ส. ชลลดา นักรบ"
               className="w-full h-auto object-contain rounded-lg"
             />
@@ -489,28 +516,57 @@ export default function OwnerBillingPage() {
                 {/* Tab 1: PromptPay / QR Bank Transfer */}
                 {paymentMethodTab === 'promptpay' && (
                   <form onSubmit={handleVerifyWithSlipOK} className="space-y-4 pt-1">
-                    {/* PromptPay / Thai QR Code Card */}
+                    {/* PromptPay / Thai QR Code Card with Auto-Locked Amount */}
                     <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center text-center space-y-3 shadow-inner">
-                      <div className="inline-flex items-center gap-1.5 bg-sky-500/15 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full text-[11px] font-bold">
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-[11px] font-bold">
                         <QrCode className="w-3.5 h-3.5" />
-                        <span>สแกน QR เพื่อชำระเงินผ่าน Mobile Banking</span>
+                        <span>ระบุยอดเงินใน QR เรียบร้อย &bull; ไม่ต้องพิมพ์จำนวนเงินเอง</span>
                       </div>
 
-                      {/* Official Thai QR Payment Slip from K-Bank */}
-                      <div className="bg-white p-2 rounded-2xl shadow-2xl border-2 border-sky-400/40 inline-block overflow-hidden max-w-[260px] sm:max-w-[280px]">
-                        <img
-                          src="/images/promptpay-qr.png"
-                          alt="Thai QR Payment น.ส. ชลลดา นักรบ"
-                          className="w-full h-auto object-contain rounded-xl mx-auto"
-                        />
+                      {/* Official EMVCo Dynamic PromptPay QR Code with embedded amount */}
+                      <div className="bg-white p-3.5 rounded-2xl shadow-2xl border-2 border-emerald-400/60 inline-block overflow-hidden">
+                        {dynamicQrUrl ? (
+                          <img
+                            src={dynamicQrUrl}
+                            alt={`PromptPay QR ฿${selectedBillForSlip.totalAmount}`}
+                            className="w-48 h-48 sm:w-52 sm:h-52 object-contain mx-auto"
+                          />
+                        ) : (
+                          <div className="w-48 h-48 flex items-center justify-center text-slate-500 text-xs">
+                            กำลังสร้าง QR Code...
+                          </div>
+                        )}
+                        <div className="text-[10px] font-black text-slate-800 mt-1 uppercase tracking-wider flex items-center justify-center gap-1">
+                          <span>THAI QR PAYMENT</span>
+                          <span>&bull;</span>
+                          <span className="text-sky-700">PROMPTPAY</span>
+                        </div>
                       </div>
 
-                      <div className="text-xs space-y-1.5 text-slate-300">
-                        <div>ยอดชำระตามบิล: <strong className="text-sky-400 font-mono text-base font-black">{formatCurrency(selectedBillForSlip.totalAmount)}</strong></div>
-                        <div>ชื่อบัญชี: <strong className="text-white">น.ส. ชลลดา นักรบ</strong></div>
-                        <div>พร้อมเพย์ / เบอร์โทร: <strong className="text-sky-300 font-mono font-bold bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">095-550-6741</strong></div>
-                        <div>หรือโอนเข้า: <strong className="text-white">ธ.กสิกรไทย</strong> <strong className="text-slate-300 font-mono font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">090-8-46418-4</strong></div>
-                        <div className="text-[11px] text-emerald-400 font-semibold pt-0.5">✓ สแกน QR ด้านบนได้จากทุกแอปธนาคาร หรือโอนผ่านพร้อมเพย์/เลขบัญชี</div>
+                      {/* Auto-filled Amount Banner */}
+                      <div className="bg-slate-900 border border-emerald-500/40 rounded-xl px-4 py-2.5 text-center w-full">
+                        <div className="text-[11px] text-slate-400">ยอดชำระที่ระบุใน QR Code</div>
+                        <div className="text-2xl font-black text-emerald-400 font-mono">
+                          {formatCurrency(selectedBillForSlip.totalAmount)}
+                        </div>
+                        <div className="text-[10px] text-emerald-300 font-semibold mt-0.5">
+                          ✓ สแกนผ่านแอปธนาคาร ยอดเงิน {selectedBillForSlip.totalAmount} บาท จะขึ้นให้อัตโนมัติทันที
+                        </div>
+                      </div>
+
+                      <div className="text-xs space-y-1.5 text-slate-300 w-full text-left bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">ชื่อบัญชีผู้รับ:</span>
+                          <strong className="text-white font-bold">{CLINIC_ACCOUNT_NAME}</strong>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">พร้อมเพย์:</span>
+                          <strong className="text-sky-300 font-mono font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">{CLINIC_PROMPTPAY_NUMBER}</strong>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">{CLINIC_BANK_NAME}:</span>
+                          <strong className="text-slate-300 font-mono font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">{CLINIC_BANK_ACCOUNT}</strong>
+                        </div>
                       </div>
                     </div>
 
