@@ -281,6 +281,7 @@ export async function POST(req: NextRequest) {
         'x-authorization': apiKey,
       },
       body: slipOkFormData,
+      signal: AbortSignal.timeout(12000), // ป้องกันการค้างหมุนนานด้วย Timeout 12 วินาที
     });
 
     const json = await response.json();
@@ -443,6 +444,16 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('SlipOK verification error:', error);
+    if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+      return NextResponse.json(
+        {
+          success: false,
+          isRealApi: true,
+          message: 'การเชื่อมต่อ SlipOK ใช้เวลานานเกินกำหนด (Timeout) กรุณาลองใหม่อีกครั้ง หรือส่งสลิปให้เจ้าหน้าที่ตรวจ',
+        },
+        { status: 504 }
+      );
+    }
     return NextResponse.json(
       { success: false, message: `เกิดข้อผิดพลาดในการเชื่อมต่อ SlipOK API: ${error.message || 'Network error'}` },
       { status: 500 }

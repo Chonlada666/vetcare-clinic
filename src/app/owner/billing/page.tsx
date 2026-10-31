@@ -46,7 +46,7 @@ export default function OwnerBillingPage() {
   const [paymentMethodTab, setPaymentMethodTab] = useState<'promptpay' | 'cash'>('promptpay');
 
   // SlipOK / Upload State
-  const [slipFile, setSlipFile] = useState<File | null>(null);
+  const [slipFile, setSlipFile] = useState<File | Blob | null>(null);
   const [slipUrl, setSlipUrl] = useState('');
   const [isVerifyingSlipOK, setIsVerifyingSlipOK] = useState(false);
   const [slipOkResult, setSlipOkResult] = useState<any>(null);
@@ -88,32 +88,31 @@ export default function OwnerBillingPage() {
     setErrorMessage('');
   };
 
-  // Handle Slip File Selection from device (with automatic canvas compression)
+  // Handle Slip File Selection from device (with automatic canvas compression to ~80KB)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert('ขนาดไฟล์รูปภาพสลิปต้องไม่เกิน 10MB');
+      if (file.size > 15 * 1024 * 1024) {
+        alert('ขนาดไฟล์รูปภาพสลิปต้องไม่เกิน 15MB');
         return;
       }
-      setSlipFile(file);
 
       const reader = new FileReader();
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 800;
+          const MAX_SIZE = 1000;
           let w = img.width;
           let h = img.height;
           if (w > h) {
             if (w > MAX_SIZE) {
-              h *= MAX_SIZE / w;
+              h = Math.round((h * MAX_SIZE) / w);
               w = MAX_SIZE;
             }
           } else {
             if (h > MAX_SIZE) {
-              w *= MAX_SIZE / h;
+              w = Math.round((w * MAX_SIZE) / h);
               h = MAX_SIZE;
             }
           }
@@ -122,9 +121,22 @@ export default function OwnerBillingPage() {
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, w, h);
-            setSlipUrl(canvas.toDataURL('image/jpeg', 0.8));
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            setSlipUrl(dataUrl);
+
+            // บีบอัดขนาดไฟล์ลงเหลือ < 100KB เพื่อให้อัปโหลดตรวจสอบสลิปได้รวดเร็วทันใจ ไม่หมุนค้าง
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  setSlipFile(blob);
+                }
+              },
+              'image/jpeg',
+              0.85
+            );
           } else {
             setSlipUrl(event.target?.result as string);
+            setSlipFile(file);
           }
         };
         img.src = event.target?.result as string;
@@ -133,7 +145,7 @@ export default function OwnerBillingPage() {
     }
   };
 
-  // Automated SlipOK API Verification
+  // Automated SlipOK API Verification (with fast response and timeout safeguard)
   const handleVerifyWithSlipOK = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBillForSlip || !slipUrl) {
@@ -145,9 +157,15 @@ export default function OwnerBillingPage() {
     setErrorMessage('');
     setSlipOkResult(null);
 
+    // ป้องกันการหมุนค้างด้วยระบบ Timeout 15 วินาที
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const formData = new FormData();
-      if (slipFile) formData.append('file', slipFile);
+      if (slipFile) {
+        formData.append('file', slipFile, 'slip.jpg');
+      }
       formData.append('amount', String(selectedBillForSlip.totalAmount));
       formData.append('billId', selectedBillForSlip.id);
       formData.append('slipBase64', slipUrl);
@@ -158,7 +176,10 @@ export default function OwnerBillingPage() {
       const res = await fetch('/api/slipok/verify', {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const json = await res.json().catch(() => ({ success: false, message: 'การตอบกลับจากเซิร์ฟเวอร์ขัดข้อง' }));
 
@@ -179,8 +200,13 @@ export default function OwnerBillingPage() {
         setErrorMessage(json.message || 'การตรวจสอบสลิปไม่ผ่าน กรุณาตรวจสอบยอดเงินหรือภาพสลิป');
       }
     } catch (err: any) {
+      clearTimeout(timeoutId);
       console.error(err);
-      setErrorMessage(`เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้'}`);
+      if (err.name === 'AbortError') {
+        setErrorMessage('การตรวจสอบสลิปใช้เวลานานเกินไป (เครือข่ายธนาคารตอบสนองช้า) กรุณากดลองใหม่อีกครั้ง หรือกดปุ่ม "อัปโหลดสลิปให้เจ้าหน้าที่ตรวจ" ด้านล่าง');
+      } else {
+        setErrorMessage(`เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้'}`);
+      }
     } finally {
       setIsVerifyingSlipOK(false);
     }
