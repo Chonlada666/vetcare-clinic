@@ -28,10 +28,15 @@ export default function VetTreatmentsQueuePage() {
   const [filterDate, setFilterDate] = useState<string>(todayStr);
   const [search, setSearch] = useState('');
 
-  const activeVet = vets.find((v) => v.email === currentUser?.email) || vets[0];
+  const activeVet =
+    vets.find(
+      (v) =>
+        (currentUser?.email && v.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (currentUser?.name && (v.name.includes(currentUser.name) || currentUser.name.includes(v.name.split(' ')[1] || '')))
+    ) || vets[0];
 
   const queueList = appointments
-    .filter((a) => a.vetId === activeVet.id && a.date === filterDate && a.status !== 'cancelled')
+    .filter((a) => (a.vetId === activeVet.id || a.vetId === activeVet.name) && a.date === filterDate && a.status !== 'cancelled')
     .filter((a) => {
       const pet = pets.find((p) => p.id === a.petId);
       const owner = users.find((u) => u.id === a.ownerId);

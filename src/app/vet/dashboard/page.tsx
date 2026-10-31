@@ -28,8 +28,15 @@ export default function VetDashboardPage() {
 
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
-  const activeVet = vets.find((v) => v.email === currentUser?.email) || vets[0];
-  const myAppointments = appointments.filter((a) => a.vetId === activeVet?.id);
+  const activeVet =
+    vets.find(
+      (v) =>
+        (currentUser?.email && v.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (currentUser?.name && (v.name.includes(currentUser.name) || currentUser.name.includes(v.name.split(' ')[1] || '')))
+    ) || vets[0];
+  const myAppointments = appointments.filter(
+    (a) => a.vetId === activeVet?.id || a.vetId === activeVet?.name
+  );
   const selectedDateAppointments = myAppointments.filter((a) => a.date === selectedDate);
   const waitingPatients = selectedDateAppointments.filter(
     (a) => a.status === 'pending' || a.status === 'in_treatment' || a.status === 'confirmed'

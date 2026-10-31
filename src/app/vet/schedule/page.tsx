@@ -54,7 +54,7 @@ export default function VetSchedulePage() {
 
   // Filter appointments specifically for this doctor and the selected date
   const dateAppointments = appointments.filter(
-    (a) => a.vetId === myVet?.id && a.date === selectedDate && a.status !== 'cancelled'
+    (a) => (a.vetId === myVet?.id || a.vetId === myVet?.name) && a.date === selectedDate && a.status !== 'cancelled'
   );
 
   // Quick dates dynamically generated around today
@@ -134,7 +134,7 @@ export default function VetSchedulePage() {
               {QUICK_DATES.map((d) => {
                 const isSelected = selectedDate === d.val;
                 const aptCount = appointments.filter(
-                  (a) => a.vetId === myVet.id && a.date === d.val && a.status !== 'cancelled'
+                  (a) => (a.vetId === myVet.id || a.vetId === myVet.name) && a.date === d.val && a.status !== 'cancelled'
                 ).length;
 
                 return (

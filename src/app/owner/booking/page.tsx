@@ -42,14 +42,16 @@ function getAssignedVet(dateStr: string, vetsList: Vet[]): Vet | undefined {
   try {
     const d = new Date(dateStr + 'T00:00:00');
     const dayName = THAI_DAYS[d.getDay()];
-    const dutyVet = vetsList.find(
+    const onDutyVets = vetsList.filter(
       (v) =>
         v.availableDays &&
         v.availableDays.some(
           (day) => day.includes(dayName) || dayName.includes(day) || day.toLowerCase().includes('ทุกวัน')
         )
     );
-    return dutyVet || vetsList[0];
+    if (onDutyVets.length === 0) return vetsList[0];
+    const dayNum = d.getDate() + d.getMonth();
+    return onDutyVets[dayNum % onDutyVets.length];
   } catch {
     return vetsList[0];
   }
@@ -61,10 +63,12 @@ function BookingContent() {
   const preSelectedPetId = searchParams.get('petId');
   const preSelectedServiceId = searchParams.get('serviceId');
   const preSelectedDate = searchParams.get('date');
+  const preSelectedVetId = searchParams.get('vetId');
 
   const { currentUser, isLoaded, pets, vets, services, appointments, createAppointment, addPet } = useClinic();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [selectedVetId, setSelectedVetId] = useState<string>(preSelectedVetId || '');
 
   // Quick Add Pet modal state
   const [isAddPetModalOpen, setIsAddPetModalOpen] = useState(false);
@@ -206,14 +210,17 @@ function BookingContent() {
     '16:30 - 17:00',
   ];
 
-  // Dynamic assigned vet
-  const assignedVet = getAssignedVet(selectedDate, vets);
+  // Dynamic assigned / selected vet
+  const effectiveVet =
+    (selectedVetId ? vets.find((v) => v.id === selectedVetId) : null) ||
+    getAssignedVet(selectedDate, vets) ||
+    vets[0];
 
   // Dynamic slot availability calculation
   const getSlotStatus = (time: string) => {
     const booked = appointments.some(
       (a) =>
-        a.vetId === assignedVet?.id &&
+        a.vetId === effectiveVet?.id &&
         a.date === selectedDate &&
         a.timeSlot === time &&
         a.status !== 'cancelled'
@@ -249,11 +256,10 @@ function BookingContent() {
 
   const handleConfirm = () => {
     if (!currentUser) return;
-    const dutyVet = getAssignedVet(selectedDate, vets);
     createAppointment({
       petId: selectedPetId,
       ownerId: currentUser.id,
-      vetId: dutyVet?.id || (vets[0]?.id || 'vet_1'),
+      vetId: effectiveVet?.id || 'vet_1',
       serviceId: selectedServiceId,
       date: selectedDate,
       timeSlot: selectedTimeSlot,
@@ -501,11 +507,63 @@ function BookingContent() {
           <div className="space-y-6">
             <div className="border-b border-slate-800 pb-4">
               <h2 className="text-lg font-bold text-white">
-                ขั้นตอนที่ 3: เลือกวันและช่วงเวลาตรวจ
+                ขั้นตอนที่ 3: เลือกสัตวแพทย์ วันและช่วงเวลาตรวจ
               </h2>
               <p className="text-xs text-slate-400 mt-1">
-                เลือกวันและเวลาที่สะดวก โดยระบบจะจัดสรรสัตวแพทย์เวรประจำวันให้อัตโนมัติ
+                เลือกสัตวแพทย์ที่ต้องการตรวจ หรือเลือกวันและช่วงเวลาที่สะดวก
               </p>
+            </div>
+
+            {/* Doctor Selection */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-300">
+                เลือกสัตวแพทย์ที่ต้องการตรวจ (หรือเลือกจัดสรรอัตโนมัติ)
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedVetId('')}
+                  className={`p-3 rounded-xl border text-left transition flex items-center gap-2.5 cursor-pointer ${
+                    !selectedVetId
+                      ? 'border-sky-500 bg-sky-950/60 ring-1 ring-sky-500'
+                      : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-400'
+                  }`}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs shrink-0">
+                    Auto
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-bold text-xs text-white truncate">จัดสรรอัตโนมัติ</div>
+                    <div className="text-[10px] text-slate-400">ตามแพทย์เวรประจำวัน</div>
+                  </div>
+                </button>
+
+                {vets.map((v) => {
+                  const isSelected = selectedVetId === v.id;
+                  return (
+                    <button
+                      type="button"
+                      key={v.id}
+                      onClick={() => setSelectedVetId(v.id)}
+                      className={`p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 cursor-pointer ${
+                        isSelected
+                          ? 'border-sky-500 bg-sky-950/60 ring-1 ring-sky-500'
+                          : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-400'
+                      }`}
+                    >
+                      <img
+                        src={v.avatar || '/images/vets/vet_panwad.jpg'}
+                        alt={v.name}
+                        className="w-9 h-9 rounded-lg object-cover shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs text-white truncate">{v.name}</div>
+                        <div className="text-[10px] text-sky-400 truncate">{v.specialty}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Date Picker */}
@@ -540,18 +598,20 @@ function BookingContent() {
               </div>
             </div>
 
-            {/* Duty Vet Info Notice */}
-            {assignedVet && (
+            {/* Duty / Selected Vet Info Notice */}
+            {effectiveVet && (
               <div className="p-3.5 bg-slate-950 border border-sky-800/50 rounded-2xl flex items-center gap-3 text-xs">
                 <img
-                  src={assignedVet.avatar || '/images/vets/vet_panwad.jpg'}
-                  alt={assignedVet.name}
+                  src={effectiveVet.avatar || '/images/vets/vet_panwad.jpg'}
+                  alt={effectiveVet.name}
                   className="w-10 h-10 rounded-xl object-cover ring-2 ring-sky-500/40"
                 />
                 <div className="flex-1">
-                  <div className="text-[10px] text-sky-400 font-bold uppercase tracking-wider">แพทย์เวรประจำวันที่เลือก</div>
+                  <div className="text-[10px] text-sky-400 font-bold uppercase tracking-wider">
+                    {selectedVetId ? 'สัตวแพทย์ที่ท่านเลือก' : 'แพทย์เวรประจำวันที่ระบบจัดสรรให้อัตโนมัติ'}
+                  </div>
                   <div className="font-extrabold text-white text-sm">
-                    {assignedVet.name} <span className="text-xs font-normal text-slate-400">({assignedVet.specialty})</span>
+                    {effectiveVet.name} <span className="text-xs font-normal text-slate-400">({effectiveVet.specialty})</span>
                   </div>
                 </div>
                 <div className="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/50 shrink-0">
@@ -629,9 +689,9 @@ function BookingContent() {
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-slate-400 block text-[11px]">สัตวแพทย์เวรประจำวัน (ระบบจัดสรร):</span>
-                  <div className="font-extrabold text-white text-sm">{assignedVet?.name || '-'}</div>
-                  <div className="text-sky-400 font-semibold">{assignedVet?.specialty}</div>
+                  <span className="text-slate-400 block text-[11px]">สัตวแพทย์ผู้ตรวจ:</span>
+                  <div className="font-extrabold text-white text-sm">{effectiveVet?.name || '-'}</div>
+                  <div className="text-sky-400 font-semibold">{effectiveVet?.specialty}</div>
                 </div>
 
                 <div className="space-y-1">
