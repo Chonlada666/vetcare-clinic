@@ -43,7 +43,6 @@ const BANNER_SLIDES = [
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_1',
     bgImage: '/banner-premier-puppy.jpg',
-    centerPetImage: '/banner-premier-puppy.jpg',
   },
   {
     id: 2,
@@ -60,8 +59,7 @@ const BANNER_SLIDES = [
     disclaimer1: '*รวมตรวจเลือดประเมินความพร้อมก่อนวางยาสลบเพื่อความปลอดภัยสูงสุด',
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_3',
-    bgImage: 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=1600&q=80',
-    centerPetImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
+    bgImage: '/banner-dog-cat.jpg',
   },
   {
     id: 3,
@@ -79,7 +77,6 @@ const BANNER_SLIDES = [
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_2',
     bgImage: '/banner-vaccine-sugarglider.jpg',
-    centerPetImage: '/banner-vaccine-sugarglider.jpg',
   },
   {
     id: 4,
@@ -97,7 +94,6 @@ const BANNER_SLIDES = [
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_4',
     bgImage: '/banner-dental-cat.jpg',
-    centerPetImage: '/banner-dental-cat.jpg',
   },
   {
     id: 5,
@@ -115,7 +111,6 @@ const BANNER_SLIDES = [
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_5',
     bgImage: '/banner-derma-cat.jpg',
-    centerPetImage: '/banner-derma-cat.jpg',
   },
   {
     id: 6,
@@ -133,63 +128,62 @@ const BANNER_SLIDES = [
     disclaimer2: 'เงื่อนไขเป็นไปตามที่คลินิกกำหนด',
     serviceId: 'srv_6',
     bgImage: '/banner-exotic-rabbit.jpg',
-    centerPetImage: '/banner-exotic-rabbit.jpg',
   },
 ];
 
-// Poster visual mappings for services (Matching exact veterinary medical procedure)
-const SERVICE_POSTER_IMAGES: Record<string, { image: string; ribbon: string; ribbonColor: string }> = {
+// Service visuals: High-performance vector icons & styling (Zero slow external images)
+const SERVICE_VISUALS: Record<string, { icon: React.ElementType; gradient: string; ribbon: string; ribbonColor: string }> = {
   srv_1: {
-    // ตรวจรักษาอาการป่วย (ไม่แน่ใจอาการ) - Physical exam & illness diagnosis on exam table
-    image: 'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=600&q=80',
+    icon: Stethoscope,
+    gradient: 'from-sky-500/20 via-blue-500/10 to-transparent text-sky-400',
     ribbon: 'ADVANCE BOOKING',
     ribbonColor: 'bg-sky-500 text-slate-950',
   },
   srv_2: {
-    // ตรวจสุขภาพประจำปีทั่วไป - Annual wellness check with stethoscope
-    image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=600&q=80',
+    icon: HeartPulse,
+    gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent text-emerald-400',
     ribbon: 'ยอดนิยม',
-    ribbonColor: 'bg-blue-600 text-white',
+    ribbonColor: 'bg-emerald-500 text-slate-950',
   },
   srv_3: {
-    // ฉีดวัคซีนรวมป้องกันโรค (สุนัข / แมว) - Core combination vaccination injection
-    image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=600&q=80',
+    icon: ShieldCheck,
+    gradient: 'from-indigo-500/20 via-purple-500/10 to-transparent text-indigo-400',
     ribbon: 'HOT DEAL',
     ribbonColor: 'bg-indigo-500 text-white',
   },
   srv_4: {
-    // ฉีดวัคซีนพิษสุนัขบ้า (Rabies Vaccine) - Veterinarian vaccinating a dog on exam table
-    image: '/service-rabies-vaccine.jpg',
+    icon: ShieldCheck,
+    gradient: 'from-amber-500/20 via-orange-500/10 to-transparent text-amber-400',
     ribbon: 'แนะนำ',
-    ribbonColor: 'bg-emerald-500 text-slate-950',
+    ribbonColor: 'bg-amber-500 text-slate-950',
   },
   srv_5: {
-    // ป้อนยา / หยอดหลัง ถ่ายพยาธิ & เห็บหมัด - Topical spot-on drops & deworming
-    image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=600&q=80',
+    icon: Sparkles,
+    gradient: 'from-teal-500/20 via-cyan-500/10 to-transparent text-teal-400',
     ribbon: 'PREVENTIVE',
     ribbonColor: 'bg-teal-500 text-slate-950',
   },
   srv_6: {
-    // ทำหมันสุนัข / แมว (เพศผู้) - Male castration / sterile surgical theater
-    image: 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=600&q=80',
+    icon: Award,
+    gradient: 'from-cyan-500/20 via-sky-500/10 to-transparent text-cyan-400',
     ribbon: 'SURGERY',
-    ribbonColor: 'bg-sky-500 text-slate-950',
-  },
-  srv_7: {
-    // ทำหมันสุนัข / แมว (เพศเมีย) - Female spaying abdominal surgical suite
-    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80',
-    ribbon: 'ADVANCED SURGERY',
     ribbonColor: 'bg-cyan-500 text-slate-950',
   },
+  srv_7: {
+    icon: Award,
+    gradient: 'from-blue-500/20 via-indigo-500/10 to-transparent text-blue-400',
+    ribbon: 'ADVANCED SURGERY',
+    ribbonColor: 'bg-blue-500 text-white',
+  },
   srv_8: {
-    // ขูดหินปูนและขัดฟัน (Dental Scaling) - Ultrasonic scaler & dental oral hygiene
-    image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=600&q=80',
+    icon: Sparkles,
+    gradient: 'from-amber-500/20 via-yellow-500/10 to-transparent text-amber-300',
     ribbon: 'DENTAL CARE',
     ribbonColor: 'bg-amber-400 text-slate-950',
   },
   srv_9: {
-    // ตรวจเลือดวิเคราะห์ผลแล็บ (CBC & Blood Chemistry) - Clinical laboratory blood test tubes
-    image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=600&q=80',
+    icon: HeartPulse,
+    gradient: 'from-rose-500/20 via-pink-500/10 to-transparent text-rose-400',
     ribbon: 'LAB & EMR',
     ribbonColor: 'bg-rose-500 text-white',
   },
@@ -306,15 +300,22 @@ export default function OwnerDashboardPage() {
                   : 'opacity-0 translate-x-full z-0 pointer-events-none'
               }`}
             >
-              {/* Full-Width Wide Background Image */}
-              <div className="absolute inset-0 z-0">
-                <img
-                  src={slideItem.bgImage}
-                  alt={slideItem.leftLogo.title}
-                  className="w-full h-full object-cover object-center"
-                />
+              {/* Full-Width Wide Background with Lazy Loading & Asynchronous Decoding */}
+              <div className="absolute inset-0 z-0 bg-slate-950">
+                {slideItem.bgImage && (
+                  <img
+                    src={slideItem.bgImage}
+                    alt={slideItem.leftLogo.title}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                    className="w-full h-full object-cover object-center"
+                  />
+                )}
                 {/* Subtle right-side gradient so wide image is clear and right-side text is legible */}
-                <div className="absolute inset-0 bg-gradient-to-l from-slate-950/85 via-slate-950/35 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-l from-slate-950/90 via-slate-950/40 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
               </div>
 
@@ -676,45 +677,48 @@ export default function OwnerDashboardPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.slice(0, 6).map((service) => {
-              const posterData = SERVICE_POSTER_IMAGES[service.id] || {
-                image: 'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=600&q=80',
+              const visual = SERVICE_VISUALS[service.id] || {
+                icon: Stethoscope,
+                gradient: 'from-sky-500/20 via-blue-500/10 to-transparent text-sky-400',
                 ribbon: 'แนะนำ',
                 ribbonColor: 'bg-sky-500 text-slate-950',
               };
+              const VisualIcon = visual.icon;
 
               return (
                 <button
                   type="button"
                   key={service.id}
                   onClick={() => router.push(`/owner/booking?serviceId=${service.id}`)}
-                  className="text-left w-full group rounded-2xl border border-slate-800 bg-slate-950 hover:border-slate-600 transition flex flex-col overflow-hidden cursor-pointer shadow-md"
+                  className="text-left w-full group rounded-2xl border border-slate-800 bg-slate-950 hover:border-sky-500/50 hover:bg-slate-900 transition flex flex-col justify-between overflow-hidden cursor-pointer shadow-md p-6 space-y-4"
                 >
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <img
-                      src={posterData.image}
-                      alt={service.name}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
-                    <div className="photo-overlay-bar absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-                      <span className="text-xs text-slate-200">อัตราค่าบริการเริ่มต้น</span>
-                      <span className="font-bold text-sky-300 text-sm">
-                        {formatCurrency(service.price)}
-                      </span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${visual.gradient} border border-slate-800 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition`}>
+                      <VisualIcon className="w-6 h-6" />
                     </div>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${visual.ribbonColor}`}>
+                      {visual.ribbon}
+                    </span>
                   </div>
 
-                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-1.5 flex-1">
+                    <h3 className="font-bold text-white text-base group-hover:text-sky-400 transition">
+                      {service.name}
+                    </h3>
+                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
                     <div>
-                      <h3 className="font-bold text-white text-sm sm:text-base group-hover:text-sky-400 transition">
-                        {service.name}
-                      </h3>
-                      <p className="text-xs text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">
-                        {service.description}
-                      </p>
+                      <span className="text-[11px] text-slate-400 block">เริ่มต้น</span>
+                      <strong className="text-sky-300 font-extrabold text-base">
+                        {formatCurrency(service.price)}
+                      </strong>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-slate-300 group-hover:text-sky-400 transition">
+                    <div className="flex items-center gap-1 font-bold text-sky-400 group-hover:translate-x-1 transition">
                       <span>จองคิวรับบริการนี้</span>
                       <ChevronRight className="w-4 h-4" />
                     </div>
@@ -750,6 +754,11 @@ export default function OwnerDashboardPage() {
                 <img
                   src={vet.avatar}
                   alt={vet.name}
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/vets/vet_panwad.jpg';
+                  }}
                   className="w-24 h-24 rounded-full object-cover border border-slate-700"
                 />
                 <div className="space-y-1">
