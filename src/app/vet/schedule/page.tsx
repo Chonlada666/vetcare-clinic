@@ -65,11 +65,24 @@ export default function VetSchedulePage() {
         const d = new Date();
         d.setDate(d.getDate() + 1);
         const nextDayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        return `${formatThaiDate(nextDayStr)} (พรุ่งนี้)`;
+        return `${formatThaiDate(nextDayStr)} (พรุ่งนี้ / วันถัดไป)`;
       })(),
       val: (() => {
         const d = new Date();
         d.setDate(d.getDate() + 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      })(),
+    },
+    {
+      label: (() => {
+        const d = new Date();
+        d.setDate(d.getDate() + 2);
+        const day2Str = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return `${formatThaiDate(day2Str)} (มะรืนนี้)`;
+      })(),
+      val: (() => {
+        const d = new Date();
+        d.setDate(d.getDate() + 2);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       })(),
     },

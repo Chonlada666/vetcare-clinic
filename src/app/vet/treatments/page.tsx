@@ -25,6 +25,15 @@ export default function VetTreatmentsQueuePage() {
     return `${year}-${month}-${day}`;
   })();
 
+  const tomorrowStr = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  })();
+
   const [filterDate, setFilterDate] = useState<string>(todayStr);
   const [search, setSearch] = useState('');
 
@@ -78,18 +87,45 @@ export default function VetTreatmentsQueuePage() {
           />
         </div>
 
-        <div className="sm:w-60">
-          <input
-            type="date"
-            value={filterDate}
-            onClick={(e) => {
-              try {
-                e.currentTarget.showPicker();
-              } catch {}
-            }}
-            onChange={(e) => setFilterDate(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-slate-700 text-xs sm:text-sm font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden cursor-pointer [color-scheme:dark]"
-          />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-700/80">
+            <button
+              type="button"
+              onClick={() => setFilterDate(todayStr)}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                filterDate === todayStr
+                  ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              วันนี้
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterDate(tomorrowStr)}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                filterDate === tomorrowStr
+                  ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              วันถัดไป (พรุ่งนี้)
+            </button>
+          </div>
+
+          <div className="w-44">
+            <input
+              type="date"
+              value={filterDate}
+              onClick={(e) => {
+                try {
+                  e.currentTarget.showPicker();
+                } catch {}
+              }}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="w-full px-3 py-1.5 rounded-xl border border-slate-700 text-xs sm:text-sm font-semibold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden cursor-pointer [color-scheme:dark]"
+            />
+          </div>
         </div>
       </div>
 

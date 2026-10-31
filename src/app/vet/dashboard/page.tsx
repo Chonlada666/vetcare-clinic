@@ -26,6 +26,24 @@ export default function VetDashboardPage() {
     return `${year}-${month}-${day}`;
   })();
 
+  const tomorrowStr = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  })();
+
+  const dayAfterNextStr = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  })();
+
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
   const activeVet =
@@ -121,12 +139,48 @@ export default function VetDashboardPage() {
         </div>
       </section>
 
-      {/* Date Filter Bar - Dynamic Date Picker */}
+      {/* Date Filter Bar - Dynamic Date Picker with Quick Date Toggles */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-bold text-white">เลือกดูคิวตรวจประจำวันที่:</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800">
+            <button
+              type="button"
+              onClick={() => setSelectedDate(todayStr)}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                selectedDate === todayStr
+                  ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              วันนี้
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedDate(tomorrowStr)}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                selectedDate === tomorrowStr
+                  ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              วันถัดไป (พรุ่งนี้)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedDate(dayAfterNextStr)}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                selectedDate === dayAfterNextStr
+                  ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              มะรืนนี้
+            </button>
+          </div>
+
           <input
             type="date"
             value={selectedDate}
@@ -136,9 +190,9 @@ export default function VetDashboardPage() {
               } catch {}
             }}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3.5 py-2 rounded-md border border-slate-700 text-xs sm:text-sm font-bold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden cursor-pointer [color-scheme:dark]"
+            className="px-3.5 py-1.5 rounded-lg border border-slate-700 text-xs sm:text-sm font-bold bg-slate-800 text-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden cursor-pointer [color-scheme:dark]"
           />
-          <span className="text-xs font-semibold text-sky-300 bg-sky-500/20 px-3 py-2 rounded-md border border-sky-500/30">
+          <span className="text-xs font-semibold text-sky-300 bg-sky-500/20 px-3 py-1.5 rounded-lg border border-sky-500/30">
             {formatThaiDate(selectedDate)}
           </span>
         </div>

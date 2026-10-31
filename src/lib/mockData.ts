@@ -347,6 +347,20 @@ export const INITIAL_MEDICINES: MedicineItem[] = [
   },
 ];
 
+// Helper to calculate dynamic ISO date strings relative to today
+const getRelativeDateStr = (offsetDays: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const TODAY_DATE = getRelativeDateStr(0);
+const TOMORROW_DATE = getRelativeDateStr(1);
+const NEXT_2_DAYS = getRelativeDateStr(2);
+
 export const INITIAL_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt_101',
@@ -390,11 +404,11 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     ownerId: 'user_owner_2',
     vetId: 'vet_1',
     serviceId: 'srv_1',
-    date: '2026-10-31',
+    date: TODAY_DATE || '2026-10-31',
     timeSlot: '10:00 - 10:30',
     initialSymptoms: 'มีอาการเดินกะเผลก ขาหลังซ้ายลงน้ำหนักไม่เต็มที่ ร้องเจ็บเวลาขยับข้อสะโพก',
     status: 'in_treatment',
-    createdAt: '2026-10-30 15:30',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 08:30',
   },
   {
     id: 'apt_105',
@@ -402,11 +416,11 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     ownerId: 'user_owner_1',
     vetId: 'vet_1',
     serviceId: 'srv_6',
-    date: '2026-10-31',
+    date: TODAY_DATE || '2026-10-31',
     timeSlot: '11:00 - 11:30',
     initialSymptoms: 'นัดตรวจสุขภาพเตรียมความพร้อมก่อนผ่าตัดทำหมันและตรวจเลือดประเมินความเสี่ยงสลบ',
     status: 'confirmed',
-    createdAt: '2026-10-30 16:45',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 09:00',
   },
   {
     id: 'apt_106',
@@ -414,11 +428,11 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     ownerId: 'user_owner_2',
     vetId: 'vet_1',
     serviceId: 'srv_2',
-    date: '2026-10-31',
+    date: TODAY_DATE || '2026-10-31',
     timeSlot: '09:00 - 09:30',
     initialSymptoms: 'ตัดไหมแผลผ่าตัดบริเวณหน้าท้องหลังทำหมัน แผลแห้งสนิท สุขภาพทั่วไปดีมาก',
     status: 'completed',
-    createdAt: '2026-10-29 11:00',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 08:00',
   },
   {
     id: 'apt_107',
@@ -438,11 +452,85 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     ownerId: 'user_owner_3',
     vetId: 'vet_3',
     serviceId: 'srv_2',
-    date: '2026-10-31',
+    date: TODAY_DATE || '2026-10-31',
     timeSlot: '14:00 - 14:30',
     initialSymptoms: 'ตรวจสุขภาพช่องปากและฟันกระต่าย ทานอาหารน้อยลง',
     status: 'confirmed',
-    createdAt: '2026-10-30 14:00',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 10:00',
+  },
+  // ================= Appointments for Tomorrow (วันถัดไป) =================
+  {
+    id: 'apt_201',
+    petId: 'pet_1',
+    ownerId: 'user_owner_1',
+    vetId: 'vet_1',
+    serviceId: 'srv_6',
+    date: TOMORROW_DATE || '2026-11-01',
+    timeSlot: '09:30 - 10:00',
+    initialSymptoms: 'นัดผ่าตัดทำหมันสุนัขเพศผู้ งดน้ำและอาหารล่วงหน้า 8 ชั่วโมง ตรวจเลือดเตรียมผ่าตัด',
+    status: 'confirmed',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 11:15',
+  },
+  {
+    id: 'apt_202',
+    petId: 'pet_3',
+    ownerId: 'user_owner_2',
+    vetId: 'vet_1',
+    serviceId: 'srv_1',
+    date: TOMORROW_DATE || '2026-11-01',
+    timeSlot: '11:00 - 11:30',
+    initialSymptoms: 'ติดตามผลการให้ยาลดอักเสบข้อกระดูกและการตอบสนองต่อการเดิน',
+    status: 'confirmed',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 14:20',
+  },
+  {
+    id: 'apt_203',
+    petId: 'pet_4',
+    ownerId: 'user_owner_2',
+    vetId: 'vet_1',
+    serviceId: 'srv_2',
+    date: TOMORROW_DATE || '2026-11-01',
+    timeSlot: '14:00 - 14:30',
+    initialSymptoms: 'ตรวจสุขภาพประจำปีทั่วไป ชั่งน้ำหนัก ตรวจช่องปาก และฉีดวัคซีนรวมแมว',
+    status: 'pending',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 16:00',
+  },
+  {
+    id: 'apt_204',
+    petId: 'pet_2',
+    ownerId: 'user_owner_1',
+    vetId: 'vet_2',
+    serviceId: 'srv_3',
+    date: TOMORROW_DATE || '2026-11-01',
+    timeSlot: '10:00 - 10:30',
+    initialSymptoms: 'ฉีดวัคซีนพิษสุนัขบ้าประจำปี สุขภาพแข็งแรงดี ไม่มีไข้',
+    status: 'confirmed',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 10:45',
+  },
+  {
+    id: 'apt_205',
+    petId: 'pet_5',
+    ownerId: 'user_owner_3',
+    vetId: 'vet_3',
+    serviceId: 'srv_8',
+    date: TOMORROW_DATE || '2026-11-01',
+    timeSlot: '15:00 - 15:30',
+    initialSymptoms: 'ตรวจฟันกระต่ายและขัดฟันหน้า สังเกตว่าเคี้ยวหญ้าลำบาก',
+    status: 'confirmed',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 12:30',
+  },
+  // ================= Appointments for Day After Tomorrow (มะรืนนี้) =================
+  {
+    id: 'apt_206',
+    petId: 'pet_3',
+    ownerId: 'user_owner_2',
+    vetId: 'vet_1',
+    serviceId: 'srv_1',
+    date: NEXT_2_DAYS || '2026-11-02',
+    timeSlot: '10:30 - 11:00',
+    initialSymptoms: 'ตรวจสัญญาณชีพและติดตามการฟื้นตัวของกล้ามเนื้อสะโพก',
+    status: 'confirmed',
+    createdAt: (TODAY_DATE || '2026-10-31') + ' 15:00',
   },
 ];
 
