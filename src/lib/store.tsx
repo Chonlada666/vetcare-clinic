@@ -71,7 +71,7 @@ interface ClinicContextType {
   // Auth & Session
   login: (userOrId: string | User) => void;
   logout: () => void;
-  quickSwitchUser: (role: UserRole) => void;
+  quickSwitchUser: (role: UserRole, specificVetId?: string) => void;
   addUser: (user: Omit<User, 'id'>) => User;
   updateUser: (id: string, data: Partial<User>) => void;
   deleteUser: (id: string) => void;
@@ -469,12 +469,109 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
 
       setIsLoaded(true);
+
+      // Real-Time Server Sync for Cross-Device Appointments
+      const syncAppointmentsWithServer = async () => {
+        try {
+          const res = await fetch('/api/appointments', { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.appointments)) {
+              setAppointments((prev) => {
+                const map = new Map<string, Appointment>();
+                json.appointments.forEach((a: Appointment) => map.set(a.id, a));
+                let hasUnsynced = false;
+                prev.forEach((localA) => {
+                  if (!map.has(localA.id)) {
+                    map.set(localA.id, localA);
+                    hasUnsynced = true;
+                    fetch('/api/appointments', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(localA),
+                    }).catch(() => {});
+                  }
+                });
+                return Array.from(map.values());
+              });
+            }
+          }
+        } catch (err) {
+          // Fallback silently to local cache
+        }
+      };
+
+      // Real-Time Server Sync for Users (Cross-Device Registration & Login)
+      const syncUsersWithServer = async () => {
+        try {
+          const res = await fetch('/api/users', { cache: 'no-store' });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.users)) {
+              setUsers((prev) => {
+                const map = new Map<string, User>();
+                json.users.forEach((u: User) => {
+                  map.set(u.id, u);
+                  if (u.email) map.set(u.email.toLowerCase(), u);
+                });
+                let hasUnsynced = false;
+                prev.forEach((localU) => {
+                  const key = localU.email ? localU.email.toLowerCase() : localU.id;
+                  if (!map.has(key) && !map.has(localU.id)) {
+                    map.set(localU.id, localU);
+                    hasUnsynced = true;
+                    fetch('/api/users', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(localU),
+                    }).catch(() => {});
+                  }
+                });
+                const seenIds = new Set<string>();
+                const list: User[] = [];
+                map.forEach((u) => {
+                  if (!seenIds.has(u.id)) {
+                    seenIds.add(u.id);
+                    list.push(u);
+                  }
+                });
+                return list;
+              });
+            }
+          }
+        } catch (err) {}
+      };
+
+      syncAppointmentsWithServer();
+      syncUsersWithServer();
+      const syncInterval = setInterval(() => {
+        syncAppointmentsWithServer();
+        syncUsersWithServer();
+      }, 8000);
+      const handleFocus = () => {
+        syncAppointmentsWithServer();
+        syncUsersWithServer();
+      };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('focus', handleFocus);
+      }
+
+      return () => {
+        clearInterval(syncInterval);
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('focus', handleFocus);
+        }
+      };
     };
 
-    initializeState();
+    let cleanupSync: (() => void) | undefined;
+    initializeState().then((cleanup) => {
+      cleanupSync = cleanup;
+    });
 
     return () => {
       unsubs.forEach((unsub) => unsub());
+      if (cleanupSync) cleanupSync();
     };
   }, []);
 
@@ -530,10 +627,25 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {}
   };
 
-  const quickSwitchUser = (role: UserRole) => {
-    let user = users.find((u) => u.role === role);
+  const quickSwitchUser = (role: UserRole, specificVetId?: string) => {
+    let user: User | undefined;
     if (role === 'vet') {
-      user = users.find((u) => u.role === 'vet' && u.name.includes('ปานวาด')) || user;
+      if (specificVetId) {
+        user = users.find(
+          (u) =>
+            u.id === specificVetId ||
+            u.id === `user_${specificVetId}` ||
+            (u.name && u.name.includes(specificVetId))
+        );
+      }
+      if (!user) {
+        user =
+          users.find((u) => u.role === 'vet' && (u.name.includes('กิตติศักดิ์') || u.id === 'user_vet_1')) ||
+          users.find((u) => u.role === 'vet' && u.name.includes('ปานวาด')) ||
+          users.find((u) => u.role === 'vet');
+      }
+    } else {
+      user = users.find((u) => u.role === role);
     }
     if (user) {
       setCurrentUser(user);
@@ -588,6 +700,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (e) {}
 
+    // Real-Time Cross-Device Server Sync (VPS Shared Storage)
+    fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser),
+    }).catch((err) => console.warn('Server sync error in addUser:', err));
+
     if (isFirebaseConfigured() && db) {
       try {
         setDoc(doc(db, 'users', newUser.id), sanitizeForFirestore(newUser)).catch((err) =>
@@ -613,6 +732,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {}
       return updated;
     });
+
+    // Real-Time Cross-Device Server Sync
+    fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...data }),
+    }).catch(() => {});
 
     if (currentUser?.id === id) {
       setCurrentUser((prev) => (prev ? { ...prev, ...data } : null));
@@ -816,6 +942,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       return updated;
     });
 
+    // Real-Time Cross-Device Server Sync (VPS Shared Storage)
+    fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newAppointment),
+    }).catch((err) => console.warn('Server sync error in createAppointment:', err));
+
     // Real-Time Cloud Firestore Sync
     if (isFirebaseConfigured() && db) {
       try {
@@ -833,6 +966,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     setAppointments((prev) =>
       prev.map((apt) => (apt.id === id ? { ...apt, status, notes: notes || apt.notes } : apt))
     );
+    // Real-Time Cross-Device Server Sync
+    fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, notes }),
+    }).catch(() => {});
+
     if (isFirebaseConfigured() && db) {
       try {
         updateDoc(doc(db, 'appointments', id), sanitizeForFirestore({ status, notes })).catch((err) =>
@@ -848,6 +988,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     setAppointments((prev) =>
       prev.map((apt) => (apt.id === id ? { ...apt, date, timeSlot, status: 'pending' } : apt))
     );
+    // Real-Time Cross-Device Server Sync
+    fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, date, timeSlot, status: 'pending' }),
+    }).catch(() => {});
+
     if (isFirebaseConfigured() && db) {
       try {
         updateDoc(doc(db, 'appointments', id), sanitizeForFirestore({ date, timeSlot, status: 'pending' })).catch(
@@ -863,6 +1010,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     setAppointments((prev) =>
       prev.map((apt) => (apt.id === id ? { ...apt, status: 'cancelled' } : apt))
     );
+    // Real-Time Cross-Device Server Sync
+    fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'cancelled' }),
+    }).catch(() => {});
+
     if (isFirebaseConfigured() && db) {
       try {
         updateDoc(doc(db, 'appointments', id), { status: 'cancelled' }).catch((err) =>

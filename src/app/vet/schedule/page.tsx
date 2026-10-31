@@ -38,9 +38,13 @@ export default function VetSchedulePage() {
   const { vets, appointments, pets, users, currentUser } = useClinic();
 
   // Automatically find the logged-in doctor profile
-  const myVet = vets.find(
+  const loggedInVet = vets.find(
     (v) => v.email === currentUser?.email || v.name.includes(currentUser?.name || '')
-  ) || vets[0];
+  );
+
+  const [selectedVetId, setSelectedVetId] = useState<string>(loggedInVet?.id || 'vet_1');
+
+  const myVet = vets.find((v) => v.id === selectedVetId) || loggedInVet || vets[0];
 
   const todayStr = (() => {
     const d = new Date();
@@ -102,6 +106,37 @@ export default function VetSchedulePage() {
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
             ตรวจสอบตารางเวลา คิวนัดหมาย และช่วงเวลาว่างของท่านในแต่ละวัน
           </p>
+        </div>
+      </div>
+
+      {/* Doctor Selection Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+        <div className="flex items-center gap-2">
+          <Stethoscope className="w-4 h-4 text-sky-400" />
+          <span className="text-xs sm:text-sm font-bold text-white">เลือกดูตารางออกตรวจของแพทย์:</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {vets.map((v) => {
+            const count = appointments.filter(
+              (a) => (a.vetId === v.id || a.vetId === v.name) && a.date === selectedDate && a.status !== 'cancelled'
+            ).length;
+            const isSelected = selectedVetId === v.id;
+            return (
+              <button
+                type="button"
+                key={v.id}
+                onClick={() => setSelectedVetId(v.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  isSelected
+                    ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                <img src={v.avatar} alt={v.name} className="w-4 h-4 rounded-full object-cover" />
+                <span>{v.name.split(' ')[1] || v.name} ({count} คิว)</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

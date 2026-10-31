@@ -92,7 +92,7 @@ function LoginForm() {
     else if (userRole === 'admin') router.push('/admin/dashboard');
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
@@ -103,7 +103,25 @@ function LoginForm() {
       return;
     }
 
-    const user = users.find((u) => u.email.toLowerCase() === cleanEmail);
+    let user = users.find((u) => u.email.toLowerCase() === cleanEmail);
+
+    // Cross-Device Server Check: If not found in local state, fetch from server API
+    if (!user) {
+      try {
+        const res = await fetch('/api/users', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.users)) {
+            user = json.users.find(
+              (u: any) => u.email && u.email.toLowerCase() === cleanEmail
+            );
+          }
+        }
+      } catch (err) {
+        console.warn('Live user fetch note:', err);
+      }
+    }
+
     if (!user) {
       setErrorMsg('ไม่พบบัญชีผู้ใช้นี้ในระบบ กรุณาตรวจสอบอีเมลหรือกดแท็บ "สมัครสมาชิกใหม่"');
       return;

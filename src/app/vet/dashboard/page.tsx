@@ -46,16 +46,24 @@ export default function VetDashboardPage() {
 
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
-  const activeVet =
-    vets.find(
-      (v) =>
-        (currentUser?.email && v.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
-        (currentUser?.name && (v.name.includes(currentUser.name) || currentUser.name.includes(v.name.split(' ')[1] || '')))
-    ) || vets[0];
-  const myAppointments = appointments.filter(
-    (a) => a.vetId === activeVet?.id || a.vetId === activeVet?.name
+  // Find which doctor matches currentUser, if any
+  const loggedInVet = vets.find(
+    (v) =>
+      (currentUser?.email && v.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (currentUser?.name && (v.name.includes(currentUser.name) || currentUser.name.includes(v.name.split(' ')[1] || '')))
   );
-  const selectedDateAppointments = myAppointments.filter((a) => a.date === selectedDate);
+
+  // Allow selecting specific doctor or 'all'
+  const [selectedVetId, setSelectedVetId] = useState<string>('all');
+
+  const activeVet = vets.find((v) => v.id === selectedVetId) || loggedInVet || vets[0];
+
+  const filteredAppointments = appointments.filter((a) => {
+    if (selectedVetId === 'all') return true;
+    return a.vetId === selectedVetId || (activeVet && a.vetId === activeVet.name);
+  });
+
+  const selectedDateAppointments = filteredAppointments.filter((a) => a.date === selectedDate);
   const waitingPatients = selectedDateAppointments.filter(
     (a) => a.status === 'pending' || a.status === 'in_treatment' || a.status === 'confirmed'
   );
@@ -67,8 +75,8 @@ export default function VetDashboardPage() {
       <section className="py-6 sm:py-8 text-center space-y-8 border-b border-slate-800/80">
         <div className="max-w-2xl mx-auto space-y-4">
           <img
-            src={activeVet.avatar}
-            alt={activeVet.name}
+            src={selectedVetId === 'all' ? (loggedInVet?.avatar || vets[0].avatar) : activeVet.avatar}
+            alt={selectedVetId === 'all' ? 'รวมทีมสัตวแพทย์' : activeVet.name}
             className="w-20 h-20 rounded-full object-cover border border-slate-700 mx-auto"
           />
           <div className="space-y-1">
@@ -76,10 +84,12 @@ export default function VetDashboardPage() {
               VETERINARIAN CLINICAL PORTAL
             </div>
             <h1 className="text-2xl sm:text-3xl font-light text-white tracking-wide">
-              {activeVet.name}
+              {selectedVetId === 'all' ? 'แดชบอร์ดคิวตรวจ (รวมทีมสัตวแพทย์ทุกท่าน)' : activeVet.name}
             </h1>
             <p className="text-slate-400 text-xs sm:text-sm">
-              {activeVet.specialty} &bull; ใบอนุญาตประกอบวิชาชีพ {activeVet.licenseNo}
+              {selectedVetId === 'all'
+                ? 'ระบบจัดการคิวตรวจผู้ป่วยและเวชระเบียนสัตว์แพทย์ VetCare Clinic'
+                : `${activeVet.specialty} • ใบอนุญาตประกอบวิชาชีพ ${activeVet.licenseNo}`}
             </p>
           </div>
 
@@ -130,7 +140,7 @@ export default function VetDashboardPage() {
               นัดหมายทั้งหมด
             </span>
             <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-              {myAppointments.length}
+              {filteredAppointments.length}
             </span>
             <span className="text-xs sm:text-sm font-bold text-slate-300">
               เคส
@@ -138,6 +148,48 @@ export default function VetDashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Doctor Filter Bar - Select Which Doctor's Queue to View */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-2">
+          <Stethoscope className="w-4 h-4 text-sky-400" />
+          <span className="text-xs sm:text-sm font-bold text-white">เลือกดูคิวตรวจของแพทย์:</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedVetId('all')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              selectedVetId === 'all'
+                ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            คิวตรวจรวมทุกแพทย์ ({appointments.filter((a) => a.date === selectedDate).length})
+          </button>
+          {vets.map((v) => {
+            const count = appointments.filter(
+              (a) => (a.vetId === v.id || a.vetId === v.name) && a.date === selectedDate
+            ).length;
+            const isSelected = selectedVetId === v.id;
+            return (
+              <button
+                type="button"
+                key={v.id}
+                onClick={() => setSelectedVetId(v.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  isSelected
+                    ? 'bg-sky-500 text-slate-950 font-black shadow-md ring-1 ring-sky-400'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                <img src={v.avatar} alt={v.name} className="w-4 h-4 rounded-full object-cover" />
+                <span>{v.name.split(' ')[1] || v.name} ({count})</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Date Filter Bar - Dynamic Date Picker with Quick Date Toggles */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
@@ -220,6 +272,7 @@ export default function VetDashboardPage() {
             {selectedDateAppointments.map((apt) => {
               const pet = pets.find((p) => p.id === apt.petId);
               const owner = users.find((u) => u.id === apt.ownerId);
+              const assignedVet = vets.find((v) => v.id === apt.vetId || v.name === apt.vetId);
 
               return (
                 <div key={apt.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -230,12 +283,18 @@ export default function VetDashboardPage() {
                       className="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-800"
                     />
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-bold text-white text-base">{pet?.name}</span>
                         <span className="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-semibold">
                           {pet?.species === 'อื่นๆ' && pet?.exoticType ? pet?.exoticType : pet?.species} ({pet?.breed || '-'})
                         </span>
                         <span className="text-[11px] text-slate-500 font-mono">Slot: {apt.timeSlot} น.</span>
+                        {assignedVet && (
+                          <span className="text-[11px] font-bold text-sky-300 bg-sky-950/70 px-2 py-0.5 rounded-md border border-sky-800/60 flex items-center gap-1">
+                            <Stethoscope className="w-3 h-3 text-sky-400" />
+                            <span>{assignedVet.name}</span>
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-slate-400 mt-0.5">
                         เจ้าของ: <strong className="text-white">{owner?.name}</strong> (โทร: {owner?.phone})

@@ -41,12 +41,16 @@ const TIME_SLOTS = [
 export default function OwnerAppointmentsPage() {
   const { currentUser, appointments, pets, vets, services, bills, rescheduleAppointment, cancelAppointment } = useClinic();
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [showAllDeviceBookings, setShowAllDeviceBookings] = useState(false);
   const [rescheduleApt, setRescheduleApt] = useState<Appointment | null>(null);
   const [newDate, setNewDate] = useState('');
   const [newTimeSlot, setNewTimeSlot] = useState('');
 
   const myAppointments = appointments
-    .filter((a) => a.ownerId === currentUser?.id)
+    .filter((a) => {
+      if (showAllDeviceBookings || !currentUser) return true;
+      return a.ownerId === currentUser?.id;
+    })
     .filter((a) => (filterStatus === 'all' ? true : a.status === filterStatus))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -109,27 +113,41 @@ export default function OwnerAppointmentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 pt-1">
-        {[
-          { key: 'all', label: 'ทั้งหมด' },
-          { key: 'pending', label: 'รอดำเนินการ' },
-          { key: 'confirmed', label: 'ยืนยันคิว' },
-          { key: 'in_treatment', label: 'กำลังตรวจ' },
-          { key: 'completed', label: 'เสร็จสิ้น' },
-          { key: 'cancelled', label: 'ยกเลิก' },
-        ].map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilterStatus(f.key)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-              filterStatus === f.key
-                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
-                : 'bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { key: 'all', label: 'ทั้งหมด' },
+            { key: 'pending', label: 'รอดำเนินการ' },
+            { key: 'confirmed', label: 'ยืนยันคิว' },
+            { key: 'in_treatment', label: 'กำลังตรวจ' },
+            { key: 'completed', label: 'เสร็จสิ้น' },
+            { key: 'cancelled', label: 'ยกเลิก' },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilterStatus(f.key)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                filterStatus === f.key
+                  ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/25 ring-2 ring-sky-400/30'
+                  : 'bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowAllDeviceBookings(!showAllDeviceBookings)}
+          className={`text-xs px-3 py-1.5 rounded-xl border transition cursor-pointer font-semibold ${
+            showAllDeviceBookings
+              ? 'bg-sky-500/20 text-sky-300 border-sky-500/50'
+              : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+          }`}
+        >
+          {showAllDeviceBookings ? '✓ แสดงคิวทั้งหมดในระบบ' : 'แสดงคิวนัดหมายทั้งหมดในระบบ'}
+        </button>
       </div>
 
       {/* Appointments List */}

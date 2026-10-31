@@ -78,17 +78,54 @@ export function DemoRoleBar() {
           <span>เจ้าของสัตว์เลี้ยง</span>
         </button>
 
-        <button
-          onClick={() => handleSwitch('vet', '/vet/dashboard')}
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition font-medium cursor-pointer ${
-            currentUser?.role === 'vet'
-              ? 'bg-sky-600 text-white shadow-xs'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-          }`}
-        >
-          <Stethoscope className="w-3.5 h-3.5" />
-          <span>สัตวแพทย์</span>
-        </button>
+        {/* Vet Direct Switchers: หมอกิต / หมอป่าน / หมอนก */}
+        <div className="flex items-center gap-1 bg-slate-800/90 p-0.5 rounded-lg border border-slate-700/80">
+          <button
+            onClick={() => {
+              quickSwitchUser('vet', 'user_vet_1');
+              if (!pathname.startsWith('/vet')) router.push('/vet/dashboard');
+            }}
+            title="เข้าสู่ระบบในฐานะ น.สพ. กิตติศักดิ์ (หมอกิต)"
+            className={`flex items-center gap-1 px-2 py-1 rounded-md transition font-semibold cursor-pointer text-[11px] ${
+              currentUser?.role === 'vet' && (currentUser?.name?.includes('กิตติศักดิ์') || currentUser?.id === 'user_vet_1')
+                ? 'bg-sky-500 text-slate-950 font-black shadow-xs'
+                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            <Stethoscope className="w-3 h-3" />
+            <span>หมอกิต</span>
+          </button>
+
+          <button
+            onClick={() => {
+              quickSwitchUser('vet', 'user_vet_2');
+              if (!pathname.startsWith('/vet')) router.push('/vet/dashboard');
+            }}
+            title="เข้าสู่ระบบในฐานะ สพ.ญ. ปานวาด (หมอป่าน)"
+            className={`flex items-center gap-1 px-2 py-1 rounded-md transition font-semibold cursor-pointer text-[11px] ${
+              currentUser?.role === 'vet' && currentUser?.name?.includes('ปานวาด')
+                ? 'bg-sky-500 text-slate-950 font-black shadow-xs'
+                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            <span>หมอป่าน</span>
+          </button>
+
+          <button
+            onClick={() => {
+              quickSwitchUser('vet', 'user_vet_3');
+              if (!pathname.startsWith('/vet')) router.push('/vet/dashboard');
+            }}
+            title="เข้าสู่ระบบในฐานะ น.สพ. ธนกฤต (หมอนก)"
+            className={`flex items-center gap-1 px-2 py-1 rounded-md transition font-semibold cursor-pointer text-[11px] ${
+              currentUser?.role === 'vet' && currentUser?.name?.includes('ธนกฤต')
+                ? 'bg-sky-500 text-slate-950 font-black shadow-xs'
+                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            <span>หมอนก</span>
+          </button>
+        </div>
 
         <button
           onClick={() => handleSwitch('admin', '/admin/dashboard')}
