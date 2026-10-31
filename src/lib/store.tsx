@@ -268,67 +268,24 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
               const activeU = (parsed.users || INITIAL_USERS).find((user: User) => user.id === activeSessionId);
               setCurrentUser(activeU || null);
             } else {
-              if (typeof window !== 'undefined') {
-                const p = window.location.pathname;
-                const userList = parsed.users || INITIAL_USERS;
-                if (p.startsWith('/vet')) {
-                  const fallbackVet = userList.find((u: User) => u.role === 'vet') || INITIAL_USERS.find((u) => u.role === 'vet');
-                  if (fallbackVet) {
-                    setCurrentUser(fallbackVet);
-                    sessionStorage.setItem(SESSION_USER_KEY, fallbackVet.id);
-                  }
-                } else if (p.startsWith('/admin')) {
-                  const fallbackAdmin = userList.find((u: User) => u.role === 'admin') || INITIAL_USERS.find((u) => u.role === 'admin');
-                  if (fallbackAdmin) {
-                    setCurrentUser(fallbackAdmin);
-                    sessionStorage.setItem(SESSION_USER_KEY, fallbackAdmin.id);
-                  }
-                } else if (p.startsWith('/owner')) {
-                  const fallbackOwner = userList.find((u: User) => u.role === 'owner') || INITIAL_USERS.find((u) => u.role === 'owner');
-                  if (fallbackOwner) {
-                    setCurrentUser(fallbackOwner);
-                    sessionStorage.setItem(SESSION_USER_KEY, fallbackOwner.id);
-                  }
-                } else {
-                  setCurrentUser(null);
-                }
-              } else {
-                setCurrentUser(null);
-              }
+              setCurrentUser(null);
             }
           } catch {
             setCurrentUser(null);
           }
         } else {
-          if (typeof window !== 'undefined') {
-            const p = window.location.pathname;
-            const activeSessionId = sessionStorage.getItem(SESSION_USER_KEY) || localStorage.getItem(SESSION_USER_KEY);
-            const userList = INITIAL_USERS;
+          try {
+            const activeSessionId =
+              typeof window !== 'undefined'
+                ? sessionStorage.getItem(SESSION_USER_KEY) || localStorage.getItem(SESSION_USER_KEY)
+                : null;
             if (activeSessionId) {
-              const activeU = userList.find((u: User) => u.id === activeSessionId);
+              const activeU = INITIAL_USERS.find((u: User) => u.id === activeSessionId);
               setCurrentUser(activeU || null);
-            } else if (p.startsWith('/vet')) {
-              const fallbackVet = userList.find((u: User) => u.role === 'vet');
-              if (fallbackVet) {
-                setCurrentUser(fallbackVet);
-                sessionStorage.setItem(SESSION_USER_KEY, fallbackVet.id);
-              }
-            } else if (p.startsWith('/admin')) {
-              const fallbackAdmin = userList.find((u: User) => u.role === 'admin');
-              if (fallbackAdmin) {
-                setCurrentUser(fallbackAdmin);
-                sessionStorage.setItem(SESSION_USER_KEY, fallbackAdmin.id);
-              }
-            } else if (p.startsWith('/owner')) {
-              const fallbackOwner = userList.find((u: User) => u.role === 'owner');
-              if (fallbackOwner) {
-                setCurrentUser(fallbackOwner);
-                sessionStorage.setItem(SESSION_USER_KEY, fallbackOwner.id);
-              }
             } else {
               setCurrentUser(null);
             }
-          } else {
+          } catch {
             setCurrentUser(null);
           }
         }

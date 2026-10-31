@@ -37,26 +37,8 @@ export function Navbar() {
 
   const isAuthPage = pathname === '/login' || pathname === '/register';
 
-  // Fallback active user if currentUser is null or uninitialized on role-specific routes
-  const roleFromPath = pathname?.startsWith('/vet')
-    ? 'vet'
-    : pathname?.startsWith('/admin')
-    ? 'admin'
-    : pathname?.startsWith('/owner')
-    ? 'owner'
-    : null;
-
-  const fallbackUser = roleFromPath
-    ? (users && users.find((u) => u.role === roleFromPath)) ||
-      INITIAL_USERS.find((u) => u.role === roleFromPath) ||
-      null
-    : null;
-
-  const activeUser = isAuthPage
-    ? null
-    : currentUser && (!roleFromPath || currentUser.role === roleFromPath)
-    ? currentUser
-    : fallbackUser || currentUser;
+  // แสดงเฉพาะผู้ใช้ที่เข้าสู่ระบบจริงเท่านั้น หากออกจากระบบแล้ว activeUser จะเป็น null ไม่นำ fallback mock มาแสดง
+  const activeUser = isAuthPage ? null : currentUser;
 
   // Profile Edit Modal State
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -132,7 +114,7 @@ export function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   // Count pending bills for current owner
@@ -319,6 +301,18 @@ export function Navbar() {
                       <LogOut className="w-4 h-4" />
                     </button>
                   </div>
+                </div>
+              )}
+
+              {!activeUser && !isAuthPage && (
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/login"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl text-xs transition cursor-pointer shadow-md shadow-sky-500/20"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>เข้าสู่ระบบ</span>
+                  </a>
                 </div>
               )}
 
